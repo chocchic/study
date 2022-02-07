@@ -2,10 +2,10 @@
 2회 블록체인기반 핀테크 서비스 개발자 양성 내용 정리
 
 ## 계획
-	자바 			   3주
-	html,css,javascript,sql      2주
-	jsp X, 프레임워크(spring) 	 3주
-	팀 프로젝트		         3주
+	자바				   3주
+	html,css,javascript,sql		    2주
+	jsp X, 프레임워크(spring)		3주
+	팀 프로젝트				3주
 	데드라인 : 4월 29일(발표)
 
 ## 기록
