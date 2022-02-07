@@ -1,5 +1,5 @@
 # javajavajava : 블록체인기반 핀테크 서비스 개발자 양성
-[이클립스 패키지](https://www.eclipse.org/downloads/packages)
+
 #### 1. 스케줄
 	자바 				   3주
 	html,css,javascript,sql		    2주
@@ -21,7 +21,7 @@
 		cmd 켜서 java -version, java, javac 쳐서 자바 설정 확인 < jdk 설치가 되었는지 확인
 	
 	2) 이클립스 eclipse
-		[이클립스 패키지](https://www.eclipse.org/downloads/packages) > EE버전으로 다운(윈도우용인지 확인) > 작업 폴더에 압축해제
+		<https://www.eclipse.org/downloads/packages> > EE버전으로 다운(윈도우용인지 확인) > 작업 폴더에 압축해제
 		실행 > browse로 workspace 미리 만들어놓은 곳으로 변경
 		오른편 위 + 표시 아이콘 클릭해서 java환경으로 바꾸기(open perspective -> java로 선택, 확인)
 		window -> preferences -> encoding 검색 -> content types빼고 다 encoding을 UTF-8로 변경(원래는 Korean~뭘로 되어있을 것)
