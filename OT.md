@@ -11,7 +11,7 @@
 	0) 구글 크롬 브라우저 > 다운, 설치(기본브라우저설정)
 	
 	1) jdk11 설치
-		구글 > jdk 검색 >https://www.oracle.com/java/technologies/downloads/ >jdk11 다운
+		구글 > jdk 검색 > https://www.oracle.com/java/technologies/downloads/ >jdk11 다운
 		설치(계속 next)
 		환경변수 설정
 			내PC(우클릭) or 윈도우버튼(우클릭) > 설정 > 고급시스템 설정 >시스템 변수 밑 새로만들기
@@ -21,7 +21,7 @@
 		cmd 켜서 java -version, java, javac 쳐서 자바 설정 확인 < jdk 설치가 되었는지 확인
 	
 	2) 이클립스 eclipse
-		[이클립스 패키지](https://www.eclipse.org/downloads/packages/) > EE버전으로 다운(윈도우용인지 확인) > 작업 폴더에 압축해제
+		[이클립스 패키지](https://www.eclipse.org/downloads/packages) > EE버전으로 다운(윈도우용인지 확인) > 작업 폴더에 압축해제
 		실행 > browse로 workspace 미리 만들어놓은 곳으로 변경
 		오른편 위 + 표시 아이콘 클릭해서 java환경으로 바꾸기(open perspective -> java로 선택, 확인)
 		window -> preferences -> encoding 검색 -> content types빼고 다 encoding을 UTF-8로 변경(원래는 Korean~뭘로 되어있을 것)
