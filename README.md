@@ -1,5 +1,4 @@
-# javajavajava
-블록체인기반 핀테크 서비스 개발자 양성
+# javajavajava : 블록체인기반 핀테크 서비스 개발자 양성
 1. 스케줄
 	자바 			3주
 	html,css,javascript,sql 	2주
