@@ -1,15 +1,13 @@
 # javajavajava : 블록체인기반 핀테크 서비스 개발자 양성
 
 1. 스케줄  
-***
-	자바 				   3주
-	html,css,javascript,sql		    2주
-	jsp X, 프레임워크(spring)		3주
-	팀 프로젝트				3주
+	자바 				   3주  
+	html,css,javascript,sql		    2주  
+	jsp X, 프레임워크(spring)		3주  
+	팀 프로젝트				3주  
 	4월29일 프로젝트 발표
 	
 2. 개발환경 설정  
-***
 	0) 구글 크롬 브라우저 > 다운, 설치(기본브라우저설정)  
 	
 	1) jdk11 설치  
@@ -34,7 +32,6 @@
 	   	  클래스 이름은 항상 대문자  
 
 3. 자바란  
-***
 	Test01.java -> 컴파일(컴파일러) -> Test01.class -> JVM(Java Virtual Machine)이 실행  
 	절차지향 언어 : c 언어  
 	객체지향 언어 : java, C++  
