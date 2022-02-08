@@ -84,9 +84,9 @@
 			```java
 			if(condition) {
 				//조건식이 참일 때 실행할 코드 작성
-			}esle if(condition2){
+			}else if(condition2){
 				//조건식2가 참일때 실행할 코드 작성
-			}esle if(condition3){
+			}else if(condition3){
 				//조건식3가 참일때 실행할 코드 작성
 			}else{
 				//위 조건들이 모두 성립되지 않을 때 뭔가 실행해야하면 else를 붙여서 코드 작성
