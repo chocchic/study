@@ -119,9 +119,9 @@
 			- 가능 변수 타입 : int, char, String  
 			- case 다음에는 반드시 값이 하나 와야한다  
 			* 예외 : 아래는 가능하다  
-				```java
-				case 값1 : case 값2 : 
-					...
-					break;
-				```  
+```java
+case 값1 : case 값2 : 
+	...
+	break;
+```  
 			- default 생략 가능  
