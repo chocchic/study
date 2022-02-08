@@ -7,9 +7,13 @@
 			ex ) import java.util.Scanner;
 			+ 클래스밖 패키지 밑에 선언
 		2. Scanner 객체 생성
+			```java
 			Scanner sc = new Scanner(System.in);
+			```
 		3. 입력받기
+			```java
 			sc.nextLine(); // 문자열 String 타입으로 return. 입력 받고 싶은 만큼 계속 사용 가능.
-			ex) String 변수명 = sc.nextLine();
+			String 변수명 = sc.nextLine();
+			```
 		4. Scanner 객체 닫기
 			sc.close();
