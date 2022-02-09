@@ -24,6 +24,12 @@
 		4. Scanner 객체 닫기  
 			```java
 			sc.close();
+			```
+	3) String 값 형변환  
+		String -> int : Integer.parseInt(String 값);  
+		String -> double : Double.parseDouble((String 값);  
+		String -> float : float.parsefloat(String 값);  
+		
 2. 연산자 operator
 	1) 종류  
 		단항연산자		: +(양수) -(음수) ++ -- !  
