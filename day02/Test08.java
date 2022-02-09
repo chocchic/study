@@ -26,11 +26,11 @@ public class Test08 {
 		System.out.println("³ªÀÌ¸¦ ÀÔ·ÂÇÏ¼¼¿ä : ");
 		String def = sc.nextLine();
 		
-		//3. 입력받기
+		//형변환
 		//String은 참조형이므로 변환X(String는 클래스)
 		//int defInt = (int) def;
 		// 그래서 위에서 에러 발생
-		// String -> int·다른 무언가를 활용해서 변환.
+		// String -> int : Integer.parseInt(String 값); 이용해서 값 변환
 		int defInt = Integer.parseInt(def);
 		//한줄로입력받기
 		int age = Integer.parseInt(sc.nextLine());
