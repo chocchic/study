@@ -32,9 +32,18 @@ public class Test29 {
 		System.out.println("최대값 : " + max);
 			
 		for(int i = 0; i< arr.length;i++) {
-			if(min>arr[i]) max = arr[i];
+			if(min>arr[i]) min = arr[i];
 			
 		}
+		System.out.println("최소값 : " + min);
+		
+		//축약
+		for(int i = 0; i< arr.length;i++) {
+			if(max<arr[i]) max = arr[i];
+			if(min>arr[i]) min = arr[i];
+			
+		}
+		System.out.println("최대값 : " + max);
 		System.out.println("최소값 : " + min);
 	}
 }
