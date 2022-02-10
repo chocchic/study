@@ -25,22 +25,15 @@ public class Test29 {
 		
 		// 문제 : 최대값과 최소값을 구해보세요
 		int[] arr = {79,85,12,120,4,95};
-		int max=0,min=0;
+		int max=0,min=79;
 		for(int i = 0; i< arr.length-1;i++) {
-			for(int j = 1;j<arr.length;j++) {
-				if(arr[i] > arr[j]) {
-					max = arr[i];
-				}
-			}
+			if(max<arr[i]) max = arr[i];
 		}
 		System.out.println("최대값 : " + max);
 			
 		for(int i = 0; i< arr.length-1;i++) {
-			for(int j = 1;j<arr.length;j++) {
-				if(arr[i] < arr[j]) {
-					min = arr[i];
-				}
-			}
+			if(min>arr[i]) max = arr[i];
+			
 		}
 		System.out.println("최소값 : " + min);
 	}
