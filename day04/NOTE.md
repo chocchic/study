@@ -6,6 +6,7 @@
 		int[][] arr;
 		arr = new int[행의개수][열의개수];
 	    	```  
+		
 		* 선언 + 생성 
 		```java
 		int [][] arr = new int[행의개수][열의개수]; 
