@@ -63,10 +63,8 @@ public class Test43 {
 	    int[] scores = new int[5];
 	    for(int i = 0; i < 5; i++) {
 	    	System.out.println("이름과 점수를 입력하세요");
-	    	String user = sc.nextLine();
-	    	int score = Integer.parseInt(sc.nextLine());
-	    	users[i] = user;
-	    	scores[i] = score;
+	    	users[i]= sc.nextLine();
+	    	scores[i] = Integer.parseInt(sc.nextLine());
 	    }
 		
 	    // 문제2-2. 위 저장된 users와 scores를 아래와 같은 형태로 출력해보세요. 
@@ -85,9 +83,9 @@ public class Test43 {
 	      // 문제2-3. 두번째 유저의 점수와 세번째 유저의 점수가 바뀌어 저장되었다 하네요.
 	      //         교환해서 저장해주세요. 
 	    int tmp;
-	    tmp = scores[2];
-	    scores[2] = scores[3];
-	    scores[3] = tmp;
+	    tmp = scores[1];
+	    scores[1] = scores[2];
+	    scores[2] = tmp;
 	    System.out.println("user_name\tscore");
 	    System.out.println("---------------------");
 	    for(int i = 0;i<users.length;i++) {
@@ -114,7 +112,7 @@ public class Test43 {
 	    		  }
 	    	  }
 	      }
-	      System.out.println("rank\tuser_name\tscore");
+	      System.out.println("rank\t user_name\tscore");
 		    System.out.println("----------------------------");
 		    for(int i = 0;i<users.length;i++) {
 		    	System.out.println((i+1)+"\t"+users[i]+"\t\t"+scores[i]);
@@ -128,9 +126,19 @@ public class Test43 {
 			int newscore = Integer.parseInt(sc.nextLine());
 			String newusers[] =Arrays.copyOf(users,users.length+1);
 			int newscores[] =Arrays.copyOf(scores,scores.length+1);
+			/*
+			String newusers[]= users;
+			users = new String[6];
+			int newscores[] = scores;
+			scores = new int[6]
+			for(int i = 0; i< user.length-1;i++){
+				users = newusers[i];
+				scores = newscores[i];
+			}
+			*/
 			newusers[5] = newuser;
 			newscores[5] = newscore;
-			users = newusers; scores = newscores;
+			users = newusers; scores = newscores; //주소값 바꾸기
 
 		    for(int i = 0; i< scores.length-1;i++) {
 		    	for(int j = i+1;j<scores.length;j++) {
