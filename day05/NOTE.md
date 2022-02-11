@@ -55,17 +55,21 @@
 
 	6) 인스턴스(객체) 생성  
 		+ 선언  
+		
 		클래스명 참조변수명;  
-    		```java
+		```java
 		Scanner sc;
-    		```
+		```
 
 		+ 생성  
+
 		참조변수명 = new 클래스명(); //참조 변수에 주소 저장  
 		```java
     		sc = new Scanner(System.in);
-    		```
+    		```  
+		
 		+ 선언 + 생성  
+		
 		클래스명 참조변수명 = new 클래스명();  
 		```java
 		Scanner sc = new Scanner(System.in);
