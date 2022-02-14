@@ -59,21 +59,28 @@ public class Test45 {
 				System.out.println(count + " >> ");
 				int answer = Integer.parseInt(sc.nextLine());
 				if(answer > sol) {
-					if(max>answer) max=answer;
+					if(max>=answer) max=answer-1;
 					System.out.println("\"Down\" : "+min+" ~ "+ max);
 					count++;
-				}else if(answer < sol) {
-					if(min<answer) min = answer;
+				}else if(answer <= sol) {
+					if (min <= answer) min = answer+1;
 					System.out.println("\"Up\" : "+min+ " ~ " + max);
 					count++;
 				}else {
 					System.out.println("맞았습니다. 다시 시작하시겠습니까?(y/n)  >>");
-					String e = sc.nextLine();
-					if(e.equals("n")) {
-						System.out.println("게임 종료!");
-						exit = true;
+					while(true) {
+						String e = sc.nextLine();
+						if(e.equals("n")) {
+							System.out.println("게임 종료!");
+							exit = true;
+							break;
+						}else if(e.equals("y")) {
+							correct = true;
+							break;
+						}else{
+							System.out.println("다시 입력하세요");
+						}
 					}
-					correct = true;
 				}
 			}
 		}
