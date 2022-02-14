@@ -59,11 +59,11 @@ public class Test45 {
 				System.out.println(count + " >> ");
 				int answer = Integer.parseInt(sc.nextLine());
 				if(answer > sol) {
-					;max=answer;
+					if(max>answer) max=answer;
 					System.out.println("\"Down\" : "+min+" ~ "+ max);
 					count++;
 				}else if(answer < sol) {
-					min = answer;
+					if(min<answer) min = answer;
 					System.out.println("\"Up\" : "+min+ " ~ " + max);
 					count++;
 				}else {
