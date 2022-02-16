@@ -12,7 +12,7 @@ class TicTacToe {
 	public TicTacToe() {
 		sc = new Scanner(System.in);
 	}
-	void boardReset() {
+	void boardReset() { // 보드 처음 세팅하는 메서드 
 		for(int i = 0; i < NUM_BOARD; i++) {
 			theBoard[i] = " ";
 		}
