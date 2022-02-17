@@ -31,8 +31,7 @@
 		}
 		```
 	
-	5) 추상클래스는 객체 생성 불가.
-		**불완전한/ 미완성인 클래스**
+	5) 추상클래스는 객체 생성 불가 **불완전한/ 미완성인 클래스**
 		```java
 		//Shape S = new Shape() // 에러
 		Shape S; // 가능
@@ -61,3 +60,71 @@
 			}
 			new Rect(); // 가능
 			```
+3. 인터페이스 interface : 규격  
+	1) 키워드 :  interface  
+		```java 
+		interface PhoneInterface {
+			// 내용 ...
+		}
+		```
+	2) 인터페이스 멤버는 추상메서드와 상수만으로 구성  
+		```java
+		interface PhoneInterface {
+			public static final 타입 상수명; // 상수
+			public static final int BUTTONS = 20;
+			public abstract 리턴타입 메서드명(); // 추상 메서드만
+			public abstract void sendCall();
+			public abstract void receiveCall();
+		}
+		```
+	* 인터페이스 멤버는 누구나 접근가능하게 모두 public 접근지정자로 만듬  
+	3) 모든 메서드는 public abstract이며, 생략 가능  
+	4) 상수는 public static final이며, 생략가능하다.  
+		```java
+		interface PhoneInterface {
+			int BUTTONS = 20; // 상수
+			//추상 메서드
+			void sendCall();
+			void receiveCall();
+		}
+		```
+	5) 인터페이스로 객체 생성 불가능.  
+	    메서드는 모두 구현이 전혀 안된(미완성인) 추상체 메서드  
+	6) 인터페이스로 레퍼런스 변수 선언은 가능  
+		```java
+		PhoneInterface iPhone; (O)
+		new PhoneInterface(); (X)
+		```
+	7) 인터페이스 상속  
+		인터페이스는 다른 인터페이스를 상속 받을 수 있다.  
+		인터페이스는 규격과 같은 것으로, 상속을 통해 기존 인터페이스에 새로운 규격을 추가한 새로운 인터페이스를 만들 수 있다.  
+		extends 키워드 사용  
+		```java
+		interface MobilePhoneInterface extends PhoneInterface { // + PhoneInterface의 변수와 메서드
+			void sendSMS();
+			void receiveSMS();
+		}
+		```
+		- **인터페이스는 다중상속 허용**
+		```java
+		interface DualCameraPhoneInterface extends PhoneInterface, CameraInterface {
+			// PhoneInterface와 CameraInterface의 변수와 메서드	
+			void makeVideo();
+		}
+		```
+	8) 인터페이스 구현 (사용하기)
+		- 인터페이스의 추상메서드를 모두 구현한 클래스를 작성하는 것  
+		- 키워드 : implements
+		```java
+		class IPhone implements MobilePhoneInterface { // 일반 클래스로만 구현 가능
+			// 추상메서드 모두 구현
+			public void sendCall(){ ... }
+			public void receiveCall(){ ... }
+			public void sendSMS() { ... }
+			public void receiveSMS() { ... }
+			// 추가적으로 일반 메서드나 변수 작성
+			public int getButtons() { ... }
+		}
+		```  
+		**추상 메서드중 하나라도 구현을 안하면 에러**  
+	9) 인터페이스의 목적  
