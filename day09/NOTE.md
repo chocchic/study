@@ -13,11 +13,16 @@
 2. 추상 클래스  
 	1) 개발할 때, 밑그림을 그리는 것. 설계 쪽에 해당  
 	2) 키워드 : abstract  
-	3) 추상메서드 : abstract 키워드를 붙혀 메서드의 선언부만 있고, 구현부({코드작성...})은 되어있지 않은 상태  
+	3) 추상메서드  
+		abstract 키워드를 붙혀 메서드의 선언부만 있고, 구현부({코드작성...})은 되어있지 않은 상태  
     	```java
     	public abstract String getName();
 	public abstract void setName(String str);
 	//public abstract void getName() {} // 에러, 중괄호도 X
     	```
+	
 	4) 추상클래스  
+		일반 멤버들과 함께 추상 메서드를 포함하는 클래스  
+		추상 메서드가 하나라도 있으면 무조건 추상 클래스  
+		클래스 앞에 abstract 붙이기  
 		
