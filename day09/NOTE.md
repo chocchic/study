@@ -17,9 +17,9 @@
 		abstract 키워드를 붙혀 메서드의 선언부만 있고, 구현부({코드작성...})은 되어있지 않은 상태  
     	```java
     	public abstract String getName();
-	public abstract void setName(String str);
-	//public abstract void getName() {} // 에러, 중괄호도 X
-    	```
+        public abstract void setName(String str);
+        //public abstract void getName() {} // 에러, 중괄호도 X
+        ```
 	
 	4) 추상클래스  
 		일반 멤버들과 함께 추상 메서드를 포함하는 클래스  
