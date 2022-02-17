@@ -14,27 +14,51 @@
 	2) 키워드 : abstract  
 	3) 추상메서드  
 		abstract 키워드를 붙혀 메서드의 선언부만 있고, 구현부({코드작성...})은 되어있지 않은 상태  
-    	```java
-    	public abstract String getName();
-        public abstract void setName(String str);
-        //public abstract void getName() {} // 에러, 중괄호도 X
-        ```
+    ```java
+    public abstract String getName();
+    public abstract void setName(String str);
+    public abstract void getName() {} // 에러, 중괄호도 X
+    ```
 	
 	4) 추상클래스  
 		- 일반 멤버들과 함께 추상 메서드를 포함하는 클래스  
 		- 추상 메서드가 하나라도 있으면 무조건 추상 클래스  
 		- 클래스 앞에 abstract 붙이기  
-	```java
-	abstract class Shape {
-		...
-		abstract void draw(); //추상 메서드
-	}
-	```
+		```java
+		abstract class Shape {
+			...
+			abstract void draw(); //추상 메서드
+		}
+		```
 	
 	5) 추상클래스는 객체 생성 불가.
 		**불완전한/ 미완성인 클래스**
-	```java
-        //Shape S = new Shape() // 에러
-        Shape S; // 가능
-        ```
+		```java
+		//Shape S = new Shape() // 에러
+		Shape S; // 가능
+		```	 
+	6) 상속에서 수퍼클래스로 사용된다. 부모클래스가 될 수 있음. extends  
+	7) 추상클래스를 물려받은 서브클래스를 완성시키려면, 추상메서드를 오버라이딩 해야한다.  
+		 추상클래스를 단순히 상속만 받은 서브 클래스는 그 또한 추상클래스가 된다.  
+		 구현을 하지 않는다면 클래스 앞에 abstract 키워드를 붙혀줘야한다.
+		 * 추상클래스 단순 상속
+		 	```java
+			abstract class Rect extends Shape { // 추상draw();
+				int width;
+				...
+			}
+			new Rect(); // error
+			```
+		 * 추상클래스를 사용할 때 -> 상속받아 구현 완성
+		 	```java
+			class Rect extends Shape {
+				int width;
+				...
+				@Override
+				void draw() {
+					// 추상메서드 구현코드 작성
+				}
+			}
+			new Rect(); // 가능
+			```
 		
