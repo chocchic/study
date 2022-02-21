@@ -80,7 +80,8 @@
 			- boolean equals(String str) : 문자열 값 비교  
 			- int compareTo(String str) : 사전 순비교, 같으면 0, 현재가 먼저 음수, 아니면 양수.  
 			- int length() : 문자열 길이 리턴  
-			- String replace(CharSequence target, CharSequence repl) : target문자열이 repl문자열로 대치된 새로운 문자열 리턴. 다른 변수에 대입해주어야 보존할 수 있다.  
+			- String replace(CharSequence target, CharSequence repl) : target문자열이 repl문자열로 대치된 새로운 문자열 리턴.  
+										   다른 변수에 대입해주어야 보존할 수 있다.  
 			- String[] split(String regex) : 정규식 regex를 구분자로 문자열을 나눠서 배열에 담아 리턴  
 			- String subString(int beginIndex) : beginIndex부터 시작하여 이어지는 문자열을 리턴  
 			- String toLowerCase() : 전체를 소문자로 리턴  
