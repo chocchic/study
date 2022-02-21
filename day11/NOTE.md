@@ -133,4 +133,6 @@
 		
 		**객체 생성(X)**  
 		Calendar now = Calendar.getInstance();  
-	2) Date 클래스
+	2) Date 클래스  
+		단일 클래스, 객체생성 가능  
+		각 값에대한 get/set메서드로 바로 사용가능  
