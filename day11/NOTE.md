@@ -29,3 +29,30 @@
 2. API Application Programming Interface  
 	자바에서 제공하는 기본 패키지를 Java API라고 한다.
 	![javapackage](./javapackage.jpg)
+	
+	1) API 문서  
+		- Java SE : https://docs.oracle.com/en/java/javase/11/docs/api/  
+		- Java EE (웹) : https://javaee.github.io/javaee-spec/javadocs/  
+	2) API  
+		java.awt 		: GUI  
+		java.beans		: == 컴포넌트 클래스  
+		java.io			: Input/Output(I/O), 입출력관련. File  
+		java.lang		: 기본 패키지 *  
+		java.math		: 기본 연산이외에 더 다양한 연산이 필요할 때 사용하는 패키지  
+		java.net		: 네트워크 관련  
+		java.nio		: new I/O  
+		java.security		: 보안 관련  
+		java.sql		: 데이터베이스 (*)  
+		java.text		: 글자 관련(폰트 색깔)  
+		java.util		: 배열 대신 사용할 것. 날짜, 벡터, 해시맵, 데이터 저장 등  
+
+		javax.~ : 서포트하는 패키지  
+		그외  
+		구글 API  
+		네이버 API : https://deveploers.naver.com/main/  
+		카카오 API : https://deveploers.kakao.com/  
+		공공데이터 포털 : https://www.data.go.kr/  
+
+3. java.lang
+	
+	
