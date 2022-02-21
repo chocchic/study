@@ -115,6 +115,22 @@
 		random, round등 숫자 연산 관련
 
 4. java.util
-	1) Calender 클래스
-	
+	1) Calender 클래스  
+		추상클래스  
+		년, 월, 일, 요일, 시간, 분, 초, 밀리초 등 get(), set() 메서드 이용  
+		1970.1.1.0.0.0를 기준으로  
+
+		+ YEAR  
+		+ DAY_OF_MONTH  
+		+ MONTH : 달(0~11)  
+		+ DAY_OF_WEEK : 요일  
+		+ HOUR : 0시에서 11시  
+		+ AM_PM : 오전인지 오후인지만 구분  
+		+ HOUR_OF_DAY : 24시간을 기준으로  
+		+ MINUTE  
+		+ SECOND  
+		+ MILLISECOND : 1초 = 1000밀리초  
+		
+		**객체 생성(X)**  
+		Calendar now = Calendar.getInstance();  
 	2) Date 클래스
