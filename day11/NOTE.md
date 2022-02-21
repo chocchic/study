@@ -111,7 +111,7 @@
 		- 박싱 / 언박싱  
 			int -----(박싱)-----> Integer : Integer ten = new Integer(10);  
 			10 <----(언박싱)----   10  : int n = ten.intValue();  
-	5) Math 클래스
+	5) Math 클래스  
 		random, round등 숫자 연산 관련
 
 4. java.util
