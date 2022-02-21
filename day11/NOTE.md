@@ -56,7 +56,7 @@
 	기본패키지. import 필요 없음
 	1) Object 클래스 : 최상위 클래스
 		* == 연산자 : 기본형이면 값 비교, 참조형은 주소 비교  
-		  boolean equals(Object obj) : 기본적으로 주소비교. 사용사에 의해 오버라이딩해서 사용 가능  
+		* boolean equals(Object obj) : 기본적으로 주소비교. 사용사에 의해 오버라이딩해서 사용 가능  
 		  ex) String 클래스의 equals()  
 	2) String 클래스 : 문자열 클래스  
 		스트링 리터널은 자바 컴파일러에 의해 모두 String 객체로 처리  
