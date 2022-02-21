@@ -61,19 +61,19 @@
 		  ex) String 클래스의 equals()  
 	2) String 클래스 : 문자열 클래스  
 		스트링 리터널은 자바 컴파일러에 의해 모두 String 객체로 처리  
-			1. 생성자  
-			```java
-			String()
-			String(String original) // 문자열 넣으면서 객체 생성
-			String(char[] value) // char 배열의 문자들을 String 객체로 생성
-			String(StringBuffer buffer) // 스트링버퍼 문자열을 String 객체로 생성
-			```
-			2. string리터럴과 new String()  
-			```java
-			String str = "hello"; //리터럴 방식
-			String str = new String(); //객체 생성 방식
-			```
-			3. 스트링은 수정 불가능  
-			4. 주요메서드  
+		1. 생성자  
+		```java
+		String()  
+		String(String original) // 문자열 넣으면서 객체 생성  
+		String(char[] value) // char 배열의 문자들을 String 객체로 생성  
+		String(StringBuffer buffer) // 스트링버퍼 문자열을 String 객체로 생성  
+		```
+		2. string리터럴과 new String()  
+		```java
+		String str = "hello"; //리터럴 방식  
+		String str = new String(); //객체 생성 방식  
+		```
+		3. 스트링은 수정 불가능  
+		4. 주요메서드  
 
 	
