@@ -108,3 +108,6 @@
 				+ static String toHexString(int i) : 16진수  
 				+ static String toOctalString(int i) : 8진수  
 				+ static String toString(int i) : 문자열로  
+			- 박싱 / 언박싱
+				int -----(박싱)-----> Integer : Integer ten = new Integer(10);
+				10 <----(언박싱)----   10  : int n = ten.intValue();
