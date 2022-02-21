@@ -1,3 +1,31 @@
 1. 패키지 package  
 	폴더 / 디렉토리 : 서로 관련있는 클래스나 컴파일된 클래스 파일들을 한 곳에 묶어 놓은 것  
 	JDK는 개발자에게 많은 클래스 파일들을 패키지 형태로 제공한다  
+	rt.jar 압축파일로 제공되며, 내부는 폴더 구조로 정리되어 있는 것을 볼 수 있다.  
+	
+	1) 클래스명
+		- 클래스를 지칭할 때 패키지명을 포함하는 경로명을 사용한다.  
+		- 패키지와 패키지사이는 점 연산자를 사용.  
+ 	2) 패키지 필요성  
+
+	3) 패키지 사용  
+		- 기본적으로 클래스 사용시, 패키지명을 포함한 전체 경로명을 기술해야함.  
+		```java
+		java.util.Scanner sc = new java.util.Scanner(System.in);
+		```
+	4) import문
+		- import 패키지..클래스명;
+		```java
+		import java.util.Scanner;
+		Scanner sc = new Scanner(System.in);
+		```
+		- 한 패키지 안에 있는 여러 클래스를 사용하고 싶은 경우  
+		```java
+		import java.util.*; // util패키지에 있는 모든 클래스 임포트
+		```  
+	5) package 만들기  
+		폴더 만들고 java파일 상단에 package 패키지명; 기술  
+
+2. API Application Programming Interface  
+	자바에서 제공하는 기본 패키지를 Java API라고 한다.
+	![javapackage](./javapackage.jpg)
