@@ -87,27 +87,34 @@
 			- String toLowerCase() : 전체를 소문자로 리턴  
 			- String toUpperCase() : 전체를 대문자로 리턴  
 			- String trim()  
-		5. StringBuffer 클래스  
-			문자열. String과는 다르게 문자열을 저장하는 가변버퍼를 가지고 있다. 저장된 문자열 수정 가능.  
-		6. Wrapper 클래스  
-			Wrapper라는 클래스는 존재하지 않는다.  
-			int, char, double 등 8개 기본형을 객체로 다루기 위해 JDK에 만들어진 8개의 클래스를 통칭하여 Wrapper클래스라 함.  
-			|기본 타입 || byte| short |    int    |  long char     | float | double | boolean |  
-			| Wrapper || Byte| Short | Integer | Long Character | Float | Double | Boolean |  
-			- 객체 생성  
-			```java
-			클래스명 변수명 = new 클래스명(값); // int to String
-			```
-			- 주요메서드  
-				+ float floatValue()  
-				+ int intValue()  
-				+ long longValue()  
-				+ short shortValue()  
-				+ static int parseInt(String s)  
-				+ static String toBinary(int i)	: 2진수  
-				+ static String toHexString(int i) : 16진수  
-				+ static String toOctalString(int i) : 8진수  
-				+ static String toString(int i) : 문자열로  
-			- 박싱 / 언박싱  
-				int -----(박싱)-----> Integer : Integer ten = new Integer(10);  
-				10 <----(언박싱)----   10  : int n = ten.intValue();  
+	3) StringBuffer 클래스  
+		문자열. String과는 다르게 문자열을 저장하는 가변버퍼를 가지고 있다. 저장된 문자열 수정 가능.  
+	4) Wrapper 클래스  
+		Wrapper라는 클래스는 존재하지 않는다.  
+		int, char, double 등 8개 기본형을 객체로 다루기 위해 JDK에 만들어진 8개의 클래스를 통칭하여 Wrapper클래스라 함.  
+		|기본 타입 || byte| short |    int    |  long char     | float | double | boolean |  
+		| Wrapper || Byte| Short | Integer | Long Character | Float | Double | Boolean |  
+		- 객체 생성  
+		```java
+		클래스명 변수명 = new 클래스명(값); // int to String
+		```
+		- 주요메서드  
+			+ float floatValue()  
+			+ int intValue()  
+			+ long longValue()  
+			+ short shortValue()  
+			+ static int parseInt(String s)  
+			+ static String toBinary(int i)	: 2진수  
+			+ static String toHexString(int i) : 16진수  
+			+ static String toOctalString(int i) : 8진수  
+			+ static String toString(int i) : 문자열로  
+		- 박싱 / 언박싱  
+			int -----(박싱)-----> Integer : Integer ten = new Integer(10);  
+			10 <----(언박싱)----   10  : int n = ten.intValue();  
+	5) Math 클래스
+		random, round등 숫자 연산 관련
+
+4. java.util
+	1) Calender 클래스
+	
+	2) Date 클래스
