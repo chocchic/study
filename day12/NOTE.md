@@ -4,7 +4,7 @@
 	가변 크기의 컨테이너로 만들어짐  
 
 	1) 컬렉션을 위한 자바 인터페이스와 클래스
-    []
+	   ![collection](./collection.jpg)
 	[ Collection 상속, 단일 클래스 객체]
 	- Vector, ArrayList : 가변 크기의 배열
 	- LinkedList : 노드들이 링크로 연결되는 리스트
