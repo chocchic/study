@@ -32,9 +32,52 @@
 		- boolean renameTo(File dest) : dest 경로명으로 파일 이름 변경
 		- long lastModified() : 마지막으로 변경 시간 리턴
 		
-		**경로**  
-			절대 경로 : c 또는 d드라이브부터 시작하는 전체 경로  
-			상대 경로 : 내 현재 파일을 기준으로 말하는 경로  
-					./ : 현재 폴더  
-					.. : 상위 폴더  
-					/ : 안에  
+		- **경로**  
+			- 절대 경로 : c 또는 d드라이브부터 시작하는 전체 경로  
+			- 상대 경로 : 내 현재 파일을 기준으로 말하는 경로  
+				- ./ : 현재 폴더  
+				- .. : 상위 폴더  
+				- / : 안에  
+				- 예시
+					c:\java\abc\test.txt
+					c:\java\abc\test2.txt
+					c:\java\def\hello.txt
+					c:\java\hahaha.txt
+					![filestructure](./file.jpg)
+2. Stream 스트림  
+	연속적인 데이터의 흐름 -> 데이터가 돌아다니는 통로(선) -> 데이터를 목적지로 i/o하기 위한 방법.
+	- 스트림은 단방향
+	- 자바 응용프로그램은 입력스트림과 출력 스트림과만 연결하고, 입출력장치 제어하고 실질적인 입출력을 담당하는 것은 입출력 스트림이다.
+	
+	- 입력장치 or 파일 ----> 입력 스트림 ---->  자바 응용프로그램
+	- 입력장치 or 파일 <---- 출력 스트림 <----  자바 응용프로그램
+	
+	- 스트림을 통해 흘러가는 기본 단위는 바이트나 문자이다.  
+	- 자바스트림 객체는 바이트 단위로 입출력하는 바이트 스트림과 문자 단위로 입출력하는 문자 스트림으로 나뉜다.  
+	- 바이트 스트림을 다루는 클래스는 공통적으로 뒤에 Stream이 붙고 문자 스트림을 다루는 클래스는 뒤에 Reader/Writer를 붙여 구분한다.
+	
+	- FIFO First In First Out : 선입선출
+	- LIFO Last In First Out : 후입선출
+
+	- close() : 스트림을 열었으면 사용 후 반드시 닫아줘야 누수가 안된다.
+
+3. 바이트 스트림
+	- 바이트 단위로 데이터 전송  
+	- 다양한 클래스 제공으로 용도에 맞게 골라 사용  
+	- 이미지, 동영상 전송 가능   
+
+	|InputStream|OutputStream|
+	|--------------|----------------|
+	|int read()| void write(int b)|
+	|int read(byte[] b)| void write(byte[]b)
+
+	1) FileOutputStream
+		파일에 출력을 하기 위한 클래스.
+		파일에 바이너리 데이터 저장
+
+		1. 생성자
+			FileOutputStream(File file) : 파일 객체에 출력 / 저장  
+			FileOutputStream(File file, boolean append) : 파일 객체에 파일의 마지막부터 데이터 출력 / 저장
+		2. 주요 메서드
+			 
+	2) FileInputStream
