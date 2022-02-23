@@ -27,3 +27,6 @@
 		- boolean isDirectory() : 디렉토리면 true
 		- long length() : 파일 크기 리턴
 		- boolean exists() : 파일 또는 디렉토리가 존재하면 true
+		- boolean createNewFile() : 빈 파일 생성
+		- boolean delete() : 파일 또는 디렉토리 삭제
+		- boolean renameTo(File dest) : dest 경로명으로 파일 이름 변경
