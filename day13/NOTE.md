@@ -142,3 +142,46 @@
 		2. Runnable 인터페이스 구현  
 		
 		1) Thread 클래스 상속받아 스레드 만들기  
+			1. 주요 메서드 
+				- void run() : JVM에 의해 호출 ( 핵심 메서드 ), 오버라이딩 하여 스레드가 실행항 코드 작성  
+				- void start() : JVM에게 스레드 실행하도록 요청  
+				- void interrupt() : 스레드 강제 종료  
+				- static void yield() : 다른 스레드에게 실행 양보.
+				- String getName() : 스레드 이름 리턴
+				- int getPriority() : 스레드 우선순위값 리턴 1~10
+				- void setPriority(int n) : 우선순위 n으로 지정
+				- Thread.State getState() : 스레드의 상태값 리턴
+				- static void sleep(long millis) : mills 시간동안 스레드 일시정지
+				- static Thread currentThread() : 현재 실행중인 스레드 객체 리턴  
+
+		2) Runnable 인터페이스로 스레드 만들기  
+			Runnable 인터페이스는 run() 메서드 하나만 가지고 있다.  
+		3) 스레드 상태  
+			- NEW  : new Thread()  
+			- RUNNABLE  : start()  
+			- TIMED_WAITING  : sleep(1000)  
+			- BLOCK  : i/o 작업  
+			- WAITING  : wait(), notify()로 깨울 때까지 기다림  
+			- TERMINATED   : 종료된 것  
+		4) 스레드 종료시키는 방법  
+			1. run() 종료  
+			2. interrupt() 호출  
+		5) 스레드 동기화 Synchronization  
+			- 멀티 스레드에서 공유 자원 혹은 공유 데이터에 동시 접근할 때 문제가 발생할 수 있다.  
+			- 스레드 동기화 방법  
+				- synchronized 로 동기화 블럭 지정  
+				- wait() - notify() 메서드로 스레드 실행 순서 제어  
+			1. 메서드 전체를 임계 영역으로 지정
+				```java
+				synchronized void add() {
+					...
+				}
+				```
+			2. 코드 블럭을 임계영역으로 지정
+				```java
+				void execute(){
+					...
+					synchronized(this) {
+						...
+					}
+					...
