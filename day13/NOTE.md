@@ -199,7 +199,8 @@
 		2 데이터링크층
 		1 물리층
 		- 라우터와 스위치  
-	3) 네트워크 유형
+	3) 네트워크 유형  
 		LAN : Local Area Network  
 			나와 같은 네트워크 간의 통신 -> 스위치  
 		WAN : Wide Area Network  
+			내부 -> 외부			
