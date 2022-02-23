@@ -79,10 +79,10 @@
 			FileOutputStream(File file) : 파일 객체에 출력 / 저장  
 			FileOutputStream(File file, boolean append) : 파일 객체에 파일의 마지막부터 데이터 출력 / 저장  
 		2. 주요 메서드
-			void write(int b) : 출력  
-			void wirte(byte[] b)  
-			void flush() : 출력스트림에 남아있는 바이너리 데이터 모두 출력  
-			void close() : 출력스트림 닫고 관련된 시스템 자원 해제  
+			- void write(int b) : 출력  
+			- void wirte(byte[] b)  
+			- void flush() : 출력스트림에 남아있는 바이너리 데이터 모두 출력  
+			- void close() : 출력스트림 닫고 관련된 시스템 자원 해제  
 	2) FileInputStream  
 		바이트 스트림으로 파일 읽는 스트림 클래스  
 	
@@ -98,6 +98,9 @@
 			EOF -1 int -> 0xFFFFFFFF  
 
 4. 문자 스트림  
-	2 바이트의 유니코드 문자를 단위로 입출력하는 스트림  
+	- 2 바이트의 유니코드 문자를 단위로 입출력하는 스트림  
 	- 문자화 되지 않는 바이너리 바이트 값들을 처리 불가 -> 이미지같은 것 처리 불가  
 	
+	1) InputStreamReader  
+	
+	2) OutputStreamWriter
