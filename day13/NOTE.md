@@ -30,3 +30,7 @@
 		- boolean createNewFile() : 빈 파일 생성
 		- boolean delete() : 파일 또는 디렉토리 삭제
 		- boolean renameTo(File dest) : dest 경로명으로 파일 이름 변경
+		- long lastModified() : 마지막으로 변경 시간 리턴
+		
+		* **경로**
+			
