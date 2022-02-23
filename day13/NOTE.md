@@ -39,11 +39,11 @@
 				- .. : 상위 폴더  
 				- / : 안에  
 				- 예시
-					c:\java\abc\test.txt
-					c:\java\abc\test2.txt
-					c:\java\def\hello.txt
-					c:\java\hahaha.txt
-					![filestructure](./file.jpg)
+					- c:\java\abc\test.txt  
+					- c:\java\abc\test2.txt  
+					- c:\java\def\hello.txt  
+					- c:\java\hahaha.txt  
+				![filestructure](./file.png)
 2. Stream 스트림  
 	연속적인 데이터의 흐름 -> 데이터가 돌아다니는 통로(선) -> 데이터를 목적지로 i/o하기 위한 방법.
 	- 스트림은 단방향
@@ -199,11 +199,13 @@
 		2 데이터링크층
 		1 물리층
 		- 라우터와 스위치  
+		![sc](./sc.png)
 	3) 네트워크 유형  
 		LAN : Local Area Network  
 			나와 같은 네트워크 간의 통신 -> 스위치  
 		WAN : Wide Area Network  
-			내부 -> 외부			
+			내부 -> 외부	
+		![network](./network.png)
 	4) IP (Address)  
 		통신을 하는 기계의 네트워크상 주소  
 		ex ) 192.168.10.54  
