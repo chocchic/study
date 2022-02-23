@@ -72,12 +72,12 @@
 	|int read(byte[] b)| void write(byte[]b)
 
 	1) FileOutputStream
-		파일에 출력을 하기 위한 클래스.
-		파일에 바이너리 데이터 저장
+		파일에 출력을 하기 위한 클래스.  
+		파일에 바이너리 데이터 저장  
 
-		1. 생성자
+		1. 생성자  
 			FileOutputStream(File file) : 파일 객체에 출력 / 저장  
-			FileOutputStream(File file, boolean append) : 파일 객체에 파일의 마지막부터 데이터 출력 / 저장
+			FileOutputStream(File file, boolean append) : 파일 객체에 파일의 마지막부터 데이터 출력 / 저장  
 		2. 주요 메서드
 			 
 	2) FileInputStream
