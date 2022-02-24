@@ -140,3 +140,9 @@
 		- compose() : B > A  
 			인터페이스AB = 인터페이스A.compose(인터페이스 B)  
 			최종결과 = 인터페이스AB.method();  
+	
+	7) and(), or(), negate() 디폴트 메서드, isEqual() 정적 메서드  
+		논리 연산자( && || ! )와 대응되는 메서드  
+		- and() : 두 개의 Predicate가 모두 true를 리턴하면 최종적으로 true 리턴  
+		- or() : 둘 중 하나라도 true면 최종적으로 true 리턴  
+		- negate() : true / false 반전시켜서 리턴  
