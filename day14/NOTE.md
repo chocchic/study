@@ -80,52 +80,53 @@
 	자바 8부터는 자주 사용되는 함수적 인터페이스를 java.util.function 패키지로 제공  
 	메서드의 매개변수, 생성자의 매개변수로 주로 사용되어 매개변수에 람다로 대입가능하게 하기 위해 주로 사용.  
 
-	[ 크게 5가지로 분류 ]
-	Consumer  
-	Supplier  
-	Function  
-	Operator  
-	Predicate  
+	**[ 크게 5가지로 분류 ]**
+	- Consumer  
+	- Supplier  
+	- Function  
+	- Operator  
+	- Predicate  
 	
 	1) Consumer 함수적 인터페이스
 		accept()  
 
-		Consumer<T> void accept(T t)  
-		BiConsumer<T,U>  
-		DoubleConsumer / IntConsumer / LongConsumer : 기본형 받아 소비  
-		ObjDoubleConsumer / ObjIntConsumer / ObjLongConsumer : 객체와 기본형 받아 소비  
+		- Consumer<T> void accept(T t)  
+		- BiConsumer<T,U>  
+		- DoubleConsumer / IntConsumer / LongConsumer : 기본형 받아 소비  
+		- ObjDoubleConsumer / ObjIntConsumer / ObjLongConsumer : 객체와 기본형 받아 소비  
 
 	2) Supplier  
 		매개변수 X, 리턴해주는 get() 메서드  
 		
-		Supplier<T> T get()  
-		BooleanSupplier boolean getAsBoolean()  
-		DoubleSupplier double getAsDouble()  
-		IntSupplier  
+		- Supplier<T> T get()  
+		- BooleanSupplier boolean getAsBoolean()  
+		- DoubleSupplier double getAsDouble()  
+		- IntSupplier  
 		LongSupplier  
 
 	3) Function  
 		매개값, 리턴값 있는 applyXXX() 메서드  
 		
-		Function<T, R> R apply(T t)  
-		BiFunction<T,U,R> R apply(T t, U u)  
-		// 기본형 -> 기본형  
-		기본형To기본형Function  
-		// 객체 -> 기본형  
-		To기본형Function  
+		- Function<T, R> R apply(T t)  
+		- BiFunction<T,U,R> R apply(T t, U u)  
+		- // 기본형 -> 기본형  
+			기본형To기본형Function  
+		- // 객체 -> 기본형  
+			To기본형Function  
 
 	4) Operator  
 		매개변수와 리턴값이 있는 applyXXX() 메서드  
 		매개변수 받아 연산 후 동일한 타입으로 리턴값 제공  
 	
-		UnaryOperator<T> T apply(T t, T t)  
-		BiOperator<T>	T apply(T t)  
-		DoubleBinaryOperator / DoubleUnaryOperator  
-		Int ... / Int ...  
-		Long.../Long..  
+		- UnaryOperator<T> T apply(T t, T t)  
+		- BiOperator<T>	T apply(T t)  
+		- DoubleBinaryOperator / DoubleUnaryOperator  
+		- Int ... / Int ...  
+		- Long.../Long..  
 
 	5) Predicate  
 		매개변수와 boolean타입 리턴값이 있는 testXXX() 메서드  
-		Predicate<T> boolean test(T t) // 하나 던지는데 기본형 아닐 때  
-		BiPredicate<T, U> boolean test(T t, U u) // 두개 던질 때  
-		DoublePredicate / IntPredicate / LongPredicate  // 기본형 쓸 때  
+		
+		- Predicate<T> boolean test(T t) // 하나 던지는데 기본형 아닐 때  
+		- BiPredicate<T, U> boolean test(T t, U u) // 두개 던질 때  
+		- DoublePredicate / IntPredicate / LongPredicate  // 기본형 쓸 때  
