@@ -146,3 +146,39 @@
 		- and() : 두 개의 Predicate가 모두 true를 리턴하면 최종적으로 true 리턴  
 		- or() : 둘 중 하나라도 true면 최종적으로 true 리턴  
 		- negate() : true / false 반전시켜서 리턴  
+
+6. 메서드 참조
+	람다식에서 불필요한 매개변수를 제거하는 것을 목적으로 사용하는 문법.
+	```java
+	Math.max(10,20); // --> 20 리턴해줌(큰수)
+	// 기존 방식 
+	IntBinaryOperator op = (a,b)->{return Math.max(a,b)};
+	int result = op.apply(10,20); ==> 20
+	
+	class Test implements IntBinaryOperator {
+		@Override
+		public int apply(int a, int b){
+			if(a >= b) return a;
+			else return b;
+		}
+	}
+	Test t = new Test();
+	int result = t.apply(10,20);
+
+	// 참조형
+	(a,b)->{return Math.max(a,b)};  
+	Int BinaryOperator op = Math::max;  
+	```
+	1) 클래스메서드와 인스턴스메서드 참조  
+		클래스::메서드  
+		참조변수::메서드  
+	
+	2) 매개변수의 메서드 참조  
+		(a,b)  -> { a.instanceMethod(b); };  
+		클래스::instanceMethod  
+	3) 생성자 참조  
+		== 객체 생성 의미함.
+		
+		(a,b) -> { return new 클래스(a,b); }
+		
+		클래스::new
