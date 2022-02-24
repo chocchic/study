@@ -130,3 +130,13 @@
 		- Predicate<T> boolean test(T t) // 하나 던지는데 기본형 아닐 때  
 		- BiPredicate<T, U> boolean test(T t, U u) // 두개 던질 때  
 		- DoublePredicate / IntPredicate / LongPredicate  // 기본형 쓸 때  
+
+	6) andThen(), compose()
+		Consumer, Function, Operator 종류의 인터페이스는 andThen(), compose() 디폴트 메서드를 가지고 있다.  
+		두 메서드는 두개의 함수적 인터페이스를 순차적으로 연결하고, 첫번째 처리결과를 두번째 매개값으로 제공해서 최종 결과값을 얻을때 사용합니다.  
+		- andThen() : A > B  
+			인터페이스AB = 인터페이스A.andThen(인터페이스 B)  
+			최종결과 = 인터페이스AB.method();  
+		- compose() : B > A  
+			인터페이스AB = 인터페이스A.compose(인터페이스 B)  
+			최종결과 = 인터페이스AB.method();  
