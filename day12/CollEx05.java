@@ -1,4 +1,8 @@
 package day12;
+
+import java.util.HashMap;
+import java.util.Scanner;
+
 /*
 	"그만"이 입력될때까지 나라이름과 인구를 입력받아 저장하고,
 	다시 나라이름을 입력받아 인구를 출력하는 프로그램을 작성하세요. 
@@ -19,8 +23,31 @@ package day12;
 */
 public class CollEx05 {
 	public static void main(String[] args) {
-
-		
-		
+		HashMap<String, Integer> nations = new HashMap<String, Integer>();
+		Scanner sc = new Scanner(System.in);
+		System.out.println("나라 이름과 인구를 입력하세요");
+		boolean stop = true;
+		while(stop) {
+			System.out.print("나라이름, 인구 >>  ");
+			String input = sc.nextLine();
+			if(input.equals("그만")) {
+				while(true) {
+					System.out.print("인구 검색 >>  ");
+					String country = sc.nextLine();
+					if(country.equals("그만")){
+						System.out.println("프로그램 종료!!!");
+						stop = false;
+						break;
+					}else if(nations.containsKey(country)) {
+						System.out.println(country + "의 인구는 " + nations.get(country));
+					}else {
+						System.out.println(country + " 나라는 없습니다.");
+					}
+				}				
+			}else {
+				String[] inputSplit = input.split(" ");
+				nations.put(inputSplit[0], Integer.parseInt(inputSplit[1]));
+			}
+		}
 	}
 }
