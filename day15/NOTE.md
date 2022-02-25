@@ -16,4 +16,31 @@
 		- 스트림은 중간처리와 최종처리를 할 수 있다.  
 		  중간처리에서는 매핑,필터링, 정렬을 수행하고 최종처리에선 반복, 카운팅, 평균, 총합 등 집계처리를 수행한다.
 		 			![stream_02](./img/stream_02.png)
+
+2. 스트림의 종류  
+	java.util.stream패키지에 Stream API들이 들어있다.  
+	
+	BaseStream  
+		- Stream  
+		- DoubleStream  
+		- IntStream  
+		- LongStream  
+		![stream_03](./img/stream_03_스트림객체얻기메서드.png)  
 		
+	1) 컬렉션으로부터 스트림 얻기  
+		컬렉션변수.stream();  
+	2) 배열로부터 스트림 얻기  
+		Arrays.stream(배열);  
+	3) 숫자 범위로부터 스트림 얻기  
+		IntStream.range(int start, int endExclusive);  
+		IntStream.rangeClosed(int start, int endInclusive);  
+	파일, 디렉토리는 pass  
+3. 스트림 파이프라인  
+	다량의 데이터를 가공해서 축소하는 것을 일반적으로 리덕션이라한다.  
+	데이터의 합계, 평균값, 카운팅, 최대값, 최소값 등을 대표적인 리덕션의 결과물이라 한다.  
+	컬렉션 요소를 리덕션의 결과물로 바로 집계할 수 없을 경우, 필터링, 매핑, 정렬, 그룹핑등 중간 처리가 필요하다.  
+	
+	중간처리와 최종처리를 파이프라인으로 해결한다.  
+  	파이프라인은 여러 개의 스트림이 연결되어 있는 구조를 말한다.  
+	<메서드 사용법>  
+	![stream_04](./img/stream_04.png)  
