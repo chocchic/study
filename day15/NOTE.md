@@ -45,8 +45,30 @@
 	- **[ 메서드 사용 구조 ]**  
 		![stream_04](./img/stream_04.png)  
 
-	- **[ 중간처리 메서드 ]**  
+	1) **[ 중간처리 메서드 ]**  
 		![stream_05](./img/stream_05_중간처리메서드.png)  
+		
+		1. 필터링 distinct(), filter()  
+			중간처리 기능으로 요소를 걸러내는 역할  
+			distinct() : 중복제거  
+			filter(Predicate / InterPredicate / LongPredicate / DoublePredicate) : 조건 필터링 변수 -> {true / false로 리턴}  
+		
+		2. 매핑 flapMapXXX(), mapXXX(), asXXXStream(), boxed()  
+			중간처리 기능으로 스트림의 요소를 다른 요소로 대체하는 작업을 함.  
+		
+			1) flapMapXXX()  
+				요소를 대체해주는 여러개의 요소들로 구성된 새로운 스트림을 리턴함  
+			2) mapXXX()  
+				요소를 대체해주는 요소로 구성된 새로운 스트림을 리턴함.  
+			3) asXXXStream(), boxed()  
+				asDoubleStream() : IntStream의 int, LongStream의 long요소를 double로 변환해 DoubleStream으로 생성해줌  
+				asLongStream() : IntStream의 int를 long으로 변환해 LongStream으로 생성  
+				boxed() : int, long,double을 wrapper클래스 요소로 박싱해서 Stream으로 생성  
+		3. 정렬 sorted()
+			최종처리 전 중간단계에서 요소를 정렬해 최종처리 해주어야 할 경우  
+			요소가 객체일 경우에는 Comparable을 구현하지 않은 객체일 때 예외 발생  
+			sorted()는 Comparable을 구현한 요소에서 사용 가능  
+			기본적으로 오름차순으로 정렬해 준다 sorted()에 Comparator.reverseOrder()를 추가하여 내림차순으로 정렬 가능  
 
-	- **[ 최종처리 메서드 ]**  
+	2) **[ 최종처리 메서드 ]**  
 		![stream_05](./img/stream_06_최종처리메서드.png)  
