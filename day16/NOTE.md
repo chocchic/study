@@ -124,3 +124,56 @@
 		placeholder : 입력 박스에 기입할 내용 힌트로 표시하기  
 		readonly : 읽기 전용  
 		required : 필수 기입 요소로 지정  
+				
+13. select 태그  
+	옵션 중에 선택하는 드롭다운 목록  
+	
+	- 태그  
+		<select>  
+			<option value="hello"> 내용1 </option>  
+			<option> 내용1 </option>  
+			<option> 내용1 </option>  
+		</select>  
+			 selected : 선택된 채 생성  
+
+14. textarea 태그  
+	여러줄 입력하는 텍스트 영역  
+	
+	- 태그  
+		<textarea></textarea>  
+
+	- 속성  
+		cols : 가로너비 문자 단위로 지정  
+		rows : 세로 너비 줄 단위로 지정  
+
+15. button  
+	버튼 태그. <input type = "button"과 동일한 버튼 생성  
+	차이점은 화면 낭독기에서 버튼이 있다는 것을 button 태그를 사용하면 인지하고 전달 가능  
+	
+	- 태그  
+		<button>버튼 텍스트</button>  
+	- type 속성  
+		submit : 폼의 내용을 서버로 전송 (input type="submit" 과 동일기능)  
+		reset : 입력내용 초기화  
+		button : 버튼 형태만 있고 자체 기능 X  
+
+16. progress  
+	작업의 진행상태를 나타내는 등의 막대 그래프 같은 태그  
+	- 태그  
+		<progress value="값"></progress>  
+	- 속성  
+		value : 부동소수점으로 표현.  
+		max : 완료 기준의 값  
+
+17. 시멘틱 태그  
+	웹페이지의 각 요소에 의미를 부여해서 의미와 관련성을 기반으로 보다 진보된 검색 또는 서비스가 가능하도록 시도한 Html5에 시멘틱 웹을 위한 태그들이 제공됨.  
+
+	header : 헤더, 상단부, 로고같은 것을 배치하는 부분  
+	nav : 네비게이션 (메뉴 가로바)  
+	aside : 오른쪽 소메뉴 같은 용도  
+	section : 본문 부분, article 포함  
+	article : 본문의 주 내용이 들어가는 부분  
+	footer : 하단부  
+
+18. 실습  
+	이력서 샘플  
