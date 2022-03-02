@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input[type="radio"]:indeterminate + span { color: red;}
+        input[type="radio"]:checked + span { color: orange;}
+        
+        input[type="checkbox"]:enabled + span { color: blue;}
+        input[type="checkbox"]:disabled + span { color: green;}
+
+
+    </style>
+</head>
+<body>
+    
+    <h1> hello css </h1>
+    <form>
+        <input type="radio" name="item" /><span>item1</span>    <br />
+        <input type="radio" name="item" /><span>item2</span>    <br />
+
+        <input type="checkbox" name="check" /><span>check1</span>    <br />
+        <input type="checkbox" name="check" disabled /><span>check2</span>    <br />
+
+    </form>
+
+
+
+</body>
+</html>
