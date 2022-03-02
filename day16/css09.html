@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /*가상요소 선택자는 드래그도 안된다.*/
+        h2::before {content: "BEFORE"; color:aqua;}
+        h2::after{content: "AFTER"; color: lightseagreen;}
+        p::first-letter {font-size: 3rem;}
+        p::first-line {color: lightgray;}
+        p::selection {background-color: lightgreen;}
+    </style>
+</head>
+<body>
+    <h2>Hello CSS</h2>
+    <h2>css selectors</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+         Ullam voluptates incidunt dolores, explicabo quasi laboriosam 
+         ut vel facilis voluptatibus in aliquid rerum inventore sapiente, 
+        quidem ipsum eaque minima officia necessitatibus.</p>
+</body>
+</html>
