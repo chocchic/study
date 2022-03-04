@@ -1,0 +1,439 @@
+[javascript]
+
+1. 자바스크립트
+	1) 객체 기반의 스크립트 프로그래밍 언어
+		웹 브라우저 내에서 많이 사용, 다른 응용 프로그램의 내장 객체에도 접근 가능한 기능이 있다.
+		node.js : 자바스크립트 엔진에 기반해 만들어진 서버 사이트 플랫폼
+2. 기본사항
+	- 자바스크립트 작성 위치
+		1) HTML 문서의 <head> 태그 안 -> <script> 자바스크립트 작성</script>
+		2) HTML 문서의 </body> 태그가 닫히기 전에 <script> 자바스크립트 작성</script> (추천)
+		3) 확장자 .js 페이지로 분리해서 만들고 <head>안에 <script src ="js파일 경로"> 태그로 링크걸기 (추천)
+	- 주석
+		html : <!-- 내용 -->
+		css : /* */
+		js : // 한줄 주석
+		    /* 여러 줄 주석 */
+	문장의 끝을 알리는 ; 작성
+	
+3. 변수
+	var let(지역) const(상수)
+	- 변수 선언
+		var 변수명 = [1,2,3,4,5];
+	- 변수 선언 + 초기화
+		var 변수명 = 값;
+		var 변수명, 변수명;
+		var 변수명=값,변수명=값;
+
+4. 데이터 타입
+	1) 숫자형 Number
+		정수 10진수/16진수 
+		실수 
+	2) 문자형 String
+		양 끝을 쌍따옴표로 묶은 형태(홑따옴표도 가능)
+	3) 논리형 Boolean
+		true / false 값을 갖는 형태
+	4) undefined
+		- 변수를 선언만 하고, 초기화하지 않은 상태
+		- 함수 인자값 없이 호출되는 경우
+		- 존재하지 않는 프로퍼티를 접근한 경우
+	5) null vs undefined
+		null = 값이 없음			var test = null;
+		undefined = 값이 할당되지 않았음	var test;
+5. 연산자
+	1) 산술연산자
+		+ - * / %
+	2) 대입연산자
+		=
+	3) 복합대입연산자 (산술+대입)
+		+= -= *= /= %=
+	4) 증감 연산자
+		증감 : ++
+		감소 : --
+		전위형/후위형 존재
+	5) 비교연산자
+		> >= < <=
+		==	: 데이터타입 관계없이 같으면 true  	"10" == 10 : true
+		===	: 데이터타입도 일치해야 true		"10" == 10 : false
+		!=	: 데이터타입 관계없이 다르면 true
+		!==	: 데이터타입도 달라야 true
+	6) 논리연산자
+		||
+		&&
+		!
+	7) 삼항연산자
+		? :
+	8) 연산자 우선순위 (위=높, 좌 --> 우)
+		() []
+		단항연산자: ! ++ --		(좌<---우)
+		산술 연산자 : * / % + -
+		(비트연산자) : >> << >>>
+		비교 연산자 : > >= < <= == != === !==
+		(비트논리연산자) : & ^ |
+		논리연산자 : && ||
+		삼항연산자 : (? :)		(좌<---우)
+		대입(복합대입)연산자 : = += -= *= /= %=
+	
+ 6. 입력문
+	입력창을 통하여 데이터를 입력받는 기능.
+	변수 = prompt("메세지");
+	변수 = prompt("메세지", "default답변");
+	입력받은 데이터는 모두 문자타입으로 가져옴
+
+7. 형변환
+	1) 자동형변환
+		- 숫자 + 문자 => 문자
+		- 불린 + 문자 => 문자
+		- 불린 + 숫자 => 숫자
+		      (true = 1, false = 0)
+		      10+"" --> "10"
+	2) 강제형변환 (명시적 형변환)
+		- 문자 -> 숫자
+			정수 : parseInt()
+			        Number()
+			실수 : parseFloat()
+			        Number()
+		- 숫자 -> 문자
+			일반숫자 : String(), 뒤에 "" 추가
+			16진수 : .toString(진수)
+			실수문자 : .toFixed(소수점자리수)
+
+8. 제어문
+	조건문 : if, switch
+	반복문 : while, do while, for
+	보조제어문 : continue, break
+	
+9. if, switch, while, do-while, for문 자바와 동일
+	-조건문 if
+	자바와 동일
+	if(condition) {
+		// code
+	}else if(condition) {
+		// code
+	}else if(condition) {
+		// code
+	}else{
+		// code
+	}	
+
+	- 조건문 switch : 자바와 동일
+	var 변수 = 값;
+	switch(변수) {
+		case 값1:
+			실행문 ...
+			break;
+
+		case 값1:
+			실행문 ...
+			break;
+		...
+		default:
+			실행문
+		}
+
+10. 배열 array
+	1) 배열 객체 생성
+		1.
+			var 참조변수 = new Array();
+			참조변수[0] = 1;
+			참조변수[1] = 2;
+		2.
+			var 참조변수 = new Array(값, 값, 값, 값, ... );
+		3.
+			var 참조변수 = [값, 값, 값, 값, ... ];
+			var 참조변수 = [];
+	2) 배열 기본 메서드(함수)
+		.length		: 배열의 길이
+		.push(var)	: 마지막에 데이터 추가
+		.pop()		: 마지막 데이터 꺼내서 리턴, 배열에서 삭제
+		.shift()		: 배열 첫번째 데이터 꺼내서 리턴, 배열에서 삭제  
+		.unshift(var)	: 배열 첫번째에 데이터 추가
+		.join("연결문자") 	: 배열 요소들을 연결문자로 연결해서 1개의 문자열로 리턴
+		.concat(연결요소)	: 배열과 연결요소를 결합 ( 배열 합치기)
+		.slice(idx1, idx2)	: idx1부터 idx2전까지 잘라내서 리턴
+		.sort()		: 오름차순 정렬
+		.reverse()		: 요소를 반대로
+	
+11. 함수 function
+	// 매개변수 X, 리턴 X
+	function 함수명(){
+		// 실행 코드들 ...	
+	}
+	
+	// 매개변수 O, 리턴 O
+	function 함수명(매개변수명, 매개변수명, ...){
+		// 실행 코드들 ...	
+		return 값;
+	}
+	* 리턴타입을 적어주지 않는다
+	* 함수명으로 어떤 기능을 하는 함수인지 알려주는게 좋다
+
+	2) 스코프
+		: 변수 또는 함수의 유효범위를 말함
+		
+		1. 전역변수 Global Variable
+			선언위치 : 함수 밖, {} 밖
+			사용범위 : 자바스크립트 전체 영역
+			중복 변수명 절대 금지
+
+		2. 지역변수 Local Variable (var 기준)
+			선언위치 : 함수 안
+			* 함수 안에서 동일 이름의 변수에 대한 우선 순위 : 지역 > 전역
+
+		3. 전역 함수
+			전역 변수랑 동일
+		4. 지역 함수
+			정의 위치 : 함수 내
+			사용 범위 : 정의된 함수를 품고 있는 외부 함수 내
+
+	3) 변수에 함수를 저장
+		자바스크립테에서는 함수도 변수에 저장 가능
+		변수에 함수를 저장하면 변수를 함수처럼 사용할 수 있다.
+
+	4) 함수를 매개변수값으로 사용
+		매개변수도 역시 변수이기 때문에 매개변수로 함수를 받아 사용할 수 있다.
+
+	5) 리턴값으로 함수 사용
+		함수는 어떤 값이든 리턴 가능, 즉 함수도 리턴 가능
+
+12. 함수리터럴과 익명함수
+	1) 리터럴
+		JS에서 데이터를 만드는 방법은 크게 두가지, 리터럴 방식과 객체 생성 방식.
+		
+		타입	리터럴 방식		객체방식
+		-------------------------------------------------------------------------------------
+		숫자	var num = 10;		var num = new Number(10);
+		문자	var name = "abc";		var name = new String("abc");
+		불린	var play = true;		var play = new Boolean(true);
+		배열	var arr = [1,2,3];		var arr = new Array(1,2,3);
+		-------------------------------------------------------------------------------------
+
+	2) 함수 리터럴
+		함수 이름을 주지 않고 만들면 된다.
+		총 3가지 방법이 있다.
+
+		1. 일반적인 방식
+		function hello(name){
+			console.log(name + "님 안녕!!");
+		}
+		
+		2. 리터럴
+		var hello = function(name){
+			console.log(name + "님 안녕!!");
+		}
+	
+		3. 객체 방식
+		var hello = new Function("name", "console.log(name + "님 안녕하세요");");
+
+	3) 익명함수
+		리터럴 방식의 함수를 익명함수라 함
+		* 호이스팅 불가능
+
+13. 자바스크립트 변수 선언 방식
+	Ecma International 표준화 기구에 넷스케이프사에서 표준화 요청, 96년 11월 ECMA-262라는 표준화 명세서 작업이 시작됨.
+	표준화된 언어의 공식이름은 ECMAScript, 대외적 javascript
+	
+	ES6 (2015)부터 var/let/const 사용 가능
+
+	* 블록스코프 : { } if for function 
+	  함수스코프 : 블록스코프 중 함수 범위를 갖는 스코프
+
+	1) var	: 함수스코프 : 변수 같은 이름으로 재선언 가능 (문제점)
+	2) let	: 블록스코프 : 변수 같은 이름으로 재선언 불가능
+			      값 수정 가능 (우리가 알고 있던 일반 자바 변수)
+	3) const	: 블록스코프 : 변수 같은 이름으로 재선언 불가능
+			      값 수정 불가능, 선언시 값 대입 필수! -> 상수
+
+14. Symbol
+	Unique한 값을 만듬
+	Symbol(값);
+15. 스크립트 태그 위치
+	자바스크립트는 HTML 내 어디에나 둘 수 있으나 "위치"는 자바스크립트의 처리시점을 결정한다. 위->아래
+	[ 웹 브라우저의 HTML 문서 렌더링 과정 ]
+	1. 불러오기 : 서버로부터 전달받은 리소스 읽어들임
+	2. 파싱 Parsing : 웹 엔진이 파서를 통해 문서를 파싱해 DOM Tree를 만든다
+	3. 렌더링 트리 만들기 : 그리기위한 별도의 트리를 만든다. ( 화면에 안 그릴거 걸러내고 만듬)
+	4. CSS 결정
+	5. 레이아웃
+	6. 그리기
+
+	- 내가 만든 js는 body 닫히기 전에 추가
+	- 로딩할 때 필요한 외부 소스가 있다면 <head>안에 작성
+
+	onload : 웹페이지(DOM데이터)의 로딩이 끝나는 시점(이벤트)에 실행됨 -> 이미 화면에 그려놓은게 날아갈 수 있으니 조심!!
+	html 태그 속성 : <body onload="스크립트함수()">
+	스크립트 : window.onload = function() {};
+	$(window).load(funtion(){});
+	
+	* onload vs jquery의 ready()
+		ready : DOM 트리 생성 직후 실행
+		onload : 페이지 이미지, 외부파일까지 로드된 후 실행
+		ready -> onload
+
+16. 자바스크립트 객체
+	1) 내장 객체 Built-in Object
+		자바 스크립트 엔진에 내장
+		String, Date, Array, Math 등
+	2) 브라우저 객체 모델 BOM, Browser Object Model
+		브라우저에 객층 구조로 내장되어 있는 객체를 말함
+		window, screen, location, history, navigator 등
+		window는 document와 location의 상위개체
+	3) 문서 객체 모델	DOM, Document Object Model
+		HTML 문서 구조를 객체화
+	4) 사용자 정의 객체
+
+	* 문서 : https://developer.mozilla.org/ko/docs/Web/JavaScript
+
+17. 내장객체 (Built-in Object)
+	1) 객체 생성
+		참조변수 = new 생성함수();
+	2) Date 객체
+		자바와 유사
+	3) Math 객체
+		객체 생성 없이 Math.으로 사용 가능
+	4) Array 객체
+	5) String 객체
+		문자열 취급
+		let str = new String('문자형데이터');
+		let str = '문자형데이터';
+
+18. 브라우저 객체 모델 (BOM Browse Object Model)
+	브라우저에 내장된 객체가 계층적 구조로 이루어져 있는 것
+		window
+		     |
+	---------------------------------------------
+	|	|	|	|	|
+      document   screen   location   history   navigator
+	
+	1) window 객체
+		최상위 객체
+
+		- 메서드
+		open("url", "새 창이름", "새 창 옵션들")	: 팝업창
+		alert(data)				: 경고창에 데이터 보여주기
+		prompt("질문", "기본답변")			: 입력창
+		confirm("질문")				: 확인/취소, 확인=true 취소 = false 리턴
+		moveTo(x,y)				: 창의 위치를 이동
+		resizeTo(width, height)			: 창 크기 변경
+		setInterval(fucntion() {}, 일정 시간 간격)	: 간격으로 function() 호출하여 실행
+		clearInterval(타임아웃객체)		
+		setTimeout(function() {}, 일정 시간 간격)	: 간격이후 함수 한번 실행
+		clearInterval(타임아웃객체)
+	
+		1. open() (close() : 창 닫기)
+			- 옵션 : 마지막 인자에 ""로 한번에 싸서 입력 각 속성마다 ,로 분리
+			width
+			height
+			left	: x 좌표
+			top	: y 좌표
+			scrollbars	: no 숨김, yes
+			location	: no / yes
+			status	: 상태표시줄 영역 숨김 / 노출
+			toolbars	: 도구 상자 영역 숨김 / 노출
+
+		2. confirm()
+			사용자가 답한 것(true/ false)을 변수에 담아서 사용할 수 있다
+		3. setInterval(fucntion() {}, 일정 시간 간격)
+			일정 시간 간격에는 밀리초 단위로 넣어줘야 한다.
+
+	2) screen 객체
+		사용자의 모니터 정보(속성)를 제공하는 객체
+
+		screen.속성;
+
+		width
+		height
+		availWidth	: 작업표시줄 제외한 화면 너비
+		availHeight	: 작업표시줄 제외한 화면 높이
+		colorDepth	: 사용자 모니터가 표현가능한 컬러 bit
+	
+	3) location 객체
+		현재 URL 관련 속성과 새로고침 메서드 등을 제공	
+		
+		herf		: 주소를 설정하거나, 현재 주소를 꺼낼 수 있음
+		hostname	: 호스트이름 설정, 현재 호스트이름 알아낼 수 있음
+		host 		: 호스트 이름, 포트 번호(현재 상태꺼내거나 수정)
+		protocol
+		search		: URL의 쿼리를 반환 ( 주소의 ? 뒤)
+				~~.html?name=adf?age10
+		reload()		: 브라우저 새로고침 
+
+	4) history 객체
+		뒤로가기 앞으로가기 기능 메서드
+		
+		back()		: 뒤로가기
+		forward()		: 앞으로가기 ( 뒤로 간적이 있어야 가능)
+		go(이동숫자)	: -2 -> 2단계 뒤로가기, 2 -> 2단계 앞으로 가기(뒤로간적 있어야 가능)
+		length		: 방문했던 기록에 저장된 사이트 목록 개수
+
+	5) navigator 객체
+		현재 방문자가 사용하는 브라우저 정보와 운영체제 졍보를 제공
+		직접 콘솔에 찍지 않아도 개발자 도구의 network>확인할 js파일>header부분을 확인할 수 있다
+
+		appVersion	: 현재 브라우저의 버전 정보
+				  Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N)
+		language		: 현재 브라우저가 사용하는 언어, 한글은 'ko' 영어는 'en'
+		product		: 현재 브라우저의 엔진 이름
+				  Gecko
+		platform		: 현재 컴퓨터 운영체제 정보
+				  Win32
+		onLine		: 온라인 상태 여부 제공
+		userAgent	: 브라우저와 운영체제의 종합 정보 제공
+				  위에 내용 종합
+	
+	6) document 객체
+		창에 표시되는 웹페이지 관리
+		DOM 트리를 읽거나 함수를 이용하여 창을 관리할 수 있다.
+
+		characterSet	: 문자 인코딩 (읽기 전용)
+		cookie		: 문서의 cookie를 쉼표로 연결한 문자열
+		location		: window.location 속성과 마찬가지로 location객체를 가르킴
+		readyState	: 문서를 읽어들인 상태 (읽기 전용)
+		referrer		: 문서에 링크된 페이지 url (읽기 전용)
+		title		: 문서 제목
+		URL		: 문서 URL (읽기 전용)
+
+		-메서드
+		close()		: 문서닫기. window.close()
+		open()		: 문서 열기
+		write()		: 문서 출력
+		writeln()		: 문서 출력 + enter값
+
+19. 자바스크립트 내장 함수
+	자바스크립트 엔진에 내장된 함수
+	parseInt()		
+	parseFloat()
+	String()
+	Number()
+	Boolean()
+	isNan()		: is Not a Number의 약자. 숫자가 아닌 문자가 포함되어 있으면 true
+	eval()		: 문자형 데이터/ 코드를 (따옴표없이) 자바스크립트 코드로 처리
+
+20. 문서 객체 모델 (DOM Document Object Model)
+	
+	DOM 트리를 구성하는 객체 하나를 node라고 함.
+
+	문서노드 : 전체 문서를 가르키는 Document 객체
+	HTML 요소 노드 : HTML 객체
+	텍스트 노드 : 텍스트 객체
+
+	Document <-- root
+	      |
+	  <HTML>
+	|	|
+        <head>   <body>
+	|	|
+         <title>     <h1>,<p>,<img />
+         <meta>
+	
+	- 노드 객체 가져오는 메서드
+		document.getElementById(id값)			: id 속성값으로 노드 가져오기
+		document.getElementsByTagName(태그명) 		: 태그명으로 노드들 가져오기
+		document.getElementsByClassName(class속성값)	: class 속성값으로 노드들 가져오기
+		document.getElementsByName(name속성값)		: name 속성값으로 노드들 가져오기
+
+		document.querySelector("선택자")	: CSS 선택자로 노드 가져오기
+		document.querySelector("선택자")	: 선택자에 해당하는 노드들 전부 가져오기
+
+		document.head
+		document.body
