@@ -29,3 +29,4 @@
 - **220228(day016)**  : html
 - **220302(day017)**  : css
 - **220303(day018)**  : css, js 함수
+- **220304(day019)**  : js 함수 구현 방식, 변수 선언 방식(var, let,const), symbol, js 객체들(내장 객체, BOM, DOM)
