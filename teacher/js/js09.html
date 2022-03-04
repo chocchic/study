@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // Date
+        var today = new Date(); 
+        console.log(today);
+
+        var christmas = new Date("2022-12-25"); 
+        console.log(christmas.getDay());
+
+        let month = today.getMonth();  // 0 ~ 11월 
+        console.log(month + 1);
+        let date = today.getDate(); 
+        console.log(date);
+        let day = today.getDay();  // 요일 숫자 일=0 월=1 토=6
+        console.log(day);
+
+        let time = today.getTime(); // 1970/1/1 ~ 숫자 
+        console.log(time);
+        
+        // Math 
+        console.log(parseInt(Math.random() * 10));
+        console.log(Math.floor(Math.random() * 10));
+        
+        // String 
+        let str = "hello";
+        console.log(str.charAt(0));
+        console.log(str.indexOf('l'));
+        console.log(str.lastIndexOf('l'));
+        console.log(str.substring(0, 2)); // 0 ~ 2전까지 짤라서 리턴 
+        console.log(str.substr(1, 3)); // 1번부터 3개 짤라서 리턴 
+        console.log(str.split('')); 
+        console.log(str.slice(3, 4)); 
+        
+
+
+
+
+
+    </script>
+</body>
+</html>
