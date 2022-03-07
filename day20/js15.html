@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <ul class="ultag"></ul>
+    <script>
+
+        const ul = document.querySelector('ul.ultag');
+        const texts = ["javascript","jquery", "ajax","node.js","react"];
+
+        for(var i = 0; i < 5; i++){
+            // 요소 생성
+            const li = document.createElement('li');
+
+            //텍스트 노드 생성
+            const text = document.createTextNode(texts[i]);
+            // 텍스트 노드를 생성한 요소에 연결
+            li.appendChild(text);
+
+            // ul 안에 li 태그 추가
+            ul.appendChild(li);
+        }
+        
+        // 요소 생성
+        const li2 = document.createElement('li');
+
+        //텍스트 노드 생성
+        const text2 = document.createTextNode("hahaha");
+        // 텍스트 노드를 생성한 요소에 연결
+        li2.appendChild(text2);
+
+        ul.insertBefore(li2, ul.childNodes[0]); // 오히려 앞에 추가하는것을 확인할 수 있음
+
+        ul.removeChild(ul.childNodes[0]); // 방금 맨 앞에 추가한 hahaha를 삭제
+
+        ul.removeChild(document.getElementsByTagName('li')[0]); // 위와 같은 의미
+        
+
+
+    </script>
+</body>
+</html>

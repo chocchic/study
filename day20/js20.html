@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        const pow = function(x){
+            return x* x;
+        }
+        console.log(pow(2));
+
+        const pow2 = x => x*x;
+        console.log(pow2(3));
+
+        // JS에서는 문자열이 없는 경우 false, 있으면 true
+        let test = Boolean("Hello");
+        console.log(test);
+        test = Boolean("");
+        console.log(test);
+
+        // let test2 = "input";
+        let test2 = "";
+        if(test2) { // String 변수에 뭐라도 들어있으면 true
+            console.log("값이 있다.");
+        }
+        
+        let test3 = null;
+        if(test3 == "" || test3 == null) { // 빈 문자열과 null은 다른 의미다.
+            console.log("값이 없다.");
+        }
+        
+        const obj = {
+            a : 10, 
+            b : x=>x+10,  // lamda 함수, this 사용 불가. function에서의 this와 의미가 다름.
+            // 화살표 함수에서는 this를 사용하지 않는 것이 덜 혼동됨.
+            c : function(){ // 리터럴형 함수
+                let abc = this.a + 10; // this 사용 가능 -> this를 잘 사용하자
+                return x + 10;
+            }
+        };
+        obj.a = 200;// 값만 바꾸는건 가능
+        // obj = 100; // 이건 불가능. 
+        // const로 만들어진 obj 자체 값을 변경하는 것은 불가능
+        console.log(obj); 
+        
+        //getter / setter
+        const user = {
+            age : 1, name : "pikachu", 
+
+            //getter
+            get getAge() {
+                return this.age;
+            },
+            //setter
+            set setAge(age){
+                this.age = age;
+            }
+        }
+
+        user.setAge=100;
+        // user.setAge(100); 이런식으로 쓰면 setAge가 Function이 아니라는 오류가 난다.
+        console.log(user);
+        console.log(user.age);
+
+        // 갑작스러운 객체 생성도 가능하다.
+        const testobj = new Object();
+        testobj.hello = "hi";
+
+        const data =  [1,2,3,4,5];
+
+        for(let i = 0; i<data.length ;i++){
+            console.log(data[i]);
+        }
+        console.log("----------------");
+        for(let i of data){
+            console.log(i);
+        }
+
+        const dataObj = {
+            name : "rainchu",
+            age : 20,
+            sleepy : true
+        };
+        console.log(dataObj.name);
+        console.log(dataObj["name"]); // 문자열로 넣는거니까 무조건 따옴표로 감싸서 넣어준다.
+
+        // java에서 dictionary 기능과 유사
+        console.log(Object.entries(dataObj));
+        console.log(Object.keys(dataObj)); // key만 뽑아줌
+        console.log(Object.values(dataObj)); // value만 뽑아줌
+
+        // for - in문
+        for(let key in dataObj){// dataObj의 프로퍼티 개수만큼 반복해서 key(프로퍼티)들을 변수에 담아줌
+            console.log(key);
+            console.log(dataObj[key]); // key롤 value 꺼내기
+            // key는 변수라서 따옴표로 감싸줄 필요가 없다.
+        }
+
+        console.log("=======forEach========");
+        let arr = [1,2,"hello",100];
+        arr.forEach(item =>{
+            console.log(item);
+        });
+
+        console.log("========map========");
+        arr = [100,68,23,30,10];
+        let mapArr = arr.map(item => item * 2);
+        console.log(arr);
+        console.log(mapArr); // 새로 mapping된것을 확인할 수 있다.
+
+
+        const dataObj2 = [
+            {
+                id : 1,
+                name : "raichu",
+                age : 20,
+                sleepy : true
+            },{
+                id : 2,
+                name : "pikachu",
+                age : 10,
+                sleepy : false
+            }
+        ];
+
+        console.log(dataObj2.indexOf("raichu")); // -1 -> 못 찾음
+        console.log(dataObj2.findIndex(item => item.name=="raichu")); // item을 하나씩 돌며 이름이 raichu인 index 리턴
+        console.log(dataObj2.find(item => item.name=="raichu")); // 이름이 raichu인 객체 전체 리턴
+        
+        console.log("-------filter---------");
+        let arr2 = [1,2,3,4,5,6,7,8,9,10];
+        let filterArr2 = arr2.filter(item => item%2==0);
+        console.log(filterArr2);
+    </script>
+</body>
+</html>
