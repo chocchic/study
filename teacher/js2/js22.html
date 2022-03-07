@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="btnHandler1(); btnHandler2();">click!!</button>
+    <button class="btn">버튼2</button>
+
+    <script>
+
+        addEventListener('click',function(){
+            alert("click!!!!!!!!!");
+        }); // 브라우저의 윈도우에 달기 -> 윈도우 어디를 클릭해도 핸들러 동작.
+
+
+
+
+
+
+
+
+        // 이벤트 핸들러 프로퍼티 등록방식 
+        // 버튼2 가져오기 
+        const btn = document.querySelector('.btn'); 
+        //console.log(btn);
+        /*
+        btn.onclick = function() {
+            alert("button2 클릭!!!"); 
+        } // 단점. 핸들러 메서드 한개만 등록가능
+        btn.onclick = function() {
+            alert("button2 클릭2222!!!"); 
+        }
+        */
+
+        // addEventListener : 한개이상 등록가능
+        // 이벤트대상타겟.addEventListener('이벤트종류', 이벤트핸들러메서드);
+        btn.addEventListener('click', function(){
+            alert("addEvent click1");
+        });
+        btn.addEventListener('click', function(){
+            alert("addEvent click222");
+        });
+
+        /*
+        if(btn.addEventListener){ // IE 9~
+            btn.addEventListener('click', btnHandler1);
+        }else if(btn.attachEvent){ // ~ IE 8
+            btn.attachEvent('onclick', btnHandler2);
+        }
+        */
+
+        // 인라인으로 이벤트 등록 
+        function btnHandler1() {
+            alert("button clicked!1111"); 
+        }
+        function btnHandler2() {
+            alert("button clicked!2222"); 
+        }
+        /*
+        document.querySelector("button").addEventListener('click',
+            function(){alert("clicked!!!!!!");}
+        );
+        */
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

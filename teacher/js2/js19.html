@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        /* 원래 
+        function Person() {
+            this.age = 1; 
+            this.name = "pika"; 
+        }
+        let kim = new Person(); 
+        let park = new Person(); 
+        console.log(kim); // 2
+        console.log(park);// 2   4개 
+        */
+        // prototype 
+        function Person() {}
+        Person.prototype.age = 1; 
+        Person.prototype.name = "pika";
+        let kim = new Person(); 
+        let park = new Person(); 
+        console.log(kim.__proto__); 
+        console.log(park);    // 2개 
+        
+        let arr = new Array(1,2,3); 
+        console.log(arr); // 35개 
+        let arr2 = new Array(); //   누적 70개 
+
+        
+
+
+
+    </script>
+</body>
+</html>
