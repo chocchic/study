@@ -1,0 +1,86 @@
+[SQL]
+
+0. 세팅
+	1) Oracle DataBase Server 19c
+		url : 192.168.02 (학원 pc) / javaking.iptime.org (학원 또는 집)
+		port : 1521
+		sid : orcl
+		username : 본인꺼
+		pw : username과 동일
+
+	2) 툴 Oracle SQL Developer
+		https://www.oracle.com/tools/downloads/sqldev-downloads.html
+		32/64bit 다운 > 압축해제해서 사용
+
+1. 데이터 베이스
+	1) DBMS : DataBase Management System : 데이터를 관리하는 툴
+		oracle, mysql, MariaDB
+	2) 데이터베이스 : 유용한 데이터의 집합
+	3) 파일 시스템의 문제점
+		일관성
+		보안성
+		경제성
+		무결성
+	4) 오라클
+		8,9 -> i
+		10,11 -> g greed
+		12,13,18,19, ... -> c
+		
+		RDMBS : Relational DBMS : 관계형 데이터 베이스 oracle, mysql, postgreSQL...
+		NoSQL : Not Only SQL : MongoDB
+	5) 관계형 데이터 베이스
+		행과 열로 표현되는 테이블간의 관계를 나타낼 때 사용됨
+
+		행 : row , 레코드
+		열 : column
+
+2. SQL : Structured Query Language : 구조화 질의어
+	 데이터베이스를 사용할 때, 데이터베이스에 접근할 수 있는 데이터베이스 하부 언어
+	SQL명령 문자를 query문이라고도 부른다.
+	
+	CRUD
+		Create
+		Read
+		Update
+		Delete
+	1) SQL 종류
+		DDL ( Data Definition Language) : 데이터 정의어
+			데이터베이스 객체(테이블, 뷰, 인덱스 .. )의 구조 정의
+			CREATE	: 생성
+			ALTER	: 수정(변경)
+			DROP	: 삭제
+			RENAME	: 객체 이름 변경
+			TRUNCATE : 삭제(저장 공간 포함)
+
+		DML (Data Manipultion Language) : 데이터 조작어
+			데이터의 삽입, 삭제, 갱신 등 데이터 처리
+			
+			INSERT : 데이터 저장
+			DELETE : 데이터 삭제
+			UPDATE : 데이터 수정
+
+		DCL (Data Contorl Language) : 데이터 제어어
+			데이터 베이스 사용자의 권한을 제어함(DB관리자만 사용가능)
+
+			GRANT	: 권한 부여
+			REMOVE 	: 권한 취소
+
+		DQL (Data Query Language)
+			SELECT	: 데이터 검색
+
+		TCL (Transaction Control Language) : 트랜젝션 제어어
+			트랜젝션(데이터를 처리하는 최소 단위) 관련 제어
+			
+			COMMIT		: 트랜젝션 정상 종료 처리
+					 (툴에서 Auto Commit을 안해놓으면 매번 commit; 명령어 실행해야함
+					  데이터 영구적 반영을 위해서 툴에서 간단히 auto commit 옵션을 활성화시킴)
+			ROLLBACK	: 돌아가기 (작업취소)
+			SAVEPOINT	: 백업정책
+
+(메모방식 : 명령어는 전체 대문자, [] 안에 작성한 것은 명령어가 아닌 여러분들이 작성할 값의 영역)
+3. 데이터 조회 : SELECT
+	
+	SELECT [컬럼명 또는 표현식] FROM [테이블명 또는 뷰명];
+	문자열 데이터를 제외한 나머지는 대소문자 구분하지 않음.
+  
+  
