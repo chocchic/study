@@ -37,3 +37,4 @@
 - **220311(day024)**  : sql , jsp 설정
 ### jsp, framework
 - **220314(day025)**  : jsp 디렉티브 태그, 스크립트 요소, 내장객체(post,get, redirect, 초기화 파라미터, 오류페이지 등)
+- **220314(day025)**  : jsp와 DB, DAO,DTO
