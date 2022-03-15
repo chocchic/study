@@ -1,0 +1,115 @@
+[Jsp03]
+
+0. JSP 페이지 구성 요소 
+	디렉티브 태그 (Directive) 
+	스크립트 : 스크립트릿(scriptlet), 표현식(expression), 선언부(declaration) 
+	표현 언어 (EL expression language)
+	내장 객체 (Implicit Object) 
+	정적인 데이터 : 일반 텍스트등 
+	표준 액션 태그 (Action tag) 
+	커스텀 태그(Custom tag)와 표준 태그 라이브러리(JSTL) 
+
+1. JDBC : Java DataBase Connectivity 
+	
+	자바/JSP 에서 데이터베이스 프로그램밍을 할 때 JDBC API를 사용한다. 
+	자바를 이용해서 DB 연결해주는것. 
+	관계형 데이터베이스 시스템에 접근하여 SQL문을 실행하기 위한 API로, 
+	DBMS의 종류에 상관없이 동일한 방법으로 데이터베이스 작업을 처리할 수 있다. 
+	DBMS에 알맞은 JDBC 드라이저가 필요하며, 각 DBMS는 자신에게 맞는 JDBC 드라이버를 제공하고 있다. 
+
+	자바 웹어플리케이션 ---> JDBC API ---> 오라클 드라이버 <---> 오라클 데이터베이스 
+					  ---> MySQL 드라이버 <---> MySQL 데이터베이스
+					  ---> MaraiDB 드라이버 <---> MariaDB 데이터베이스 
+					  ---> MSSQL 드라이버 <---> MSSQL 데이터베이스 
+
+	1) 드라이버 준비 
+		DB > oracle 19c (19.3) 
+		드라이버 : ojdbc8.jar 
+
+	2) 드라이버 배치 
+		/WEB-INF > lib 폴더안에다 ojdbc8.jar (압축된그대로) 넣기 
+		-> 프로젝트 목록에 Web App Libraries 폴더생성되고 ojdbc8.jar가 보이면 성공 
+
+	3) JDBC로 JSP와 데이터베이스 연동 단계
+		0 : java.sql의 클래스들 임포트 
+		1 : JDBC 드라이버 로딩 
+		2 : DB 접속을 위한 Connection 객체 생성 (url, username, pw, port등등) 
+		3 : 쿼리 실행을 위한 Statement 객체 생성, 쿼리문 작성 
+		4 : 쿼리 실행 
+		5 : 결과값 있으면 꺼내서 사용 
+		6 : Statement, ResultSet등 사용된 객체 닫기 
+		7 : Connection 닫기 
+
+	4) 쿼리 실행을 위한 Statement 객체 
+		쿼리문을 실행하려면 생성한 Connection 객체로 부터 Statement를 (생성)받아오고 
+		쿼리를 실행할 수 있다. 
+
+		* 쿼리 실행 객체 3가지 
+		Statement		: 정적쿼리에 사용. 하나의 쿼리를 사용하면 더 사용 불가. close() 즉시 해제해야함.
+		PreparedStatement	: 동적쿼리에 적용. 하나의 객체로 여러번의 쿼리를 실행할 수 있다. 
+					작업한 쿼리문들을 쌓아두고, 같은 요청이 들어오면 재활용가능. 
+		CallableStatement	: 함수 실행방식으로 현재는 사용 안함. 
+
+		
+		* 쿼리 실행을 위한 PreparedStatement의 메서드 
+		ResultSet	executeQuery() : SELECT문 실행할때 사용 
+		int		executeUpdate() : INSERT, UPDATE, DELETE문 실행할때 사용. 데이터꺼내오는것아닐때. 
+		void		close()		: 객체 닫기. 메모리 해제. 
+		
+		* java.sql.ResultSet 으로 받은 결과 사용 
+		executeQuery() 실행시, 레코드 값을 테이블 형태로 가진 ResultSet 객체로 반환된다. 
+		레코드가 많으면 반복문을 사용하여, 레코드 단위로 결과 추출. 
+		하나의 레코드에서 컬럼별로 값을 꺼내서 사용가능. 
+
+		* ResultSet 메서드 
+		boolean		next()			: 다음 행에 값이 존재하면 true리턴하며, 다음행으로 커서 이동.
+		Xxx		getXxx(int columnIndex) : 지정한 columnIndex의 값을 지정한 Xxx타입으로 가져옴. 
+							Xxx : String, Int, Array, Timestamp 등등 다양한 타입 
+		Xxx		getXxx(String columnName) : 지정한 column명의 값을, 지정한 Xxx타입으로 가져옴. 
+		void		close()			: 객체 닫기 
+
+		
+2. 자바빈즈 JavaBeans
+	: JSP 기반 웹 어플리케이션에서 정보를 표현할때 사용하는 것중 하나로,
+	JSP 페이지에 데이터를 보여주기 위한 자바 코드와 단순히 화면을 출력하는 
+	HTML 코드를 함께 작성하면 코드 재사용의 어려움이 있고, 유지보수도 힘들어진다. 
+	로직의 모듈화를 위하여, 화면에 출력하는 부분과 데이터를 처리하는 로직부분을 구분하여 작성하고
+	로직부분의 코드에 자바 빈즈 클래스를 사용함. 
+	-> 자바는 자바끼리, 스크립트는 스크립트 끼리 
+
+	즉, 로직을 담당하는 자바 코드를 따로 분리하여, 자바 클래스로 로직을 작성하는 방법 
+
+	1) 자바빈즈 기존의 자바 클래스를 작성하는 방법과 동일하게 작성 
+		* 구성요소
+			- 프로퍼티 : 데이터를 담는 변수 
+			- getter : 데이터 가져오는 메서드 
+			- setter : 데이터를 저장하는 메서드 
+			- 메서드
+		* 자바빈즈 작성 규칙 
+			1. 클래스는 java.io.Serializable 인터페이스를 구현 (생략가능) 
+			2. 인수없는 기본생성자 필요 
+			3. 캡슐화로 작성. 변수 private
+			4. 모든변수는 getter/setter메서드 존재해야함. 
+
+		* 우리가 만들 빈 중에서 자주 사용할 것들..
+		Bean	MemberBean	: 회원관련 객체 (vo,dto)  
+		VO	MemberVO	: Value Object : 값을 저장해서 전달하는 용도로 사용하는 객체 (값변경X, DB컬럼과 동일) 
+		DTO	MemberDTO 	: Data Transfer Object : 값을 전달하는 용도로 사용하는 객체 (값변경, DB와 동일하지 않을수도) 
+		DAO	MemberDAO	: Data Access Object : 주로 DB 접속하고 데이터 관리할때 사용되는 객체 
+		Action	MemberAction : 회원관련 비지니스 로직처리하는 객체 
+
+	
+3. 커넥션 풀 Connectio Pool 
+	
+	연결지향성 	: 브라우저에서 요청 -> 결과 받고 난 후 랜선 뽑으면 바로 페이지를 볼수없는 환경 
+	비연결지향성 	: 브라우저에서 요청 -> 결과 받고 난 후 랜선을 뽑아도 페이지가 유지되는 환경 
+
+	커넥션풀은 데이터베이스와 연결된 커넥션을 미리 만들어서 풀(pool)속에 저장해두고
+	필요할때에 커넥션풀에서 가져다 쓰고 반납하는 기법을 말함. 
+	즉, 커넥션풀 객체를 만들어놓고 관리하며, 요청 들어오면 만들어 놓은것을 재사용하기 위한 방법임. 
+	
+	1) 커넥션 풀 준비물 
+		- ojdbc8.jar 
+		- tomcat-dbcp.jar
+		- Server > context.xml 에 커넥션에 필요한 resource 기술 작성 
+		- DAO 
