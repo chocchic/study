@@ -111,4 +111,8 @@
 	V View		: 화면에 보여주는 역할	: jsp 파일 (자바 코드 X, 태그로만 작성)  
 	C Controller	: 사용자의 요청을 받고, Model과 View의 흐름 제어 : servlet (java)
 
+
+메이븐repo : https://mvnrepository.com/search?q=spring
+STS 설치 : https://spring.io/tools
+eclipse 너무 최신버전은 TS3 플러그인 지원 x, 새로 설치 : https://www.eclipse.org/downloads/packages/release/2020-12/r
 	
