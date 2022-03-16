@@ -1,0 +1,114 @@
+[spring01]
+
+1. Framwork 프레임 워크
+
+	2.5 : 어노테이션을 활용하는 설정 도입, 편리한 설정과 개발 가능
+	3.0 : 별도의 설정이 없어도 Java클래스만으로 설정 파일을 대신할 수 있게 지원
+	4.0 : 모바일환경과 웹 환경에서 많이 사용되는 REST 방식의 컨트롤러 지원
+	5.0 : Reactor를 이용한 Reactive 스타일의 개발환경 지원
+	
+	* 많이 사용하는 프레임워크
+		Spring framework
+		전자정보 프레임워크 (Spring 기반)
+		.NET framework
+		Struts
+		PHP
+		자체 프레임워크
+	* 스프링
+		Spring MVC 프레임워크 : 웹 프로그래밍 기반
+		Spring AOP 프레임워크 : 설계 기반
+		Spring Boot 프레임워크 : 모든 설계 환경들을 합쳐 놓은 것
+
+2. Spring Framework
+	1) 특징
+		- POJO 기반 구성 : Plain Old Java Object : 일반적인 자바 코드를 이용해 객체를 구성하는 방식을 그대로 스프링에서 사용할 수 있다. 특정 라이브러리나 컨테이너의 기술에 종속적이지 않음
+		- MVC 웹 프레임워크 제공 : MVC 모델 가지고 있음
+		- DI/IoC : Dependency Injection(의존성 주입) / Inversion of Control (제어의 역전)
+			의존성 주입 : 객체를 대여하는 개념, 무분별한 객체 생성을 줄여서 메모리 낭비 최소화하기 위한 방법으로 만들어 놓은 것을 잠시 빌려쓰고 돌려주는 개념. 
+			제어의 역전 : 제어권은 스프링이 가지고 있다
+		- AOP : Aspect Oriented Programming 관점 지향 프로그래밍
+			대부분 시스템이 공통으로 가지고 있는 보안이나, 로그, 트랜젝션같이 메인 비즈니스 로직은 아니지만 공통적으로 반드시 처리가 필요한 부분을 횡단 관심사(Cross-concern)라고 하는데 스프링은 이런 횡단 관심사를 분리해서 제작하는 것이 가능
+			AOP는 이런 횡단관심사를 모듈로 분리하는 프로그램 패러다임.
+			
+			POP 절차지향 :  C
+			OOP 객체지향 : Java, C++
+			AOP 관점지향 : framework
+				        해당 조건에 맞으면 자동으로 돌아가는 클래스들이 존재함
+
+3. 세팅
+	1) Spring 개발 환경 세팅
+	
+		개발환경 필요 요소
+		- JDK 11 (환경 변수)
+		- Eclipse + plugin / STS(Eclipse)
+		- DB 오라클(19c) / SQL Developer 등 DBMS 활용 툴
+		- Mybatis 프레임워크 (추후 추가)
+
+	2) Spring 툴
+		IDE Tool
+			Eclipse + 플러그인, Eclipse기반 STS, Intellij
+
+			* 개발환경 세팅 방법
+				Eclipse에 플러그인 추가해서 프로젝트 생성
+				STS로 프로젝트 생성
+		프로젝트 생성하는 방식
+			Spring 기본방식 : lib 폴더에 스프링라이브러리들 넣기 (offline)
+			Spring Maven 방식 * : 많이 사용 (online)
+			Spring Gradle 방식 : 근래에 많이 보임
+
+4. STS 세팅
+	1) 다운받은 STS4 (한글 안들어간 경로에 두고 ) 압축해제 > contets도 압축해제!
+	2) SpringToolSuite4.exe (초록색 아이콘) 실행
+	3) workspace 폴더 경로 잡기
+	4) Help > Market palce ... 선택 > 팝업 find 부분에 'sts'라고 검색 > STS 3 Add on ... 인 것 install하고 기다리기 > 툴 재부팅
+	5) 오른쪽 상단 + (open persvective) 아이콘 클릭해서 Spring 있는지 확인 > Spring 선택하고 확인 > 스프링 개발모드로 변경~
+	6) 인코딩 UTF-8로 변경
+	7) 서버 세팅
+		Tomcat 9 압축해제 해놓은 곳으로 잡아서 세팅
+		확인 : 서버 스타트해서 실행 잘 되는지 확인
+	8) 프로젝트 생성
+		File > New > Spring Legacy Project > project name : 맘대로, Spring MVC project 선택 > next > 패키지명 3단계로 작성 > finish!
+		* 부수적인 에러는 잘 처리
+
+5. Eclipse에 STS3 플러그인 추가
+	1) 이클립스 새로 압축 해제
+	2) STS3 플러그인 추가
+		Help > Eclipse Marketplace ... > 팝업 find에 'STS3' 검색 > STS 3 (stand alone)... install > I accept 하고... finish > 기다렸다가 재부팅뜨면 재부팅하기
+	3) 오른쪽 상단 + (open perspective) > Spring 선택 (spring 
+	4) 톰캣 서버 세팅
+	5) 프로젝트 생성
+		File > New > Spring Legacy Project 선택 > project name : myspring, Spring MVC ... 체크 > next > 기본 패키지명 3단계로 작성 : com.basic.controller > finish! 기다린다
+	6) pom.xml 세팅
+		java 버전 = java-version : 11(자신의 jdk 버전)
+		springframework 버전  = springframework-version : 5.1.5 RELEASE
+		-> 프로젝트 폴더 우클릭 > MAVEN > Update Project ... 선택 enter
+		다른 lib추가시 여기에 추가
+	7) 폴더 구조
+		src/main/java	 : 자바 클래스 작성
+		src/main/resources : 실행시 참고하는 설정 파일 등 소스들
+		src/test/java 	 : 테스트 코드 넣는 패키지
+		src/test/resources	 : 테스트 할 때 필요한 소스들 
+		
+		src
+		  main
+		    webapp
+		      resources	: js, css, 이미지들 ...
+		      WEB-INFO
+			classes`	: 자밥 컴파일된 소스 폴더 (우리는 사용 안함)
+			spring	: 설정파일 저장된 폴더
+			  appServlet
+			       servlet-context.xml 	: 서블릿(웹) 관련 설정
+			  root-context.xml	: 스프링 전체 관련 설정
+			views		: jsp 파일들 위치할 곳
+			  home.jsp
+			web.xml		: 전제 기본 설정
+		pom.xml			: Maven 방식의 라이브러리 관리하는 파일
+				
+	
+6. MVC (MVC 패턴, MVC Architecture)
+
+	M Model		: 비즈니스 로직 처리 담당	: DAO, Service, DTO 등 자바 클래스
+	V View		: 화면에 보여주는 역할	: jsp 파일 (자바 코드 X, 태그로만 작성)  
+	C Controller	: 사용자의 요청을 받고, Model과 View의 흐름 제어 : servlet (java)
+
+	
