@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	https://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+		https://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- Service, DAO, DB관련 등 (모든 곳에서 참조해야하는 설정들) 여기에 -->
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!-- 여긴 beans로 묶여 있기 때문에 beans:bean이 아님~ -->
+	
+	<!-- Date date;
+		if(date != null){
+			date = new Date(); 
+		}
+	-->
+	<!-- 스프링 빈으로 등록 : 스프링이 객체 생성해서 관리
+				Date date = new Date(); -->
+	<bean id="date" class="java.util.Date"/>
+	<!-- 같은 클래스로 빈 두개 설정 : 같은 타입의 객체 두개 생성 -> error 발생!! -->
+	<bean id="day" class="java.util.Date"/>
+	
+	<!-- component scan 이나 bean 둘 중 하나만하기 -->
+	<!-- 
+	<bean id="chef" class="com.test.sample.Chef"/>
+	<bean id="restaurant" class="com.test.sample.Restaurant">
+		<property name="chef" ref="chef"></property>
+	</bean>
+	-->
+	 
+	 <context:component-scan base-package="com.test.sample"/> 
+	 
+	 <!--						  -> Chef		-> Chef
+	 [		] -> root-context.xml -> Restaurant -> Restaurant 
+	 								^ Chef
+	  -->
+	  
+	  <!-- 스프링이 객체 생성, 기본생성자 호출 -->
+	  <!-- <bean id="hello" class="com.test.sample.HelloBean"/> --> 
+	  <!-- 아래 3줄은 자바의  
+	  	HelloBean hello = new HelloBean(); hello.setNum(10); hello.setMsg("hello spring"); 
+	  	과 같은 의미-->
+	  	<!-- hellobean.java에 setter가 없으면 적용시킬 수 없으므로 property에 선언한 것이 전부 error가 난다 -->
+	  <!-- HelloBean에 생성자 만들면 오류남!!  
+	  <bean id="hello"  class="com.test.sample.HelloBean">
+	  	<property name="num" value="10"/> 
+	  	<property name="msg" value="hello spring"/>
+	  	<property name="reg" ref="date"></property>
+	  </bean>
+	  -->
+	  <!-- index를 넣지 않고 생성자의 변수 순서를 맞춰 주지 않으면 Error -->
+	  <!-- index 해주면 순서 상관 없이 선언 가능 -->
+	 <!-- 
+	 <bean id="hello" class="com.test.sample.HelloBean">
+	  	<constructor-arg index="1" value="hello spring" />
+	  	<constructor-arg index="0" value="100" />
+	  	<property name="reg" ref="date"/>
+	 </bean>
+	  -->
+	 <!-- name 사용시 HelloBean.java에 선언되어있는 기본생성자에 @ConstructorProperties을 추가하고
+	 원하는 매개변수의 이름을 순서에 맞춰서 줘야한다. 매개변수 순서가 어노테이션에 주는 값과 일치해야 한다는 점이 제일 중요
+	 @ConstructorProperties({"msg","c","a","b"})
+	 public HelloBean(String msg, boolean c, int a, long b){
+	 	....
+	 }
+	  
+	  <bean id="hello" class="com.test.sample.HelloBean">
+	  	<constructor-arg value="true" name ="c" />
+	  	<constructor-arg value="hohoho" name = "msg"/>
+		<constructor-arg value="2" name ="a" />
+		<constructor-arg value="1" name = "b"/>
+		
+	 </bean>
+	  -->
+</beans>
