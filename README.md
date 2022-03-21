@@ -4,7 +4,7 @@
 ## 계획
 	자바					3주
 	html,css,javascript,sql			2주
-	jsp, 프레임워크(spring)		3주
+	jsp, 프레임워크(spring)			3주
 	팀 프로젝트				3주
 	데드라인 : 4월 29일(발표)
 
@@ -39,3 +39,6 @@
 - **220314(day025)**  : jsp 디렉티브 태그, 스크립트 요소, 내장객체(post,get, redirect, 초기화 파라미터, 오류페이지 등)
 - **220314(day025)**  : jsp와 DB, DAO,DTO
 - **220316(day026)**  : spring 환경 설정, MVC 패턴
+- **220317(day027)**  : spring 라이브러리 추가(lombok, pring-test, sevlet-api 수정, log4j 수정, junit 버전 변경), Controller, DI
+- **220318(day028)**  : 테스트, 스프링 빈, 파라미터 받아 화면에 출력하기 까지. 스프링 실행 구조
+- **220321(day029)**  : 
