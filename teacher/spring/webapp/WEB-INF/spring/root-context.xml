@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	https://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	https://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!--  Service, DAO, DB관련등 (모든곳에서 참조해야되는 설정들) 여기에  -->
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!-- 스프링빈으로 등록 : 스프링아~ 객체 생성해서 관리해줘~ 
+							Date date = new Date();  -->
+	<bean id="date" class="java.util.Date" /> 
+	<!-- 같은 클래스로 빈 두개 설정 : 같은타입의 객체 두개 생성 -->
+	<bean id="day" class="java.util.Date" /> 
+	
+	<!-- 
+	<bean id="chef" class="com.test.sample.Chef" />
+	<bean id="restaurant" class="com.test.sample.Restaurant" >
+		<property name="chef" ref="chef" ></property>
+	</bean>
+	<context:component-scan base-package="com.test.sample" />
+	-->
+	
+	<!-- 스프링이 객체생성. 기본생성자 호출 
+	<bean id="hello" class="com.test.sample.HelloBean" /> -->
+	
+	<!-- HellBean hello = new HelloBean(); 
+		hello.setNum(10); 
+		hello.setMsg("hello spring"); 
+	 
+	<bean id="hello" class="com.test.sample.HelloBean">
+		<property name="num"  value="10" />
+		<property name="msg"  value="hello spring" />
+		<property name="reg" ref="date" />
+	</bean>
+	
+	<bean id="hello" class="com.test.sample.HelloBean" >
+		<constructor-arg index="1" value="hahahaha" />
+		<constructor-arg index="0" value="100" />
+		<property name="reg" ref="date" />
+	</bean> 
+	
+	//@ConstructorProperties({"msg", "c", "a", "b"})
+	public HelloBean(String msg, boolean c, int a, long b) {
+		....
+	}
+	
+	<bean id="hello" class="com.test.sample.HelloBean" >
+		<constructor-arg value="true" name="c" />
+		<constructor-arg value="hahahaha" name="msg" />
+		<constructor-arg value="2" name="b" />
+		<constructor-arg value="1" name="a" />
+
+		<property name="reg" ref="date" />
+	</bean>
+	 -->
+	
+	<context:component-scan base-package="com.test.sample" />
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</beans>
