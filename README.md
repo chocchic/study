@@ -42,3 +42,5 @@
 - **220317(day027)**  : [spring 02] : spring 라이브러리 추가(lombok, pring-test, sevlet-api 수정, log4j 수정, junit 버전 변경), Controller, DI 
 - **220318(day028)**  : [spring 03] : 테스트, 스프링 빈, 파라미터 받아 화면에 출력하기 까지. 스프링 실행 구조
 - **220321(day029)**  : [spring 04] : EL, JSLT, Model(@ModelAttribute까지)
+- **220322(day030)**  : [spring 05] : Oracle DB 연동, Mybatis 설정, Mybatis로 DB CRU
+- **220323(day031)**  : 동적 쿼리 사용해보기
