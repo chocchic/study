@@ -1,0 +1,163 @@
+[spring05]
+
+1. Spring과 Oracle DataBase 연동
+	1) 라이브러리 배치
+		- ojdbc9.jar : oracle DB driver
+		- spring-jdbc : Java에서 DB connection 맺을 때 필요, 트랜젝션 포함(커넥션 풀 가능)
+		- HikariCP : 커넥션 풀
+		* Mybatis
+			- mybatis
+			- mybatis-spring
+		- org.bgee.log4jdbc-log4j2 : DB 관련, SQL문 실행 절차 로그로 남기는 라이브러리
+
+	2) 커넥션 풀
+		일반적으로 여러 명의 사용자를 동시에 처리해야 하는 웹 어플리케이션의 경우 DB연결을 이용할 때 '커넥션 풀 Connection Pool'을 이용
+	
+		자바에서는 DataSource라는 인터페이스를 통해 커넥션 풀을 사용함. 커넥션 풀 종류 중 요즘 많이 사용되는 HikariCP를 이용해보자
+	
+		* HikariCP
+			DB 커넥션풀 관리해주는 라이브러리
+	
+2. MyBatis
+
+	SQL 매핑 프레임워크
+	객체지향언어인 자바에서 관계형 데이터베이스 프로그래밍을 좀 더 쉽게 할 수 있도록 도와주는 DB관련 개발 프레임워크
+	자바 클래스 -> SQL문 사이에 자동 매핑 기능을 지원하는 ORM(Object Relational Mappig) 프레임워크(Java의 객체와 RDB의 table의 매핑을 지원)
+	문서 참고 : https://mybatis.org/mybatis-3/ko/index.html
+	iBatis(아파치) -> MyBatis(구글)
+	hibernate, JPA 등 것도 있다.
+
+	* 전통적인 JDBC 프로그램 ( jsp 배울 때 DAO 클래스에 작성하던 방식 )
+		직접 Connection 맺고, close()
+		PreparedStatement 직접 생성 및 처리
+		PreparedStatement의 setXXX() 등에 대한 모든 작업을 개발자가 처리
+		Select문의 경우 직접 ResultSet 처리
+
+	* Mybatis
+		자동으로 Connection 맺고, close() 가능
+		Mybatis 내부적으로 PreparedStatement 처리
+		#{속성명}와 같이 속성을 지정하면 내부적으로 자동으로 데이터 바인딩 처리
+		리턴 타입을 지정하는 경우 자동으로 객체 생성 및 ResultSet 처리
+
+	Mybatis는 기존의 SQL을 그대로 활용할 수 있다는 장점이 있고, 진입장벽이 낮은 편이라 JDBC의 대안으로 많이 사용함.
+	
+	좀더 편하게 작업하기 위해 SQL을 어떻게 처리할 것인지 별도의 설정을 분리, 자동으로 처리되는 방식을 이용한다.
+	이를 위해 Mybatis의 Mapper라는 존재를 작성해줘야함
+		
+	Mapper는 쉽게 말해 SQL과 그에 대한 처리를 지정하는 역할을 함.
+	Mybatis-spring을 이용하는 경우에는 Mapper를 XML, 인터페이스+어노테이션 형태로 작성할 수 있다.
+	
+	# Mybatis mapper 적용 방법
+		1. xml 파일만 이용 : 복잡한 쿼리문 필요시
+		2. 인터페이스 + annotation 이용 : 간단한 쿼리문만 사용시
+		(3.) 인터페이스 + xml : 우리가 사용하는 방식 복잡한 쿼리문, 간단한 쿼리는 어노테이션만 사용가능
+	
+	1) SQL 태그
+		# 태그명 : select, insert, update, delete 같이 각 쿼리문에 해당하는 태그 존재함
+	
+		# 속성
+			id : 태그에 id 부여, (인터페이스와 혼용시) 인터페이스 메서드명과 동일하게 작성
+			resultType : ..자바로 따지면 쿼리문 실행 후 결과에 따른 리턴 타입
+				    속성 값은 int, String, DTO/VO, 날짜는 원하는 타입(String, Timestamp, Date..)
+				    결과의 컬럼 기준으로 컬럼이 1개면 그 해당 컬럼의 데이터타입
+				    결과의 컬럼 기준으로 컬럼이 2개 이상이면 DTO/VO 타입 또는 Hashmap
+			parameterType : 자바로 따지면 파라미터
+					( 인터페이스와 혼용시, 매개변수 타입으로 대체)
+					int, String, DTO, hashmap
+
+					placeholder : ? 대신 DTO/hashmap -> #{변수명/키값}, int,String -> #{value}
+
+					자바 : insert into test values(?,?,?,sysdate);
+						setString(1,dto.getId());
+						...
+					mybatis : 
+						<insert parameterType="com.test.model.TestDTO">
+							insert into test values(#{id}. #{pw}, #{age}, sysdate);
+						</insert>
+
+						Map map = new HashMap();
+						map.put("id","pikachu");
+						map.put("pw","1234");
+						<update parameterType="hashmap">
+							update test set age=#{age}, pw=#{pw}
+						</update>
+	2) Log의 태그들
+		FATAL
+		ERROR
+		WARN
+		INFO
+		DEBUG
+	
+		DEBUG까지 다 찍으면 너무 많으니까 INFO만 찍는 중
+
+3. DB 연동 세팅 정리 
+
+	1) pom.xml 
+		라이브러리들 배치 
+	2) src/main/resources  > log4jdbc.log4j2.properties 파일 추가 
+		log4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
+	3) 폴더와 패키지들 먼저 구성 
+		src/main/java > com.test.mapper 패키지 생성 
+		src/main/resources > com > test > mapper 폴더 생성 
+
+	4) root-context.xml : DB 세팅 빈들 작성 
+		<bean> 3개 
+		페이지 상단에 mybatis-spring 스키마 추가하고, 
+		<mybatis-spring:scan base-package....> src/main/java에 있는 mapper패키지로 추가 
+		
+	5) src/main/java > ...mapper패키지에  인터페이스 생성 
+
+	6) src/main/resource > ... mapper 폴더에 인터페이스이름과 같은 xml 파일 생성 
+		Mybatis 사이트에서 !Doctype mapper 복사해와 붙히고, 
+		<mapper name="....mapper.인터페이스명">
+		</mapper> 
+
+	세팅끝!
+	-----------
+	하나씩 인터페이스와 xml 파일을 번갈아가며 추가 
+
++) 패키지 정리
+	1) 각 영역의 Naming Convention (명명 규칙)
+		프로젝트를 3-tier로 구성하는 것이 가장 일반적임. 유지 보수에 대한 필요성 때문.
+		스프링 MVC 프로젝트의 기본 구성으로 웹 프로젝트는 3-tier방식으로 구성
+
+		Presentation <--> Business <--> Persistence tier
+		JSP		모든 처리		DB 관련, Mybatis DAO	
+
+		Presentation Tier : 화면 계층 :  화면에 보여주는 기술을 사용하는 영역
+			Servlet/JSP가 스프링 MVC의 화면계층을 담당.
+		Business Tier : 비즈니스 계층 : 순수한 비즈니스 로직을 담고 있는 영역
+			실제 요청되는 요구사항을 처리해주는 영역.
+			이 영역은 주로 'xxxService'와 같은 이름으로 구성하고, 메서드의 이름도 고객들이 사용하는 용어를 그대로 사용하는 것이 좋다.
+
+		Persistence Tier : 영속계층 또는 데이터계층 : 데이터를 어떤 방식으로 보관하고, 사용하는가에 대한 설계가 들어가는 계층. 개발 기획단계에서 구성 
+			일반적인 경우 데이터베이스를 많이 이용하나, 경우에 따라 네트워크 호출이나 원격 호출 등의 기술이 접목될 수 있다.
+			이 영역은 MyBatis와 mybatis-spring을 이용해 구성
+
+		[ 스프링MVC와 계층 구조 ]
+		[ Spring MVC ] <------> [ Spring Core <--> [ springn-mybatis ] <--]--> [ Mybatis ] <--> [ DB ]
+		servlet-context.xml		root-context.xml
+
+		Spring MVC 영역 : Presentation Tier 구성
+		Spring Core 영역 : 흔히 POJO의 영역(일반 자바 클래스 객체). 의존성 주입을 이용해 객체 간의 연관 구조 완성해 사용.
+		Mybatis영역 : mybatis-spring을 이용해 구성하는 영역. SQL에 대한 처리를 담당
+
+	2) 각 영역의 Naming Convention (명명 규칙)
+
+		[ 인터페이스 / 클래스 Naming convention ]
+			- xxxController : 스프링 MVC에서 동작하는 Controller 클래스
+				- xxxServiec, xxxServiceImpl : 비즈니스 로직 담당하는 인터페이스와 이에 따른 구현 클래스
+			- xxxDAO, xxxRepossitory : DAO나 Repository(저장소)라는 이름으로 영역을 따로 구성하는 것이 보편적임.
+			- VO, DTO : 데이터를 담고 있는 객체를 말함
+				VO : 주로 read only의 목적이 강하고, 데이터 자체도 불변하게 설계하는 것이 정석
+				DTO : 주로 데이터 수집, 이동의 용도가 더 강함.
+
+		[ 패키지 Naming convention ]
+			- com.xxx.controller	: 컨트롤러 클래스들 위치	
+			- com.xxx.service		: Service 인터페이스와 구현 클래스
+			- com.xxx.domain		: VO, DTO
+			- com.xxx.persistence	: mybatis mapper 인터페이스
+			- com.xxx.exception	: 예외 처리 관련
+			- com.xxx.aop		: aop 관련 
+			- com.xxx.security	: spring security 관련 
+			...
