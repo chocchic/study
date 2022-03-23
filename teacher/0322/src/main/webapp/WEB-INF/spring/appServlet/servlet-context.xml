@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+		https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans 
+		https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		https://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--  Controller, HandlerMapping, ViewResolver 등이 세팅되는 곳 -->
+
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+
+	<!-- css,js, 이미지등 소스들의 경로를 jsp에서 경로적을때, 
+		 /resources/~~라고 작서하면 webapp밑에 resources 폴더안에서 찾겠다~ 지정하기  -->
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<!-- 해당 패키지를 스캔해라~ @Component, @Controller, @Service, @Repository 들이 붙어있는 클래스들을 
+		전부 스캔해서 객체 생성 자동으로 해줌 
+		스프링이 해당 어노테이션이 붙은 클래스들을 객체생성(스프링빈으로등록)해서 
+		스프링이 객체를 관리하게 됨.  -->
+	<context:component-scan base-package="com.basic.controller" />
+	<context:component-scan base-package="com.test.controller" />
+	
+	<!-- 객체 생성 : = 스프링 빈(스프링이 관리하는 객체)으로 등록
+			java.util.Date
+			new TestController(); 
+	<beans:bean class="com.test.controller.TestController"></beans:bean>
+	<beans:bean class="com.basic.controller.HomeController"></beans:bean>
+	<beans:bean class="com.basic.controller.SampleController"></beans:bean>
+	 -->
+	
+	
+	
+	
+	
+	
+	
+	
+</beans:beans>
