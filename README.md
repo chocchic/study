@@ -44,3 +44,5 @@
 - **220321(day029)**  : [spring 04] : EL, JSLT, Model(@ModelAttribute까지)
 - **220322(day030)**  : [spring 05] : Oracle DB 연동, Mybatis 설정, Mybatis로 DB CRU
 - **220323(day031)**  : 동적 쿼리 사용해보기
+- **220324(day032)**  : [spring 07] : member login signup / session
+- **220325(day033)**  : [spring 08] : member logout main updateMem / cookie
