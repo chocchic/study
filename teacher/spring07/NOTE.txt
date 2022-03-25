@@ -1,0 +1,158 @@
+[day07]
+
+1. 프로젝트 생성 
+
+	1) Spring Legacy Project 
+		name : 프로젝트명 작성 
+		Spring MVC... 선택 > next > 기본패키지3단계로 작성 ex) com.member.controller > finish!
+		설정정보파일들 있는지 폴더들 열어 확인 
+
+	2) pom.xml 세팅 
+		java-version	: 11
+		spring version  : 5.1.5
+		그 외 lombok 등 추가/수정 
+		
+	3) 프로젝트 우클릭 > Maven > Update project... 선택해서 프로젝트 update 
+
+		> MavenRepository, JRE 등등 버전 변경된것 확인 
+	
+	4) 서버 우클릭 > Add and Remove... > 프로젝트 서버에 올리기 
+
+	5) 프로젝트 우클릭 > Properties 
+		> Java Build Path > Libraries 탭 > JRE, Maven, Tomcat 있는지 확인 
+			* Tomcat 없으면, classpath 선택하고 Add Library 
+			> Runtime Server.. > Tomcat 9.0..선택 > finish > 하단에 Apply! 
+		> Project Facets > Java 11 확인, 
+				 > 오른쪽 Runtime 탭 > Tomcat... 체크 > 하단에 Apply and Close! 
+
+	6) 서버 더블클릭 > 하단에 Modules 탭 > 
+		올라간 프로젝트 확인하고, Path '/'로 수정 
+		수정은 프로젝트 선택 > Edit 버튼 > Path에 '/controller' -> '/' 로 변경하고 확인 
+		> 열린 톰캣세팅 파일 저장 > 서버 재부팅   
+			
+	7) 서버 스타트 된 상태에서, 브라우저 열어 http://localhost:8080/ 요청해서 Hello World 찍히는지 확인. 
+
+
+2. 회원 가입 
+
+	1) scr/main/java 패키지 구성 
+		com.member.controller	: 컨트롤러 클래스 
+		com.member.service	: 비지니스 로직처리하는 Serivce 파일들 
+		com.member.domain	: DTO,VO
+		com.member.mapper	: Mapper 인터페이스 
+
+	   src/main/resources 패키지 구성 
+		com > member > mapper 폴더  : Mapper.xml 
+
+	   webapp
+		resources
+			css폴더		: .css
+			js 폴더		: .js
+			imgs폴더	: 이미지들 
+		WEB-INF
+			views
+				member폴더 : .jsp 파일들 
+	
+	
+	2) 경로와 필요한 페이지 
+		
+		URL			Method		설명 			jsp페이지 
+		-----------------------------------------------------------------------------------
+		/member/main		GET		메인페이지 		main.jsp
+		/member/signup		GET		회원가입 폼페이지 	signup.jsp
+		/member/signup		POST		회원가입 처리 		(signupPro.jsp) 
+		/member/login		GET		로그인 폼페이지 	login.jsp
+		/member/login		POST		로그인 처리 		(loginPro.jsp) 
+		/member/mypage		GET		내정보 페이지 		mypage.jsp
+		/member/modify		GET		회원정보수정 폼페이지	modify.jsp
+		/member/modify		POST		회원정보수정 처리	(modifyPro.jsp) 
+		/member/delete		GET		회원 탈퇴 폼 페이지 	delete.jsp
+		/member/delete		POST		회원 탈퇴 처리 		(deletePro.jsp)
+		-----------------------------------------------------------------------------------
+			
+	3) DB 테이블 : springMember 
+		singup.jsp 참고 
+
+	4) Service 
+		MemberService : 인터페이스 
+		MemberServiceImpl : 구현클래스 (@Serivce) 
+	
+	5) DAO (생략) 
+		MemberRepository : 인터페이스 
+		MemberRepositoryImpl : 구현클래스 (@Repository) 
+
+	5) Mapper 
+		MemberMapper : 인터페이스 
+		MemberMapper : xml파일 
+
+
+3. Session 세션 
+	: 클라이언트와 웹 서버간의 상태를 지속적으로 유지하는 방법. 
+	쿠키와 세션의 차이점은 어디에 정보를 저장하느냐의 차이. 
+	쿠키 : 웹브라우저에 사용자 정보 저장   (클라이언트측 사용자 정보 보관소) 
+	세션 : 웹 서버쪽의 웹 컨테이너에 정보를 저장 (서버측 사용자 정보 보관소) 
+
+	서버는 세션을 사용해서 클라이언트 상태를 유지할 수 있기 때문에, 
+	주로 로그인한 사용자 정보를 유지하기 위한 목적으로 세션을 사용한다. 
+	세션은 웹 서버에서만 접근이 가능하므로 브라우저와 서버의 상태 유지가 훨씬 안정적이고 
+	보안 유지에 더 유리하며 데이터 저장하는데 한계가 없다. 
+	간혹, 웹브라우저에서 쿠키를 지원하지 않을 경우나 강제걱으로 쿠키를 막는 경우 세션은 상관없이 사용가능. 
+	하지만, 세션은 여러 서버에서 공유 할 수 없다. www.daum.net, mail.daum.net 
+	
+	웹 컨테이너에는 세션컨테이너가 존재하며, 기본적으로 한 웹브라우저마다 한 세션을 생성하여, 사용자의 구분단위가 됨. 
+	한 브라우저에서 여러 jsp 페이지를 보여줘도 하나의 세션을 사용, 
+	같은 페이지라도 브라우저에 따라 서로 다른 세션을 사용. 
+	세션을 사용하면 클라이언트(브라우저)가 웹 서버의 세션에 의해 가상으로 연결된 상태가 되며, 
+	웹 브라우저를 닫기 전까지 웹 페이지를 이동하더라도 사용자의 정보가 
+	웹 서버에 보관되있어 사용자 정보를 잃지 않는다. 
+
+	로그인 상태유지 -> 세션에 속성을 하나 추가해줄것임. 
+
+	웹 브라우저마다 별도의 세션을 갖는다고 했는데, 이런 각 세션을 구분하기 위해 
+	세션마다 고유 ID를 할당하는데 이를 세션 ID라고 한다. 
+	웹 서버는 웹 브라우저에 세션ID를 기본적으로 전송, 웹 브라우저는 웹 서버에 연결할 때마다 
+	매번 세션ID를 보내서 서버가 어떤 세션을 사용할 지 판단할 수 있게 한다. 
+	
+	웹 서버와 웹 브라우저는 세션ID를 공유해야하는데 이를 위해 사용하는 것이 쿠키이다. 
+	쿠키 목록중 JSESSIONID인 쿠키가 세션 ID 공유할때 사용하는 쿠키이다. 
+	
+
+	* HttpSession 메서드 
+	void			setAttribute(String name, Object value) : 속성명 name으로 value속성값 세션에 추가 
+	Object			getAttribute(String name) : 속성명name인 속성값 Object로 리턴. 없으면 null. 
+	void			removeAttribute(String name) : name 속성명과 값 삭제 
+	void			invalidate()		: 현재 세션에 저장된 모든 세션속성 제거 
+
+	java.util.Enumeration	getAttributeNames() : 세션 속성명들 모두 리턴 
+	long			getCreationTime()   : 세션 생성된 시간 리턴 
+	int			getMaxInactiveInterval() : 해당 세션을 유지하기 위한 유지시간 리턴 1,800초 (30분) 
+	void			setMaxInactiveInterval(int interval) : 세션 유지시간 초단위로 할당 
+	String			getId()		: 세션에 할당된 고유 아이디 리턴 
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
