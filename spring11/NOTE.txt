@@ -1,0 +1,117 @@
+1. 페이징 처리
+	* order by의 문제점
+		성능 저하
+		-> order by보다는 인덱스
+
+	1) Oracle에서의 인덱스
+		B-TREE (Normal Index) : OLTL DB에서 사용
+		BITMAP : OLAP DB에서 주로 사용
+		함수기반
+		어플리케이션 도메인
+		Index-Oragnized
+
+		* OLTL : On-Line Transaction Processing = insert, update, delete가 실시간으로 자주 발생하는 것
+		  OLAP : insert, update, delete가 별로 사용될 일이 없는 것
+	2) 인덱스 특징
+		- 검색 속도가 무척 빨라질 수 있다 (잘 써야 빠르다)
+		- 그 결과 해당 쿼리 부하가 줄어들어 결국 시스템 전체 성능 향상 가능
+		- 인덱스가 데이터베이스 공간을 차지해서 추가적인 공간 필요함.
+		- 처음 인덱스 생성시 시간 많이 소요될 수 있다.
+		- 데이터 변경작업이 자주 일어나는 경우에는 오히려 성능이 나빠질 수 있다
+
+	3) 자동으로 생성되는 인덱스
+		인덱스는 테이블의 컬럼 단위로 생성된다.
+		하나의 컬럼을 인덱스로 생성할 수도 있고, 여러 컬럼에 하나의 인덱스를 생성할 수도 있다.
+
+		테이블 생성시 제약조건 Primary Key 또는 Unique를 사용하면 자동으로 인덱스가 생성된다.
+	
+		[ order by ]
+		select * from board where bno > 0 order by bno desc;
+		[ index ]
+		select /*+ INDEX_DESC(board pk_board) */
+		* from board where bno > 0;
+
+		인덱스는 색인이다. 정렬이 이미 되어있는 상태
+		레코드가 적으면 인덱스 없이 Full Scan 해도 빨리 처리되지만 레코드가 많으면 인덱스를 사용하는 것이 좋은 경우도 있다.
+
+	4) 오라클에서 인덱스 힌트 사용하기
+		
+		SELECT /*+ 힌트 */ 컬럼명,... FROM 테이블명;
+		SELECT --+ 힌트 컬럼명,... FROM 테이블명;
+
+		# 1. Full 힌트 : 전체 스캔
+			/*+ FULL(테이블명) */
+		# 2. INDEX_ASC, INDEX_DESC 힌트
+			/*+ INDEX_ASC(테이블명 인덱스명)*/
+
+	5) ROWNUM
+		페이징 처리시, 전체가 아닌 필요한 만큼의 데이터를 가져오고 싶을 때 정렬된 레코드에 넘버링해주기 위해 사용.
+
+2. 게시판 페이징 처리
+	1) 페이징 처리를 위한 파라미터
+		# 1. 페이지 번호 : pageNum
+		# 2. 한 페이지 당 몇 개의 데이터를 보여줄 것인지 : listQty
+		
+		-> 묶어서 전달하기 위해 클래스 생성
+		1 패이지
+			pageNum = 1
+			listQty = 10 (한 페이지에 10개 글 보여주기)
+
+			rownum 1 ~ 10
+		2 페이지
+			pageNum =2
+			listQty = 10
+			
+			rownum 11 ~ 20
+
+		3 페이지
+			pageNum = 3
+			listQty = 10
+
+			rownum 21 ~ 30
+
+		=> min rownum = (pageNum-1) * listQty + 1
+		     max rownum = pageNum * listQty
+
+	2) 페이징 화면 처리
+		- 브라우저 주소창에 페이지 번호 전달해서 결과 확인하고 JSP페이지에 페이지 번호 출력
+		- 각 페이지 번호에 이벤트 처리
+		- 전체 데이터 개수를 반영해 페이지 번호 조절
+
+		* 페이징 화면 처리시 필요한 정보들
+			- 현재 페이지 번호 (page)
+			- 이전과 다음으로 이동가능한 링크의 표시 여부 (prev, next)
+			- 화면에서 보여지는 페이지의 시작번호와 끝번호(startPage, endPage)
+
+			* 끝번호 endPage
+				endPage = (int)(Math.celi(page/10)) * 10
+
+			* 시작번호 startPage
+				startPage = endPage - 9;
+
+			* 끝번호 추가 계산
+				전체 레코드 수 total -> 페이지 전체 수 amount = 10
+				totalPage = (int)(Math.ceil((total*1.0)/amount)) // 전체 글의 페이지 수
+				if(totalPage < endPage) {
+					endPage = totalPage;
+				}
+			* 이전 prev, 다음 next (boolean)
+				prev = startPage > 1 ?true:false;
+				next = endPage < totalPage?true:false;
+
+[ 앞으로 할 것 ]
+검색 기능 
+	제목, 내용, 작성자
+	제목 or 내용	+ 키워드 -> 검색
+	제목 or 작성자
+	내용 or 작성자
+	전체
+
+content 
+	댓글
+파일 업로드
+	이미지 업로드
+인터셉터
+스프링 시큐리티
+	
+게시판 + 회원가입
