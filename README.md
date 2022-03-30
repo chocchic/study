@@ -48,4 +48,4 @@
 - **220325(day033)**  : [spring 08] : member logout main updateMem / cookie
 - **220328(day034)**  : [spring 09] : jQuery와 이벤트
 - **220329(day035)**  : [spring 10] : ajax, 게시판
-- **220330(day036)**  : [spring 11]
+- **220330(day036)**  : [spring 11] : 게시판 페이징, list로 링크처리
