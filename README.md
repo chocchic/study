@@ -46,5 +46,6 @@
 - **220323(day031)**  : 동적 쿼리 사용해보기
 - **220324(day032)**  : [spring 07] : member login signup / session
 - **220325(day033)**  : [spring 08] : member logout main updateMem / cookie
-- **220329(day034)**  : [spring 09] : jQuery와 이벤트
-- **220330(day034)**  : [spring 10] : ajax, 게시판
+- **220328(day034)**  : [spring 09] : jQuery와 이벤트
+- **220329(day035)**  : [spring 10] : ajax, 게시판
+- **220330(day036)**  : [spring 11]
