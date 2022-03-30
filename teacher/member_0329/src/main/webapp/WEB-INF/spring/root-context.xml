@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	https://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	https://www.springframework.org/schema/context/spring-context.xsd
+	http://mybatis.org/schema/mybatis-spring
+	http://mybatis.org/schema/mybatis-spring-1.2.xsd">
+	
+	<!--  Service, DAO, DB관련등 (모든곳에서 참조해야되는 설정들) 여기에  -->
+	
+	<!-- DB 관련 세팅 -->
+	<!-- 커넥션 관련 설정 정보  -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy" /> 
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@javaking.iptime.org:1521:ORCL" />
+		<property name="username" value="gangsa" />
+		<property name="password" value="1234" />
+	</bean>
+	<!-- 커넥션 맺어줄때 사용하는 클래스 등록 -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+	<!-- 커넥션 풀 역할 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="/WEB-INF/spring/mybatis-config.xml" />
+	</bean>
+	
+	<!-- mybatis로 mapper 패키지 스캔 추가 -->
+	<mybatis-spring:scan base-package="com.member.mapper"/>
+	<mybatis-spring:scan base-package="com.board.mapper"/>
+	<!-- spring아 service 패키지 스캔해 -->
+	<context:component-scan base-package="com.member.service" />
+	<context:component-scan base-package="com.board.service" />
+	
+	
+	
+	
+</beans>
