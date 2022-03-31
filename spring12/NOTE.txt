@@ -1,0 +1,129 @@
+1.  검색 기능
+	1) 검색조건
+		* 단일 조건
+			제목 title
+			내용 content
+			작성자 writer
+			select bno, title, content, writer, regdate, update, from
+				(select rownum r, bno,title, content, writer, regdate, updatedate frorm	
+					(select /*+ INDEX_DESC(board pk_board) */ 
+					bno, title, content, writer, regdate, update from board 
+					where ${column} like '%'||#{keyword}||'%')
+				where rownum <=(#{pageNum} * #{listQty} ))
+			where r > (#{pageNum} -1)*#{listQty};
+			
+			* 동적쿼리
+				<choose>
+					<when test ="type == 'T'.toString()">
+						title like '%'||#{keyword}||'%'
+					</when>
+					<when test ="type == 'C'.toString()">
+						content like '%'||#{keyword}||'%'
+					</when>
+					<when test ="type == 'W'.toString()">
+						writer like '%'||#{keyword}||'%'
+					</when>
+				</choose>
+
+			* test = "조건"
+				조건은 OGNL 표현식 : Object-Graph Navigation Language
+				예약어를 제외하고는 홑따옴표나 겹따옴표없이 문자열이 들어오게되면 어떤 객체라고 판단
+				(자바) ~> map.put("test","5");
+				(mybatis) ~><when test="abc == '5'.toString()"> 
+	
+				-> 홑따옴표로 묶은 것은 이건 변수/프로퍼티가 아니라고 명시만 해주는 것이지 문자열이라고 명시하는 것은 아니다.
+				프로퍼티가 아니라고 명시했으니 내부적으로 값을 분석해서 적당한 자료형으로 대체되어 사용이 되지만, 
+				더 명확하게 명령을 내리기 위해서는 겹따옴표로 묶어서 문자열임을 알려줘야 함. 
+				** .toString()을 사용하는 것이 가장 확실하게 문자열임을 제시하는 방법
+
+		
+
+		* 다중 항목 검색
+			제목 or 내용
+			제목 or 작성자
+			제목 or 내용 or 작성자
+
+		select bno, title, content, writer, regdate, update, from
+			(select rownum r, bno,title, content, writer, regdate, updatedate frorm	
+				(select /*+ INDEX_DESC(board pk_board) */ 
+				bno, title, content, writer, regdate, update from board 
+				where ${column} like '%'||#{keyword}||'%' or ${column} like '%'||#{keyword}||'%' ) <--바뀌는부분
+			where rownum <=(#{pageNum} * #{listQty} ))
+		where r > (#{pageNum} -1)*#{listQty};
+
+			* 동적 SQL
+				where ${column} like '%'||#{keyword}||'%' or ${column} like '%'||#{keyword}||'%' ) 
+				<trim prefix="where" prefixOverrides="or">
+					<if test="title!=null">title like '%'||#{keyword}||'%'</if>
+					<if test="content!=null">or content like '%'||#{keyword}||'%'</if>
+					<if test="writer!=null">or writer like '%'||#{keyword}||'%'</if>
+				</trim>
+	
+	2) 검색조건 처리를 위한 Criteria 수정
+
+2. REST 방식 (RESTful API)
+	URL Uniform Resource Locator
+	URI Uniform Resource Identifier : 자원 식별자
+
+	REST : Representational State Transfer
+		하나의 URI는 하나의 고유한 리소스를 대표하도록 설계한다
+
+		/board/content/5	: 게시판 컨텐트 중 5번 글
+		/board/content?bno=5
+		URI + GET/POST/PUT/DELETE
+	제약조건
+		- client-server 각 파트가 독립적으로 개선될 수 있도록 하자.
+		- statelessness 각 요청간 클라이언트의 콘텍스트가 서버에 저장되어서는 안된다
+		- cache 클라이언트는 응답을 캐싱할 수 있어야한다
+		- uniform interface 인터페이스의 일관성 : 일관적인 인터페이스로 분리되어야 한다.
+		- layered system 요청 정보를 검색하는데에 관련된 서버의 유형을 클라이언트가 볼 수 없는 계층 구조로 체계화
+		- code on demand 서버에서 클라이언트로 코드를 보내 수행시킬 수 있어야한다.
+
+		*uniform interface
+			- 리소스는 uri로 식별된다. http://rootcontext/menu/..id
+			- 메세지를 통한 리소스의 조작
+			- sele-descriptive message. 메세지는 스스로 설명해야한다.
+			- hypermedia as the engine of application state (HATEOAS)
+		
+		ex) 
+		GET / HTTP/1.1
+		Host : www.naver.com
+
+		HTTP/1.1 200 OK
+		[{"op" : "modify","path":"a/b/c"}]
+
+	1) REST 관련 어노테이션
+		@RestController	: @Controller + REST  :  @Controller + @ReponseBody
+		@ResponseBody	: 컨트롤러에서 응답을 JSP뷰로 전달X, 데이터자체를 전달하기 위한
+		@PathVariable	: URL 경로에 있는 값을 매개변수로 추출하려고 할 때 사용
+		@CrossOrigin	: Ajax의 크로스도메인 문제를 해결해주는 어노테이션
+		@RequestBody	: JSON 데이터를 원하는 타입으로 바인딩처리
+
+	2) @ResController
+		** 서버에서 응답해주는 것은 순수한 데이터다 ** 
+		{a: 10, b:20, c:[1,2,3,4,5], d:{x:"str", y=-20.123,z:[]}};
+		* JSON 데이터를 처리하기 위한 라이브러리
+			- jackson-databind	: 서버 -> 객체 -> json -> 브라우저
+			- jackson-dataformat-xml
+			- gson		: Java객체를 JSON타입의 문자열로 변환할 때
+	
+	3) REST 파라미터
+		@PathVariable : 일반 컨트롤러에서도 사용가능, REST 주로 사용
+				URL 경로의 일부를 파라미터(매개변수)로 사용하고 싶을 때
+		@RequestBody : 클라이언트가 보내준 JSON 데이터를 원하는 자바 객체로 변환해야 하는 경우 주로 사용 
+		
+		/sample/{cat}/{pid}
+
+	4) HTTP 전송방식
+		작업 	전송방식	스프링 매핑 어노테이션
+		Create	POST	@PostMapping
+		Read	GET	@GetMapping
+		Update	PUT	@PutMapping
+		Delete	DELETE	@DeleteMapping
+
+		* 회원가입
+		작업	전송방식	URI
+		등록	POST	/member/new
+		조회	GET	/member/{id}
+		수정	PUT	/member/{id} + body(json 데이터)
+		삭제	DELETE	/member/{id}
