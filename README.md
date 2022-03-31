@@ -49,3 +49,4 @@
 - **220328(day034)**  : [spring 09] : jQuery와 이벤트
 - **220329(day035)**  : [spring 10] : ajax, 게시판
 - **220330(day036)**  : [spring 11] : 게시판 페이징, modify/list/delete 링크처리
+- **220331(day037)**  : [spring 12] : 게시판 검색기능, RESTful API 설정, 데이터 주고받기
