@@ -1,0 +1,29 @@
+1. 댓글 Ajax
+	1) 테이블 reply
+		rno : 댓글 고유번호 -> 시퀀스
+		bno : 댓글이 달리는 고유 게시물 번호
+		reply : 댓글 내용
+		replyer:  댓글 작성자
+		replyDate : 댓글 작성일
+ 		updateDate : 댓글 수정일
+	2) ReplyController 계획	
+		작업		URL (ajax)		Method
+		-----------------------------------------------------
+		등록		/replies/new		POST
+		조회		/replies/{rno}		GET
+		삭제		/replies/{rno}		DELETE
+		수정 		/replies/{rno}		PUT
+		*전체글(페이지)	/replies/pages/{bno}	GET
+	3) JSON으로 데이터 전달
+		<form id="form">
+			<input type ="text" name="id/>
+			<input type = "password" name = "pw"/>
+		</form>
+		serialize()		: URL 쿼리스트링(?뒤파라미터)으로 데이터 전달 : ?a=10&b=20
+				 $("#form").serialize(); id=java&pw=1234
+
+		serializeArray()	:  배열 객체로 변환
+				$("#form").serializeArray(); --> [{"id" : "java"}, {"pw":"1234"}]
+
+		stringify()		: 자바스크립트 객체 -> JSON 포맷의 문자열로 변환
+		JSON.parese()	: JSON 포맥의 문자열 -> 자바스크립트 객체로 변환
