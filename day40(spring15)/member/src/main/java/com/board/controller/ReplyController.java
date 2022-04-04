@@ -1,0 +1,140 @@
+package com.board.controller;
+
+import java.util.List;
+import java.util.stream.IntStream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.board.domain.Criteria;
+import com.board.domain.ReplyVO2;
+import com.board.service.ReplyService2;
+
+import lombok.extern.log4j.Log4j;
+
+@RestController
+@RequestMapping("/replies")
+@Log4j
+public class ReplyController {
+	
+	@Autowired
+	private ReplyService2 replyService;
+	
+	/*
+	 * 	consumes : 브라우저에서 요청시 지정한 content-type과 일치해야함
+	 * 	produces : 서버에서 브라우저에 리턴해주는 데이터의 형태 브라우저에서 요청시 지정한 accept 요청 헤더값과 일치
+	*/
+	@PostMapping(value="new", consumes = "application/json", produces= {MediaType.TEXT_PLAIN_VALUE})
+	public ResponseEntity<String> create(@RequestBody ReplyVO2 vo){
+		log.info("reply vo : "+ vo); 
+		int result = 0;
+		if(vo.getRno()==null) {// 새 댓글
+			log.info("새 댓글 등록");
+			vo.setStep(0);
+			vo.setLev(0);
+			result = replyService.register(vo);
+		}else {		// 답글 : rno나 다른건 null 이 아니니까 그대로 등록
+			log.info("댓글의 답글 등록");
+			result = replyService.addReply(vo);
+		}
+		log.info("reply insert result : " + result);
+		return result == 1 ? new ResponseEntity<>("success",HttpStatus.OK) 
+				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	// 특정 게시물의 댓글 목록 확인 (댓글 전체)
+	@GetMapping(value="/pages/{bno}/{page}", produces= {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
+	public ResponseEntity<List<ReplyVO2>> getList(
+			@PathVariable("page") int page, 
+			@PathVariable("bno") Long bno){
+		log.info("Get list requested");
+		Criteria cri = new Criteria(page,10);
+		log.info("new cri" + cri);
+		
+		return new ResponseEntity<>(replyService.getList(bno,cri),HttpStatus.OK);
+	}
+	
+	// 댓글 한개 조회
+	@GetMapping(value="/{rno}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_XML_VALUE})
+	public ResponseEntity<ReplyVO2> get(@PathVariable("rno") Long rno){
+		log.info("get : " + rno);
+		
+		return new ResponseEntity<>(replyService.get(rno), HttpStatus.OK);
+	}
+	
+	// 댓글 삭제
+	@DeleteMapping(value="/{rno}")
+	public ResponseEntity<String> remove(@PathVariable("rno") Long rno){
+		log.info("remove" + rno);
+		return replyService.remove(rno) == 1 ? new ResponseEntity<>("success", HttpStatus.OK) 
+				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	// 댓글 수정
+	@PutMapping(value="{rno}")
+	public ResponseEntity<String> modify(@PathVariable("rno") Long rno, @RequestBody ReplyVO2 vo){
+		log.info("modify rno : " + rno);
+		log.info("modify vo : " + vo);
+		vo.setRno(rno);
+		log.info("modify vo after set() : " + vo);
+		return replyService.modify(vo) == 1 ? new ResponseEntity<>("success", HttpStatus.OK) : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	//Service 구현 전 Mapper로 연습
+//	@Autowired
+//	ReplyMapper replyMapper;
+	@GetMapping("test")
+	public String test() {
+		int result = 0;
+		// 등록
+		/*
+		IntStream.rangeClosed(2, 10).forEach(i ->{
+			ReplyVO vo = new ReplyVO();
+			vo.setBno(22L);
+			vo.setReply("댓글 테스트"+i);
+			vo.setReplyer("java02");
+			int result = replyMapper.insert(vo);		
+		});
+		*/
+		
+		//전체 조회
+		/*
+		List<ReplyVO> list = replyMapper.getList(21L);
+		list.forEach(l -> System.out.println(l));
+		*/
+		//댓글 한 개 조회
+		/*
+		ReplyVO vo = replyMapper.read(4L); // 실제 reply 테이블에 존재하는 rno 번호 사용
+		System.out.println(vo);
+		*/
+		
+		// 삭제
+		/*
+		int result = replyMapper.delete(9L);
+		System.out.println("result : " + result);
+		*/
+		// 수정 : 댓글 내용 (reply), 수정일(updateDate)
+		/*
+//		ReplyVO vo = new ReplyVO();
+//		vo.setRno(11L); // 실제 reply 테이블에 존재하는 rno 번호 사용
+//		vo.setReply("수정 댓글");
+		ReplyVO vo = replyMapper.read(11L);
+		vo.setReply("읽어와서 수정하기2");
+		int result  = replyMapper.update(vo);
+		*/
+		
+		return "insert result : " + result;
+	}
+	
+	
+}
