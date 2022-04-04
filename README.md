@@ -51,5 +51,5 @@
 - **220330(day036)**  : [spring 11] : 게시판 페이징, modify/list/delete 링크처리
 - **220331(day037)**  : [spring 12] : 게시판 검색기능, RESTful API 설정, 데이터 주고받기
 - **220331(day038)**  : [spring 13] : ajax 댓글 기능
-- **220401(day039)**  : [spring 13] : ajax 댓글 기능
-- **220404(day040)**  : [spring 13] : ajax 댓글의 답글 기능 
+- **220401(day039)**  : [spring 14] : ajax 댓글 기능
+- **220404(day040)**  : [spring 15] : ajax 댓글의 답글 기능 
