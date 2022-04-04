@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- SQL문을 처리시 NULL값이 올때 통합처리 세팅해놓은것.
+		통합처리를 하지 않고 개별 데이터에 하나씩 처리하기 위해서는 
+		#{id, jdbcType=VARCHAR} #{age, jdbcType=INTEGER} ... 이런식으로 매번 작성해줘야함. 
+		vo/dto : int age => 0 
+				Integer age => (null) 
+	 -->
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+
+	<!-- mapper.xml에서 resultType에 작성하는 vo같은 클래스 이름이 길다.
+		별칭달아서 짧게 써보자 
+	 -->
+	<typeAliases>
+		<typeAlias type="com.member.domain.MemberVO" alias="memberVO" />
+		<typeAlias type="com.board.domain.BoardVO" alias="boardVO" />
+		<typeAlias type="com.board.domain.ReplyVO" alias="replyVO" />
+		<typeAlias type="com.board.domain.ReplyVO2" alias="replyVO2" />
+	</typeAliases>
+
+	
+
+
+
+
+
+
+
+
+</configuration>
