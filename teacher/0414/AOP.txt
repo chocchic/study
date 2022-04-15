@@ -1,0 +1,99 @@
+[AOP]
+
+1. AOP Aspect Oriented Object : 관점지향 프로그램
+	핵심로직은 아니지만, 공통적으로 실행되어야 하는 부수적인 기능(황단관심사 Cross-cutting concern)을 모아서 AOP로 구현해놓는다
+	1) AOP 용어들
+
+		# Target : 순수 비즈니스 로직, 실행되어야 할 핵심 기능
+		# Proxy : 핵심 기능의 실행은 다른 객체에게 위임하고, 부가적인 기능을 제공하는 객체를 proxy는 내부적으로 target을 호출하지만, 중간에 필요한 관심사들을 거쳐서 target을 호출하도록 자동 혹은 수동으로 작성된다.
+		# Jointpoint : Target 객체가 가진 method
+		# Poincut : 관심사의 비즈니스 로직이 결합되는 지점을 결정하는 것
+		# Aspect : 관심사 자체를 추상적으로 말함
+		# Advice : 실제 공통기능을 분리시켜놓은 코드
+			Jointpoint에 삽입되어서 동작하는 코드
+			Before Adivce : 핵심기능이 실행되기 전에 실행
+			After Returning Advice : 핵심기능이 정상적으로 실행완료 된 후 실행
+			After Throwing Advice : 핵심기능 실행시 예외 발생했을 때 실행
+			After Advice : 핵심기능 실행 후
+			Around Advice : 핵심 기능 전/후 둘 다 적용
+
+	2) 3가지 Advice weaving 방식
+		- 컴파일 로딩시 weaving : AspectJ 사용방식
+		- 클래스 로딩시 weaving : AspectJ 지원
+		- 런타임시 weaving : proxy 이용
+
+		대상 객체(Service)의 인터페이스를 가지고 프록시를 만들어 프록시로 대상 객체에 간접 접근하게 된다.
+		인터페이스가 없으면 aop 적용이 안되니 만들도록 하자.
+
+		client 요청 -> Controller - Model Proxy -> Model(Service) Before
+				       <- Model Proxy-- 		 After
+	3) 라이브러리 추가
+		- spring-aop
+		- aspectJ
+		- aspectweaver
+
+	4) PointCut 표현식
+		#1. execution()	: 표현식을 상요하여 적용할 메서드 명시
+
+			execution(접근지정자 리턴타입 패키지경로포함클래스패턴. 메서드이름패턴(파라미터패턴))
+
+			접근지정자 : public에만 aop 적용가능.-> 생략가능
+			리턴타입 : * (모든리턴타입)
+			
+			* : 모든
+			.. : 0개 이상
+
+			execution(public void set*(..)) // 매개변수가 있던 없던 set으로 시작하는 모든 메서드에 대해 걸리게 됨
+			execution(* test.ex01.package.*.*.()) // 모든 리턴타입에 대해 해당 패키지 안의 모든 클래스의 모든 매개변수 없는 메서드
+			execution(* get*(*,*)) // 모든 리턴타입에 대해 타입 상관없이 메서드 "2"개만 갖고 get으로 시작하는 method 
+			execution(* get*(Integer,..)) // 위에서 매개변수 첫번째꺼는 무조건 정수형, 두번째꺼는 있던지 없던지 개수제한 X
+		#2. within()     	: 특정 타입에 속하는 메서드(범위)를 설정
+		#3. bean() 	: 스프링에서 제공해주는 명시자, 스프링 빈을 지정.
+
+[ Spring Security ]
+
+1. 스프링 시큐리티
+	로그인, 로그아웃, 자동로그인 모두 스프링 시큐리티가 처리해줌
+
+	1) 라이브러리 추가 : 4개
+	2) 스프링 시큐리티 관련 설정 xml파일 : security-context.xml
+
+(샘플 프로젝트 기준)
+
+2. 시큐리티가 필요한 URI 설계
+	* 권한
+		ROLE_GUEST	: 비회원
+		ROLE_USER	: 사용자
+		ROLE_MEMBER	: 회원
+		ROLE_ADMIN	: 관리자
+	
+	* URI
+	/common/main : 로/비로그인 둘다 가느
+	/common/signup : 비로그인
+	/common/login : 비로그인
+	/member/mypage : 로그인
+	/member/modify
+	/member/delete
+	
+	* <security:interceptor-url> access 속성 값에 작성하는 문법 : SpEL 문법
+	
+	표현식			문법
+	hasRole('role')		role 권한을 가지고 있으면 OK   *많이 사용
+	hasAnyRole('role','role')	role 중 권한을 가지고 있으면 OK
+	permitAll()		모두 허용			* 많이 사용 
+	denyAll			모두 금지
+	isAnonymous()		인증하지 않은 사용자일 경우 (비로그인) 
+	isRememberMe()		remember-me (자동로그인) 기능으로 로그인한 사용자일 경우
+	isAuthenticated()		인증한 사람 (로그인) * 많이 사용
+	isFullyAuthenticated()	직접 로그인한 사람 (로그인)
+
+	## 스프링 시큐리티
+		* login 처리시 이름
+			id -> username
+			pw -> password
+			자동로그인 -> remember-me
+
+		* POST 요청시 csrf token 보내야함 (csrf는 공격방식 cross site request forgery 사이트간 요청 위조, 보안관련)
+			
+
+		
