@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/security 
+	http://www.springframework.org/schema/security/spring-security.xsd">
+<!-- sec#2. 파일생성하고, security 네임스페이스 추가 -->
+
+	<!-- sec#9. CustomAccessDeniedHandler 빈으로 등록 (접근거절시처리 핸들러 빈 직접구현) -->
+	<bean id="customAccessDenied" class="com.common.security.CustomAccessDeniedHandler" />  
+
+	<!-- sec#11. 패스워드 보호를 위한 클래스 빈으로 등록,  -->
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" /> 
+
+	<!-- sec.#15. CustomUserDetailService 빈으로 등록  -->
+	<bean id="customUserDetailsService" class="com.common.security.CustomUserDetailsService" /> 
+
+
+	
+
+	<!-- sec#18. CustomLoginSuccessHandler 빈으로 등록 (로그인성공시 처리 핸들러 빈) -->
+	<bean id="customLoginSuccess" class="com.common.security.CustomLoginSuccessHandler" />  
+	
+	<!-- sec#5. 스프링 시큐리티가 동작하기 위한 최소 기본설정태그 추가하고 서버 스타트 해보기 
+	 <security:http>
+	 	<security:form-login/>
+	 </security:http>
+	 <security:authentication-manager>
+	 
+	 </security:authentication-manager>
+	 -->
+
+<!-- sec#6. 접근 제한 설정  -->
+	<security:http>
+		<!-- sec#6. 특정 URI에 접근제한 설정 -->
+		<security:intercept-url pattern="/common/*" access="permitAll" />
+		<security:intercept-url pattern="/member/**" access="hasRole('ROLE_MEMBER')" />
+		
+	
+		<!-- sec#7.상단에 빈으로 등록한 customAccessDeniedHandler 로 등록 -->
+		<!--  접근 제한 처리를 위한 설정 : 접근 권한이 없는 페이지 요청시 처리  -->
+		<security:access-denied-handler ref="customAccessDenied" /> 
+		<!-- 접근제한 처리를 위해 에러페이지 URI 지정 
+		<security:access-denied-handler error-page="/accessError" /> -->
+		
+	
+		<!-- sec#17. 로그인 페이지 커스텀으로 변경위해, login-page 속성 추가, 이때 지정하는 URI는 반드시 Get방식 접근 URI로 지정. 
+		<security:form-login login-page="/common/login" />  -->
+		<!-- sec#22. 로그인 커스텀으로 로그인 성공한 후에, 권한에 따라 다른페이지 요청되도록,authentication-success-handler-ref 속성으로 위 빈 등록. 
+					원래 가던길(또는 기본설정경로로) 가도록 하기위해서는 위에꺼 사용  --> 
+		<security:form-login login-page="/common/login" authentication-success-handler-ref="customLoginSuccess" /> 
+		
+		
+		<!-- sec#20. csrf 비활성화할때는 여기다 추가 가능함
+		<security:csrf disabled="true" /> --> 
+		
+		
+		<!-- sec#23. 로그아웃 uri 지정, 세션true, 매핑 controller 에 추가,
+			 sec#29.  로그아웃시 자동로그인 쿠키 삭제 속성 추가 (JSESSION_ID는 톰캣이 발행하는 쿠키로 크게 상관없으나 그냥 같이 지워주자) -->
+		<security:logout logout-url="/logout" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID" logout-success-url="/common/main"/>  
+		
+		
+		<!-- sec#27. 자동 로그인에서 데이터베이스 이용하는 설정 : 604800 = 60*60*24*7 (1week) -->
+		<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800" /> 
+		
+	</security:http>
+	<security:authentication-manager> <!--  인증과 권한 처리해주는 태그  -->
+		
+		<!-- 특정 아이디와 패스워드 지정하여 로그인 가능하도록 설정하는 방법 -->
+		<!-- <security:authentication-provider>
+			<security:user-service>
+				// 'PasswordEncoder' 매핑안해도 에러 안생기게 할때는 password속성값에 앞에 {noop} 붙혀서 임시방편으로 처리가능 
+				<security:user name="member" password="{noop}member" authorities="ROLE_MEMBER"/>
+				<security:user name="admin" password="{noop}admin" authorities="ROLE_MEMBER, ROLE_ADMIN"/>
+			</security:user-service>			
+		</security:authentication-provider> -->
+		
+		
+		<!-- sec#15. 권한에 대한 인증 해주는 authentication-provider 태그와 그안에 password-encoder bcrypt 추가 
+					 CustomUserDetailsService 빈으로 등록하고 user-service-ref에 적용 
+		--> 
+		<security:authentication-provider user-service-ref="customUserDetailsService">
+		
+			<security:password-encoder ref="bcryptPasswordEncoder" />
+			
+		</security:authentication-provider>  
+	
+	</security:authentication-manager>	
+
+</beans>
