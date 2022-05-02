@@ -1,0 +1,14 @@
+{
+  "name": "gmail.cyberadam.nodefirst",
+  "version": "1.0.0",
+  "description": "node_basic",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "node_basic"
+  ],
+  "author": "adam",
+  "license": "ISC"
+}
