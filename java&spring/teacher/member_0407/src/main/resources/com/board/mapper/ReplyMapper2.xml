@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper.ReplyMapper2">
+	<!-- 새 댓글 추가 처리  -->
+	<insert id="insert">
+		<selectKey keyProperty="rno" order="BEFORE" resultType="long">
+			select reply_seq2.nextval from dual
+		</selectKey>
+		insert into reply2 (rno, bno, reply, replyer, grp, step, lev) 
+		values(#{rno}, #{bno}, #{reply}, #{replyer}, #{rno}, #{step}, #{lev})
+	</insert>
+	
+	<!-- 댓글의 답글 처리 -->
+	<!-- 기존 답글들 step을 1씩 올려주기(답글들의 순서 정렬을 위해) -->
+	<update id="updateStep">
+		update reply2 set step=step+1 
+		where grp=#{grp} and step > #{step} 
+	</update>
+	<!-- 답글 추가  -->
+	<insert id="addReReply">
+		<selectKey keyProperty="rno" order="BEFORE" resultType="long">
+			select reply_seq2.nextval from dual
+		</selectKey>
+		insert into reply2 (rno, bno, reply, replyer, grp, step, lev) 
+		values(#{rno}, #{bno}, #{reply}, #{replyer}, #{grp}, #{step}, #{lev})
+	</insert>
+
+	<select id="read" resultType="replyVO2">
+		select * from reply2 where rno=#{rno}
+	</select>
+
+	
+	<update id="update">
+		update reply2 set reply=#{reply}, replyDate=sysdate 
+		where rno = #{rno}
+	</update>
+	
+
+	<delete id="delete">
+		delete from reply2 where rno=#{rno}
+	</delete>
+	
+	<delete id="deleteReply">
+		delete from reply2 where bno=#{bno}
+	</delete>
+
+	<select id="getList" resultType="replyVO2">
+		select * from reply2 where bno=#{bno} order by rno desc
+	</select>
+	
+	<select id="getListWithPaging" resultType="replyVO2">
+	<![CDATA[
+		select rno, bno, reply, replyer, replyDate, grp, step, lev 
+		from 
+			(select rownum r, rno, bno, reply, replyer, replyDate, grp, step, lev 
+			from
+				( select rno, bno, reply, replyer, replyDate, grp, step, lev 
+				from reply2
+				where bno = #{bno}
+				order by grp desc, step asc) 
+			where rownum <= #{cri.pageNum} * #{cri.listQty} 
+			order by grp desc, step asc
+			)
+		where r > (#{cri.pageNum} -1) * #{cri.listQty}
+	]]>
+	</select>
+	
+	<!-- #1. 전체 댓글의 개수 가져오기 -->
+	<select id="getRepCount" resultType="int">
+		select count(*) from reply2 where bno=#{bno}
+	</select>
+
+
+
+
+
+
+</mapper>

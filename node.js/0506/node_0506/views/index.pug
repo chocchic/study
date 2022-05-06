@@ -1,0 +1,26 @@
+doctype html
+html
+    head
+        title=title
+        link(rel='stylesheet', href='/style.css')
+    body
+        block content
+block content
+    h1 Welcome to #{title}
+
+    #Jade
+        ul
+            each a in Jade
+                li=a
+
+    - const msg = 'Hello'
+    p #{msg}
+    
+    script
+        alert(#{title})
+
+style.
+    h1{
+        font-size:24px;
+        color: red;
+    }

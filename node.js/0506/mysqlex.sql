@@ -58,5 +58,8 @@ select * from usertbl;
 select * from buytbl;
 
 select num userid, amount * price from buytbl;
-
 select num as 번호, userid as 아이디, amount * price as 금액 from buytbl;
+
+select * from usertbl where name ='김태연';
+select * from usertbl where birthyear > 1990 and addr='서울';
+select * from usertbl where birthyear between 1990 and 1993;

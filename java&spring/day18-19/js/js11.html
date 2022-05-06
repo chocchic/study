@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>page 1</h1>
+    <button onclick="location.href='js12.html'">2page</button>
+    <button onclick="history.forward()">앞으로가기 forward</button>
+    <button onclick="history.go(1)">앞으로가기 go(1)</button>
+
+    <button onclick="show()">show history length</button>
+    <script>
+        function show(){
+            console.log(history.length);
+        }
+
+        console.log(navigator.userAgent);
+        let result = isNaN("53"); //false
+        console.log(result);
+        result = isNaN("5-2"); // true
+        console.log(result);
+        result=eval("5-3");
+        console.log(result);
+    </script>
+</body>
+</html>

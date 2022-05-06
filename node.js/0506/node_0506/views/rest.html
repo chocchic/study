@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ajax를 이용한 출력</title>
+    </head>
+    <body>
+        <div id="content"></div>
+    </body>
+    <script>
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', '/json', true)
+        xhr.send
+        xhr.addEventListener('load', function(){
+            var result = xhr.responseText;
+            // 위의 데이터를 javascript 객체로 변환
+            var obj = JSON.parse(result)
+            document.getElementById('content').innerHTML = obj.title;
+            //alert(result)
+        })
+    </script>
+</html>

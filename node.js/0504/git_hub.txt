@@ -1,0 +1,52 @@
+지속적인 통합(CI/CD - Continuous Integration/Continuous Delivery)
+ - CI는 개발자를 위한 자동화 프로세스 인 지속적인 통합
+ - CD는 지속적인 서비스 제공으로 배포를 의미
+
+형상 관리(Software Configuration Management)
+ - 변경 사항을 관리
+ - 개발 과정 전체의 변경 사항을 관리
+
+GIT - 형상 관리 중에서도 소스 코드를 관리해주는 애플리케이션
+GIT 을 인터넷상에서 사용할 수 있도록 만든 사이트가 Git Hub
+
+	용어
+           commit: 변경 내용을 적용
+	   push: 변경된 내용을 업데이트
+           pull: 자기 저장소에서 가져오기
+  	   clone: 저장소에서 복제
+
+	   repository: 전체 저장소
+	   branch: 저장소 안에서 별도의 분기점
+
+
+	1.Git Hub 가입 - github.com
+	  =>이메일 주소를 가지고 가입을 하고 이메일 인증을 받아야 회원 가입이 마무리 됩니다
+
+	2.Git Hub에서 토큰 발급
+		=>git hub 사이트에서 로그인을 하고 사진을 클릭해서 settings를 클릭
+		=>화면을 아래로 스크롤해서 developer settings 를 클릭
+		=>왼쪽에서 personal access tokens를 클릭
+		=>Generate new token을 선택
+		=>설명 과 권한을 설정한 후 하단의 Generate token을 클릭
+		=>토큰 넘버가 화면에 출력되는데 복사를 해 둠
+		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
+	
+	3.Repository(저장소)를 생성 
+		=>IDE 마다 사용법이 조금 다른데 Eclipse는 저장소를 만들고 업로드를 하고 Intelli J 나 XCode 같은 경우는 프로젝트를 만들면 자동으로 저장소를 생성해줍니다.
+
+		=>code 버튼을 눌러서 repository URL을 복사
+		https://github.com/itggangpae/spring_blockchain.git
+
+	4.Eclipse에서 프로젝트를 업로드
+		=>window 메뉴의 show - view - other를 눌러서 git을 찾고 git repositoris를 선택
+		=>clone a git repository를 누르고 복사한 repoistory url을 설정하고 next를 누르면 branch 가 보이게 됩니다.
+
+		=>업로드 할 프로젝트를 선택하고 마우스 오른쪽을 눌러서 [Team] - [Share Project]를 선택하고 repository에 연결할 저장소를 선택
+		=>프로젝트를 업로드 할 때는 [Team] - [Commit]을 선택한 후 업로드할 파일들을 statged changes로 이동 
+		=>commit and push 버튼을 누르고 user 란에는 이메일이나 아이디를 입력하고 password에는 토큰 번호를 입력
+
+
+
+
+
+

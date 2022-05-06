@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>js 10 page</h3>
+    <button onclick="location.reload()">새로고침</button>
+    <!-- onclick : 버튼이 클릭될 때(이벤트) t실행해야 되는 자바스크립트 코드를 ""안에 작성 -->
+    <button onclick="clearInterval(plusInterval)">증가 정지</button>
+    <button onclick="plusInterval">증가 시작</button>
+    <script>
+        // window.open("js10_pop.html","pop", "width=350,height=350,top=50,location=no,scrollbars=np,status=no")
+        // var result = window.confirm("배가 부르고 졸린가요?");
+        // console.log(result);
+        
+        // let plus = 0;
+        // // Interval을 어떤 행위나 이벤트에 따라 멈춰주려면, 호출한 함수를 변수에 담아두고
+        // // 그 변수를 clearInterval로 삭제시켜주면 된다.
+        // function adding(){
+        //     plus++;
+        //     console.log(plus);
+        // }
+        // let plusInterval = window.setInterval(adding(),1000);
+
+        // var auto = setTimeout(function(){
+        //     console.log("TIME OUT");
+        // },3000);
+
+        // console.log(screen.width);
+        // console.log(screen.height);
+        // console.log(screen.availWidth);
+        // console.log(screen.availHeight);
+        // console.log(screen.colorDepth);
+
+        // location
+        var href = location.href;
+        console.log(href);
+        //window.confirm("이동할까요?");
+        //location.href="http://127.0.0.1:5500/js/js10_pop.html"
+        console.log(location.protocol); // http가 콘솔에 찍힌다
+
+        var search = location.search;
+        console.log(search);
+
+        // reload
+    </script>
+</body>
+</html>

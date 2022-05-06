@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>노드</title>
+    </head>
+    <body>
+        <form action="login.jsp" id="loginform">
+            아이디:<input type="text" id="id" required="required"/>
+            <br/>
+            <input type="checkbox" value="check" id="idsave" />
+            아이디 저장<br/>
+            <input type="submit" value="로그인"/>
+        </form>
+    </body>
+    <script>
+        var loginform = document.getElementById('loginform')
+        var ids = document.getElementById('id')
+        var idsave = document.getElementById('idsave')
+
+        //파일의 모든 내용이 메모리에 로드될 때
+        window.addEventListener('load', function(e){
+            //브라우저 종류에 상관없이 이벤트 객체를 사용하기 위한 문장
+            var event = e || window.event
+            //localStorage에 ids 라는 이름이 있다면
+            if(typeof localStorage.ids != 'undefined'){
+                //ids 의 내용을 ids 에 설정
+                ids.value = localStorage.ids;
+                //체크 박스에 체크
+                idsave.checked = true;
+            }
+        })
+
+        //로그인 버튼을 눌렀을 때
+        loginform.addEventListener('submit', function(e){
+            if(idsave.checked == true){
+                localStorage.ids = ids.value
+            }else{
+                localStorage.clear();
+            }
+        })
+    </script>
+</html>

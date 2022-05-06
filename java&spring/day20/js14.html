@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2 id="test" class="haha hoho">hello js</h2>
+
+    <script>
+        /*
+        let elem = document.getElementById("test");
+        console.log(elem);
+
+        elem.textContent = "hello world!";
+
+        console.log(elem.className); // class 속성 값 꺼내기
+        elem.className = "hello";   // class 속성값 수정
+        console.log(elem.className);
+
+        console.log(elem.id);
+        elem.id="js";
+        console.log(elem.id);
+        */
+        let elem = document.getElementById("test");
+        console.log(elem);
+
+        console.log(elem.hasAttribute("class"));
+        console.log(elem.hasAttribute("style"));
+
+        console.log(elem.getAttribute("id"));
+        elem.setAttribute("class","sunny " + elem.getAttribute("class"));
+        console.log(elem.getAttribute("class"));
+
+        elem.removeAttribute("id");
+        console.log(elem.getAttribute("id")); // null
+    </script>
+</body>
+</html>

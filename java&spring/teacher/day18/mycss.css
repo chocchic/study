@@ -1,0 +1,144 @@
+/* css 파일 */
+* {
+    box-sizing: border-box;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+}
+body {
+    margin: 0 auto;
+    background-color: #edf0f2;
+}
+a {
+    all:unset; /* a태그 기본속성 없애기*/
+}
+a:link{
+    text-decoration: none;
+    color: #3d3d3c;
+}
+a:visited {
+    text-decoration: none;
+    color: #3d3d3c;
+}
+a:active {
+    text-decoration: none;
+    color: #3d3d3c;
+}
+a:hover {
+    text-decoration: none;
+    color: #3d3d3c;
+    cursor: pointer;
+}
+
+header {
+    width: 100%;
+    height: 60px;
+    background-color: lightgray;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: 100; /*다른요소에 가려지지 않기 위해*/
+}
+.inner {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    /* background-color: orange; */
+    padding: 0 2rem;
+}
+
+.head-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/*-----------section----------------------------------------------------------*/
+section {
+    /* background-color: lightpink; */
+    width: 100%;
+    height: 700px;
+    top: 60px;
+    position: relative;
+    margin: 1rem 0;
+}
+
+.form-container {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 50px 5rem 3rem 5rem;
+}
+
+.form-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+}
+.form-label {
+    font-size: 0.8rem;
+    width: 100%;
+    height: 100%;
+    margin: 0.3rem 0;
+}
+.form-input {
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    margin: 0.3rem 0;
+    padding: 0.5rem;
+}
+input:not([type="checkbox"]) {
+    all: unset;
+    font-size: 0.8rem;
+    width: 100%;
+}
+button {
+    border: 2px solid #f9aa33;
+    color: #f9aa33;
+    font-weight: bold;
+    font-size: 0.8rem; 
+    border-radius: 1rem;
+    padding: 0.5rem 1.5rem;
+    transition: all ease 0.5s 0s;
+}
+button:hover {
+    color: #fff;
+    background-color: #f9aa33;
+}
+.form-submit-btn {
+    margin: 0.5rem 0;
+}
+
+/*-----------footer----------------------------------------------------------*/
+footer {
+    background-color: #d2dbe0;
+    padding: 1rem 0;
+    margin: 1rem 0;
+}
+.footer-message {
+    font-size: 0.6rem;
+    color: #5e7380;
+    margin: 0.5rem 0;
+}
+.footer-contact {
+    font-size: 0.6rem;
+    color: #5e7380;
+    margin: 0.8rem 0;
+}
+.footer-copyright {
+    font-size: 0.4rem;
+    color: #5e7380;
+    margin-top: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+
+
+/*------------ media query ---------------------------------------------------*/
+@media only screen and (min-width:1200px) {
+    .inner {
+        max-width: 1200px;
+    }
+}

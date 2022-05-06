@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        const pow = function(x) { 
+            return x * x; 
+        }
+        console.log(pow(2));
+
+        const pow2 = x =>  x * x; 
+        console.log(pow2(3));
+
+        // js에서는 문자열이 없는 경우 false, 있으면 true
+        let test = Boolean("hello"); 
+        console.log(test);
+        test = Boolean(""); 
+        console.log(test);
+
+        let test2 = null; 
+        if(test2 == "" || test2 == null) {
+            console.log("값이 없다");
+        }
+
+        const obj = {
+            a : 10,
+            // 화살표함수에서는 this 사용하지 않는것이 덜 혼동됨. 
+            b : x => {return a + x + 10}, 
+            c : function(x) {
+                let abc = this.a + 10;  // 여기서는 this 사용해야함 
+                return x + 10; 
+            }
+        };
+        obj.a = 200; 
+        //obj = 100;  const 로만들어진 obj 자체 값을 변경하는것은 불가능 
+        console.log(obj);
+
+        // getter/setter 
+        const user = {
+            age : 1,
+            name: "pikachu", 
+
+            // getter 
+            get getAge() {
+                return this.age;
+            },
+            // setter 
+            set setAge(age) {
+                this.age = age;
+            }
+        }
+
+        user.setAge = 100; 
+        console.log(user);
+        console.log(user.getAge);
+
+
+        const testobj = new Object(); 
+        testobj.hello = "hi"; 
+
+        const data = [1,2,3,4,5];
+        for(let i = 0; i < data.length; i++){
+            console.log(data[i]);
+        }
+        console.log("-------for..of--------");
+        for(let i of data){
+            console.log(i);
+        }
+
+        const dataObj = {
+            name : "raichu",
+            age : 20,
+            sleepy : true
+        };
+        console.log(dataObj.name);
+        console.log(dataObj["name"]);
+
+        console.log(Object.entries(dataObj));
+        console.log(Object.keys(dataObj));
+        console.log(Object.values(dataObj));
+
+        // for..in
+        // dataObj의 프로퍼티 개수만큼 반복해서 
+        //  key(프로퍼티명)들을 앞에 변수에 담아줌 
+        for(let key in dataObj){ 
+            console.log(key, typeof key);
+            console.log(dataObj[key]); // key로 값꺼내기 
+        }
+        console.log("----------forEach-----------")
+        let arr = [1, 2, "hello", 100]; 
+        arr.forEach(item => {
+            console.log(item);
+        }); 
+        
+        console.log("----------map-----------")
+        arr = [1,2,3,10]; 
+        let mapArr = arr.map(item => item * 2); 
+        console.log(arr);
+        console.log(mapArr);
+
+        const dataObj2 = [
+            {
+                id : 1,
+                name : "raichu",
+                age : 20,
+                sleepy : true
+            },
+            {
+                id : 2,
+                name : "pikachu",
+                age : 10,
+                sleepy : false
+            }
+        ];
+
+        console.log(dataObj2.indexOf('raichu')); // 못찾음 == -1
+        console.log(dataObj2.findIndex(item => item.name == 'pikachu'));
+        console.log(dataObj2.find(item => item.name == 'pikachu'));
+        
+        console.log("--------filter---------")
+        let arr2 = [1,2,3,4,5,6,7,8,9,10]; 
+        let filterArr2 = arr2.filter(item => item % 2 == 0); 
+        console.log(filterArr2);
+
+
+
+
+
+
+    </script>
+</body>
+</html>

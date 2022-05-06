@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>여러 개의 파일 업로드</title>
+    </head>
+    <body>
+        <form id="form" method="post" enctype="multipart/form-data">
+            <p>이름:<input type="text" name="title" id="title"/></p>
+            <p>파일:<input type="file" id="image1" name="image1" 
+            multiple="multiple"/></p>
+            <p>파일:<input type="file" id="image2" name="image2" 
+                multiple="multiple"/></p>
+            <input type="submit" value="업로드" />
+        </form>
+    </body>
+
+    <!-- ajax를 편리하게 사용할 수 있는 자바스크립트 라이브러리 -->
+    <script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('form').addEventListener('submit', function(e){
+            //원래 가지고 있는 기능을 하지 않도록 설정
+            e.preventDefault()
+
+            //전송할 데이터 생성
+            const formData = new FormData()
+            formData.append('image1', e.target.image1.files[0])
+            formData.append('image2', e.target.image2.files[0])
+            formData.append('title', e.target.title.value)
+            //ajax 전송
+            axios.post('/multiparamupload', formData)
+
+        })
+    </script>
+</html>

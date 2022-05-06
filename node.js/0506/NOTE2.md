@@ -90,65 +90,184 @@
 ## 6. SQL(Structed Query Language)
   관계형 DB의 질의어
 
-  ### 1) DDL(Data Definition Language - 정의어, DB관리자의 언어)  
-    * Create : 구조 생성  
-    * Alter : 구조 변경  
-    * Drop : 구조 삭제  
+### 1) DDL(Data Definition Language - 정의어, DB관리자의 언어)  
+  * Create : 구조 생성  
+  * Alter : 구조 변경  
+  * Drop : 구조 삭제  
 
 
-    * Truncate : 테이블의 데이터 삭제  
-    * Rename : 구조 이름 변경  
+  * Truncate : 테이블의 데이터 삭제  
+  * Rename : 구조 이름 변경  
 
-  ### 2) DML(Data Manipulation Language - 조작어, 개발자의 언어)  
-    * Select : 조회, DQL로 분리하는 것이 요즘의 추세
+### 2) DML(Data Manipulation Language - 조작어, 개발자의 언어)  
+  * Select : 조회, DQL로 분리하는 것이 요즘의 추세
 
-    * Insert : 삽입  
-    * Update : 데이터의 변경  
-    * Delete : 데이터 삭제  
+  * Insert : 삽입  
+  * Update : 데이터의 변경  
+  * Delete : 데이터 삭제  
 
-    * 4개의 구문을 줄여서 CRUD(Create, Read, Update, Delete)라고도 합니다.
-  
-  ### 3) DCL(Data Control language - 제어어, DB 관리자의 언어)
-    Grant & Revoke : 권한을 부여하고 회수하는 명령
-  
-    * Commit & Rollback : 작업 내역을 DB에 반영하고 취소하는 명령 (Transaction Control Language로 분리를 하고 개발자의 언어)
+  * 4개의 구문을 줄여서 CRUD(Create, Read, Update, Delete)라고도 합니다.  
 
+### 3) DCL(Data Control language - 제어어, DB 관리자의 언어)  
+  Grant & Revoke : 권한을 부여하고 회수하는 명령  
 
+  * Commit & Rollback : 작업 내역을 DB에 반영하고 취소하는 명령 (Transaction Control Language로 분리를 하고 개발자의 언어)  
 
-  
+## 7.DQL - Select
+  샘플 데이터 생성
+  ```sql
+  show databases;
 
+  create database node;
 
+  show databases;
 
-  ### 1) Select의 구조
-    5  SELECT : 열단위 추출을 위한 컬럼이나 연산식을 나열 - 별명 부여할 수 있음, 필수  
-    1  FROM : 테이블 이름 나열하는데 다른 이름을 부여할 수 있음 - 필수  
-    2  WHERE : 행 단위 추출을 위한 조건 나열   
-    3  GROUP BY : 그룹화하기 위한 컬럼이나 연산식을 나열 - 그룹 함수 생성 시점  
-    4  HAVING : 그룹화한 후 행 단위 추출을 위한 조건 나열  
-    6  ORDER BY : 정렬할 컬럼이나 연산식 나열  
-    7  LIMIT : 추출할 행의 시작 인덱스와 개수 나열 가능(오라클은 이 옵션이 없어서 inline view를 최근의 버전의 다른 옵션을 이용해서 이 부분을 해결)  
-  
-  ### 2) 테이블의 전체 데이터 확인  
-    select * from 테이블이름;
-    접속 도구에서는 블럭을 잡아서 실행하므로 ;을 입력하지 않아도 됩니다.
-    콘솔 환경이라면 반드시 입력해주어야 합니다.
-    프로그래밍 언어에서 embedded sql의 형태로 많이 사용하는데, 이 경우 ;이 있으면 에러가 나는 경우가 많습니다.
-    ;을 생략하고 입력하는 것이 일반적입니다.
+  use node;
 
-    usertbl 테이블과 buytbl테이블을 조회
-    select * from usertbl;
-    select * from buytbl;
+  create table usertbl(
+  userid char(15) not null primary key,
+  name varchar(20) not null,
+  birthyear int not null, 
+  addr char(100),
+  mobile char(11),
+  mdate date)ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-    Oracle은 테이블이름과 컬럼 이름을 대문자로 사용하는데 MySQL은 소문자로 사용합니다.
-    Oracle은 SQL 조건절을 제외한 경운 대소문자 구분을 하지 않지만 MySQL은 대소문자 구분을 하는 경우가 많습니다.  
-  
-  ### 3) 특정 컬럼이나 연산식 출력
-    select 컬럼이름 이나 연산식 나열 from 테이블이름;
-    -> 연산식을 사용하게 되면 연산식은 컬럼으로 만들어지는 것이 아니고 출력할 때 연산을 수행해서 출력합니다.
-    -> 별명을 붙이고자 할 때는 공백이나 as를 붙이고 별명을 입력하면 됩니다.
-    별명에 공백이 있는 경우에는 별명을 반드시 ' '로 감싸야 합니다.
-    -> 테이블을 만들 때는 컬럼 이름을 길게 하고 사용을 할 때 별명을 이용해서 사용하는 경우가 많습니다.
+  create table buytbl(
+  num int auto_increment primary key,
+  userid char(8) not null,
+  productname char(10),
+  groupname char(10),
+  price int not null,
+  amount int not null,
+  foreign key (userid) references usertbl(userid) on delete cascade)ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-    -> buytbl 테이블에서 nu, userid, amount*price 결과를 조회
-    select num userid, amount * price from buytbl;
-    select num as 번호, userid as 아이디, amount * price as 금액 from buytbl;
+  show tables;
+
+  insert into usertbl values('kty', '김태연',1989,'전주','01011111111', '1989-3-9');
+  insert into usertbl values('bsj', '배수지',1994,'광주','01022222222', '1994-10-10');
+  insert into usertbl values('ksh', '김설현',1995,'부천','01033333333', '1995-1-3');
+  insert into usertbl values('bjh', '배주현',1991,'대구','01044444444', '1991-3-29');
+  insert into usertbl values('ghr', '구하라',1991,'광주','01055555555', '1991-1-13');
+  insert into usertbl values('san', '산다라박',1984,'부산','01066666666', '1984-11-12');
+  insert into usertbl values('jsm', '전소미',2001,'캐나다','01077777777', '2001-3-9');
+  insert into usertbl values('lhl', '이효리',1979,'서울','01088888888', '1979-5-10');
+  insert into usertbl values('iyou', '아이유',1993,'서울','01099999999', '1993-5-19');
+  insert into usertbl values('ailee', '에일리',1989,'미국','01000000000', '1989-5-30');
+
+  insert into buytbl values(null, 'kty', '운동화', '잡화', 30, 2);
+  insert into buytbl values(null, 'kty', '노트북', '전자', 1000, 1);
+  insert into buytbl values(null, 'jsm', '운동화', '잡화', 30, 1);
+  insert into buytbl values(null, 'lhl', '모니터', '전자', 200, 1);
+  insert into buytbl values(null, 'bsj', '모니터', '전자', 200, 1);
+  insert into buytbl values(null, 'kty', '청바지', '잡화', 100, 1);
+  insert into buytbl values(null, 'lhl', '책', '서적', 15, 2);
+  insert into buytbl values(null, 'iyou', '책', '서적', 15, 7);
+  insert into buytbl values(null, 'iyou', '컴퓨터', '전자', 500, 1);
+  insert into buytbl values(null, 'bsj', '노트북', '전자', 1000, 1);
+  insert into buytbl values(null, 'bjh', '메모리', '전자', 50, 4);
+  insert into buytbl values(null, 'ailee', '운동화', '잡화', 30, 2);
+  insert into buytbl values(null, 'ghr', '운동화', '잡화', 30, 1);
+
+  commit;
+  ```
+ ### 1) Select의 구조
+  5  SELECT : 열단위 추출을 위한 컬럼이나 연산식을 나열 - 별명 부여할 수 있음, 필수  
+  1  FROM : 테이블 이름 나열하는데 다른 이름을 부여할 수 있음 - 필수  
+  2  WHERE : 행 단위 추출을 위한 조건 나열   
+  3  GROUP BY : 그룹화하기 위한 컬럼이나 연산식을 나열 - 그룹 함수 생성 시점  
+  4  HAVING : 그룹화한 후 행 단위 추출을 위한 조건 나열  
+  6  ORDER BY : 정렬할 컬럼이나 연산식 나열  
+  7  LIMIT : 추출할 행의 시작 인덱스와 개수 나열 가능(오라클은 이 옵션이 없어서 inline view를 최근의 버전의 다른 옵션을 이용해서 이 부분을 해결)  
+
+### 2) 테이블의 전체 데이터 확인  
+  ```sql
+  select * from 테이블이름;  
+  ```  
+  접속 도구에서는 블럭을 잡아서 실행하므로 ;을 입력하지 않아도 됩니다.  
+  콘솔 환경이라면 반드시 입력해주어야 합니다.  
+  프로그래밍 언어에서 embedded sql의 형태로 많이 사용하는데, 이 경우 ;이 있으면 에러가 나는 경우가 많습니다.  
+  ;을 생략하고 입력하는 것이 일반적입니다.  
+
+  * usertbl 테이블과 buytbl테이블을 조회
+  ```sql
+  select * from usertbl;
+  select * from buytbl;
+  ```  
+
+  Oracle은 테이블이름과 컬럼 이름을 대문자로 사용하는데 MySQL은 소문자로 사용합니다.  
+  Oracle은 SQL 조건절을 제외한 경운 대소문자 구분을 하지 않지만 MySQL은 대소문자 구분을 하는 경우가 많습니다.  
+
+### 3) 특정 컬럼이나 연산식 출력  
+  ```sql
+  select 컬럼이름 이나 연산식 나열 from 테이블이름;
+  ```  
+  -> 연산식을 사용하게 되면 연산식은 컬럼으로 만들어지는 것이 아니고 출력할 때 연산을 수행해서 출력합니다.
+  -> 별명을 붙이고자 할 때는 공백이나 as를 붙이고 별명을 입력하면 됩니다.
+  별명에 공백이 있는 경우에는 별명을 반드시 ' '로 감싸야 합니다.
+  -> 테이블을 만들 때는 컬럼 이름을 길게 하고 사용을 할 때 별명을 이용해서 사용하는 경우가 많습니다.
+
+  * buytbl 테이블에서 nu, userid, amount*price 결과를 조회  
+  ```sql
+  select num userid, amount * price from buytbl;
+  select num as 번호, userid as 아이디, amount * price as 금액 from buytbl;
+  ```  
+
+### 4) 조건 검색  
+  * where에 조건을 설정해서 행 단위 추출을 수행  
+  * 연산자  
+    > >= < <=  
+    = !=  
+
+    between A and B(not between A and B) : A와 B 사이, 반드시 B의 값이 A보다 크거나 같아야합니다.  
+    in(not in) : 여러 개의 데이터를 괄호 안에 나열해서 그 중 하나오 ㅏ잉ㄹ치하는 데이터 조회  
+    is null(is not null) : null 데이터 조회  
+    and : 그리고  
+    or : 또는(and의 우선순위가 or보다 높음)  
+
+    and는 앞의 조건이 false이면 뒤의 조건을 확인하지 않고 or는 앞의 조건이 true이면 뒤의 조건을 확인하지 않음  
+
+    3의 배수면서 4의 배수인 데이터 조회  
+    데이터 % 3 == 0 and 데이터 % 4 == 0  
+    데이터 % 4 == 0 and 데이터 % 3 == 0  
+
+    3의 배수는 아니면서 4의 배수도 아닌 데이터 조회  
+    데이터 % 3 != 0 and 데이터 % 4 != 0  
+    데이터 % 4 != 0 and 데이터 % 3 != 0  
+
+    like(not like) : 패턴 검색  
+      _ : 하나의 문자
+      % : 글자수 없는 문자
+    
+    * 데이터베이스에서는 문자도 크기 비교가 가능  
+    * 날짜도 숫자로 인식  
+
+    * usertbl 테이블에서  name이 김태연인 데이터 조회  
+    ```sql
+      select * from usertbl where name ='김태연';
+    ```
+
+    * usertbl 테이블에서 birthyear가 1990보다 크고 addr이 서울인 데이터 조회  
+    ```sql
+      select * from usertbl where birthyear > 1990 and addr='서울';
+    ```  
+
+    * usertbl 테이블에서 birthyear가 1990에서 1993인 데이터 조회  
+    ```sql
+      select * from usertbl where birthyear between 1990 and 1993;
+      select * from usertbl where birthyear >= 1990 and birthyear <= 1993;
+    ```  
+
+    * usertbl 테이블에서 name에 라가 포함된 데이터 조회  
+    ```sql
+      select * from usertbl where name like '%라%';
+    ```  
+
+    * usertbl 테이블에서 name이 배로 시작하는 데이터 조회  
+    ```sql
+      select * from usertbl where name like '배%';
+    ```  
+
+    * usertbl 테이블에서 name이 4글자인 데이터 조회  
+    ```sql
+      select * from usertbl where name like '____';
+    ```  

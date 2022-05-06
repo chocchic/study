@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<meta charset="utf-8"/>
+<title>nunjucks</title>
+</head>
+<body>
+<h1>{{title}}</h1>
+<ul>
+    {% for item in aespa %}
+        <li>{{loop.index}} 번째 {{itme}}</li>
+    {% endfor %}
+</ul>
+<p>변수 생성</p>
+{% set fruit = 'orange' %}
+
+{% if fruit === 'apple' %}
+    <p>apple</p>
+{% elif fuit ==='orange' %}
+    <p>orange</p>
+{% else %}
+    <p>other fruit</p>
+{% endif %}
+</body>
+</html>

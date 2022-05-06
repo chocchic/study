@@ -1,0 +1,524 @@
+**Express - node.js 에서 Web Server를 쉽게 만들도록 해주는 프레임워크
+=>Middle Ware 는 express 의 사용자 요청 처리 구문 과 응답 사이에 존재해서 특별한 기능을 수행하는 것
+Logging(기록), Filtering(걸러 내는 역할), Wrapping(변환) 등의 작업을 대부분 수행
+
+0.express web server 생성 및 실행
+
+=>프로젝트 생성
+
+=>패키지 설치 - express, nodemon(서버 코드를 수정했을 때 서버를 자동 재시작할 수 있도록 해주는 모듈)
+npm install express
+npm install --save-dev nodemon
+
+=>package.json 파일을 수정해서 설정 - 자동 재시작하도록 scripts 속성을 수정
+"scripts": {
+    "start":"nodemon app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+}
+
+=>시작 페이지로 출력될 HTML 파일을 생성하고 작성 - index.html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Express를 활용한 웹 서버 구축</title>
+    </head>
+    <body>
+        <h1>메인 페이지</h1>
+    </body>
+</html>
+
+=>entry point로 사용할 javascript 파일을 생성하고 작성 - app.js
+//모듈 가져오기
+const express = require('express')
+//파일 경로를 사용하기 위한 모듈
+const path = require('path')
+
+//express 인스턴스를 생성
+const app = express()
+
+//포트 설정
+app.set('port', process.env.PORT || 3000)
+
+//사용자 요청 처리
+//별다른 경로 입력을 하지 않은 경우 현재 디렉토리의 index.html을 출력
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '/index.html'))
+})
+
+//서버 구동
+app.listen(app.get('port'), () => {
+    console.log(app.get('port'), '번 포트에서 대기 중')
+})
+
+=>서버 시작 - 터미널에서 명령을 수행
+npm start 또는 node index.js
+
+=>브라우저에 localhost:3000 으로 확인
+
+1.dotenv
+=>.env 파일을 읽어서 process.env 의 속성으로 생성해주는 모듈
+=>상수들을 정의해서 소스 코드에 직접 작성하지 않고 사용할 목적으로 이용
+=>보안이 필요한 내용이나 개발 환경에서 운영 환경으로 이전할 때 수정할 내용 등을 작성해 놓는 것이 일반적
+
+1)설치
+npm install dotenv
+
+2)프로젝트에 .env 파일을 생성하고 작성
+PORT=3000
+
+3)app.js 파일에 추가
+const dotenv = require('dotenv')
+dotenv.config() //.env 파일의 모든 내용을 읽어서 process.env에 추가
+
+=>process.env 는 express 가 제공하는 환경 변수를 설정하기 위한 객체
+
+2.morgan middle ware
+=>로그 출력을 위한 미들웨어
+
+1)설치
+npm install morgan file-stream-rotator
+
+2)app.js 파일을 수정
+//로그 기록을 위한 모듈 가져오기
+const morgan = require('morgan')
+const FileStreamRotator = require('file-stream-rotator')
+const fs = require('fs')
+
+//로그가 저장될 디렉토리 경로 생성
+var logDirectory = path.join(__dirname, 'log')
+
+//로그 기록을 위한 내용 - 일단위로 로그 파일 생성
+
+//logDirectory가 있으면 다음으로 넘어가고 없으면 생성
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+
+//로그 생성 옵션
+var accessLogStream = FileStreamRotator.getStream({
+    date_format:'YYYYMMDD',
+    filename:path.join(logDirectory, 'access-%DATE%.log'),
+    frequency:'daily',
+    verbose:false
+})
+
+app.use(morgan('combined', {stream:accessLogStream}))
+
+
+3)서버를 재시작하고 브라우저에서 localhost:3000 을 입력한 후 프로젝트 디렉토리를 확인
+=>log 디렉토리 안에 access-오늘날짜.log 파일이 생성되었는지 와 내용을 확인
+
+3.static 
+=>정적인 파일의 경로를 설정하는 미들웨어
+=>html 이나 css, js, 이미지 등의 자원들이 정적인 파일
+=>설정
+app.use(url, express.static(실제 경로))
+
+app.use('/', express.static(path.join(__dirname, 'public'))): /다음에 오는 경로는 현재 디렉토리의 public 디렉토리에서 가져옴
+
+4.body-parser
+=>multipart-form 형식(file이 포함된 form) 이 아닌 post 방식 전송의 파라미터를 req.body에 넣어주는 미들웨어
+
+=>데이터가 json 형식인 경우는 아래 설정을 추가
+app.use(express.json());
+app.use(express.urlencoded({extended:false}));
+
+=>버퍼 데이터 나 text 데이터는 아래 설정을 추가
+const bodyParser = require('body-parser');
+app.use(bodyParser.raw());
+app.use(bodyParser.text());
+
+5.compression
+=>데이터를 압축해서 전송하기 위한 미들웨어
+1)설치
+npm install --save compression 
+
+2)설정
+var compression = require('compression');
+app.use(compression());
+
+6.cookie-parser
+=>쿠키를 해석해서 req.cookies 나 req.signedCookies 객체로 만들어주는 미들웨어
+
+=>설정
+app.use(cookieParser())
+ - 설정을 할 때 키(문자열)를 하나 대입해서 내 서버가 만든 쿠키임을 확인할 수 있음
+ - 옵션을 설정할 대 signed 를 true로 설정하면 req.signedCookies로 읽어야 함
+
+7.express-session
+=>req.session 객체 안에 세션의 내용이 유지
+=>세션 쿠키는 앞에 s%3A 가 붙은 후 암호화 되서 클라이언트에게 전송됨
+=>옵션
+ secret: 쿠키 암호화
+ cookie: 세션 쿠키 옵션
+ resave: 요청이 왔을 때 세션에 수정 사항이 생기지 않아도 다시 저장할 지 여부
+ saveUninitialized: 세션에 저장할 내역이 없더라도 세션을 저장할 지 여부
+ store: 쿠키 저장을 위한 옵션
+
+1)설치
+npm install express-session
+
+2)세션 확인을 위해서 app.js 파일에 세션에 대한 설정 과 요청을 생성
+
+//세션 사용을 위한 모듈 가져오기
+const session = require('express-session')
+
+app.use(
+    session({
+        secret:'keyboard',
+        resave:false,
+        saveUninitialized:true
+    })
+)
+
+app.get('/session', (req, res) => {
+    if(!req.session.num){
+        req.session.num = 1
+    }else{
+        req.session.num += 1
+    }
+    console.log(req.session.num)
+    res.send('Views:' + req.session.num)
+})
+
+3)브라우저에서 localhost:3000/session 을 입력하고 콘솔을 확인
+=>처음에는 콘솔에 1이 출력, 새로 고침을 하거나 현재 브라우저 창을 제거하거나 추가해서 수행하면 1이 증가해서 출력
+=>브라우저를 종료(세션이 소멸)하고 다시 접속(세션이 다시 생성)하면 그 때는 다시 1이 됩니다.
+=>서버를 종료하고 다시 시작하면 모든 세션이 소멸되고 다시 만들어집니다.
+
+4)세션의 반 영구적 저장
+=>세션은 기본적으로 메모리를 사용하기 때문에 서버를 종료하거나 브라우저를 종료하면 초기화가 됩니다.
+=>파일이나 데이터베이스에 저장하면 세션을 반영구적으로 사용하는 것이 가능
+=>파일에 저장할 때는 session-file-store 모듈을 이용
+프로젝트의 현재 디렉토리에 sessions 라는 디렉토리가 생성되고 각 접속마다 별도의 세션 파일이 생성됩니다.
+
+ - 설치: npm install session-file-store
+ - app.js 파일에 모듈을 가져오고 session 설정을 수정
+const FileStore = require('session-file-store')(session)
+app.use(
+    session({
+        secret:'keyboard',
+        resave:false,
+        saveUninitialized:true,
+        store:new FileStore()
+    })
+)
+
+
+ - 브라우저에서 새로 고침을 하고 프로젝트를 확인해서 sessions 디렉토리 와 세션 파일이 만들어지는지 확인
+서버를 종료한 후 브라우저 창을 새로고침을 했을 때 숫자가 이어서 나오는지 확인
+
+8.multer
+=>파일 업로드를 위한 모듈
+=>파일이 있는 데이터(multipart/form-data)는 body-parser로 해석이 불가능
+1)multer 함수를 이용해서 설정할 때 옵션
+storage: 데이터를 저장할 공간
+diskStorage: 하드디스크에 업로드 파일을 저장
+destination: 저장할 경로
+filename: 파일 이름
+limits: 파일의 개수나 사이즈를 제한
+
+2)multer 안에 존재하는 미들웨어
+single: 하나의 업로드 할 때 사용
+
+none: 파일이 없을 대
+
+array: 여러 개의 파일을 업로드 할 때 사용하는데 1개의 파라미터에 여러 개의 파일이 있을 때
+
+fields: 여러 개의 파일을 업로드 할 때 여러 개의 파라미터에 여러 개의 파일이 있을 때
+
+3)필요한 패키지 설치
+=>cookie-parser, multer
+npm install cookie-parser multer
+
+4).env 파일에 쿠키의 비밀키로 사용할 상수를 설정
+COOKIE_SECRET=cookiesecret
+
+5)app.js 파일에 설정 추가
+//쿠키를 req.cookies 로 사용할 수 있도록 설정
+const cookieParser = require('cookie-parser')
+app.use(cookieParser(process.env.COOKIE_SECRET))
+
+//정적인 파일의 요청 경로를 설정
+app.use('/', express.static('public'))
+
+6)파일 업로드 설정
+//파일 업로드 설정
+const multer = require('multer')
+
+//업로드할 디렉토리를 생성
+//학원에서 연습할 때는 대부분 프로젝트 안에 파일을 업로드 하지만
+//실무에서는 별도의 스토리지 서버(amazon 의 s3 서버 등)를 이용해서 업로드
+try{
+    fs.readdirSync('uploads')
+}catch(error){
+    console.error('업로드할 디렉토리가 없어서 생성')
+    fs.mkdirSync('uploads')
+}
+
+const upload = multer({
+    storage:multer.diskStorage({
+        destination(req, file, done){
+            //업로드할 디렉토리 설정
+            done(null, 'uploads/')
+        },
+        filename(req, file, done){
+            //파일명 생성
+            const ext = path.extname(file.originalname);
+            done(null, path.basename(file.originalname, ext) + 
+                Date.now() + ext)
+        }
+    })
+})
+
+7)하나의 파라미터로 하나의 파일을 업로드 하는 경우
+=>url 처리 함수 안에 multer객체.single(file parameter)를 배치하면 파일 정보가 req.file 에 저장되고 나머지 파라미터는 req.body에 저장됩니다.
+=>req.file 의 구조
+{
+	fieldname: 파라미터 이름,
+	originalname: 파일의 원래 이름,
+	encoding: 인코딩 방식,
+	mimetype: 파일 종류,
+	destination: 업로드할 파일의 경로,
+	filename: 업로드 할 파일 이름,
+	path: 파일의 전체 경로,
+	size: 파일 크기
+}
+
+
+8)하나의 파일 업로드
+=>app.js 파일에 파일을 업로드 할 수 있는 html을 출력하는 코드를 작성
+//하나의 파일을 업로드 하기 위한 요청 처리 구문
+app.get('/singlefileupload', (req, res) => {
+    res.sendFile(path.join(__dirname, 'singlefileupload.html'))
+})
+
+=>하나의 파일을 업로드하는 singlefileupload.html 파일을 생성
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>하나의 파일 업로드</title>
+    </head>
+    <body>
+        <form id="form" method="post" enctype="multipart/form-data">
+            <p>제목:<input type="text" name="title" id="title"/></p>
+            <p>파일:<input type="file" name="image" id="image"
+                accept='image/*' /></p>
+            <input type="submit" />업로드
+        </form>
+    </body>
+</html>
+
+=>app.js 파일에 업로드를 처리하는 코드를 추가
+app.post('/singlefileupload', upload.single('image'), (req, res) => {
+    //파일
+    console.log(req.file);
+    //파일이 아닌 파라미터
+    console.log(req.body.title)
+
+    res.send("OK")
+})
+
+=>서버를 실행한 후 브라우저에 localhost:3000/singlefileupload를 입력하고 파일을 선택해서 업로드를 누름
+프로젝트의 upload 디렉토리에 파일이 업로드되고 콘솔에 다른 파라미터의 값이 제대로 출력되는지 확인
+
+9)하나의 파라미터로 여러 개의 파일을 업로드: ajax를 이용
+=>app.js 파일에 업로드할 html을 출력하는 코드를 작성
+
+//여러 개의 파일을 하나의 파라미터로 업로드 하기 위한 요청 처리 구문
+app.get('/multifileupload', (req, res) => {
+    res.sendFile(path.join(__dirname, 'multifileupload.html'))
+})
+
+=>multipartupload.html 파일을 생성하고 작성
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>여러 개의 파일 업로드</title>
+    </head>
+    <body>
+        <form id="form" method="post" enctype="multipart/form-data">
+            <p>이름:<input type="text" name="title" id="title"/></p>
+            <p>파일:<input type="file" id="image" name="image" 
+            multiple="multiple"/></p>
+            <input type="submit" value="업로드" />
+        </form>
+    </body>
+
+    <script>
+        //폼의 데이터를 전송할 때
+        document.getElementById('form').addEventListener('submit',
+            function(e){
+                //원래 가지고 있는 기능을 수행하지 않도록 함
+                e.preventDefault()
+
+                //폼의 데이터 가져오기
+                const formData = new FormData()
+
+                //파일 전부 가져오기
+                var files = e.target.image.files
+                //파일을 image 라는 이름으로 formData에 추가
+                for(idx=0; idx < files.length; idx++){
+                    formData.append('image', e.target.image.files[idx])
+                }
+
+                formData.append('title', e.target.title.value)
+
+                //ajax 요청 객체
+                var xhr = new XMLHttpRequest()
+                //ajax 요청 생성
+                xhr.open("POST", "/multifileupload", true)
+                //ajax 요청 전송
+                xhr.send(formData)
+
+                //결과 출력
+                xhr.addEventListener('load', function(){
+                    alert(xhr.responseText)
+                })
+        })
+    </script>
+</html>
+
+
+=>ajax 요청을 처리할 함수를 app.js 파일에 생성
+app.post('/multifileupload', upload.array('image'), (req, res) => {
+    console.log(req.files)
+    console.log(req.body.title)
+    res.send('OK')
+})
+
+=>서버를 재시작하고 브라우저 창에 localhost:3000/multifileupload를 입력하고 파일을 여러개 선택하고 업로드 
+
+10)여러 개의 file 파라미터 업로드
+=>여러 개의 file 파라미터를 가진 html을 출력하기 위한 처리 코드를 app.js 에 추가
+//여러 개의 파일을 하나의 파라미터로 업로드 하기 위한 요청 처리 구문
+app.get('/multiparamupload', (req, res) => {
+    res.sendFile(path.join(__dirname, 'multiparamupload.html'))
+})
+
+=>multiparamupload.html 파일을 만들고 작성
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>여러 개의 파일 업로드</title>
+    </head>
+    <body>
+        <form id="form" method="post" enctype="multipart/form-data">
+            <p>이름:<input type="text" name="title" id="title"/></p>
+            <p>파일:<input type="file" id="image1" name="image1" 
+            multiple="multiple"/></p>
+            <p>파일:<input type="file" id="image2" name="image2" 
+                multiple="multiple"/></p>
+            <input type="submit" value="업로드" />
+        </form>
+    </body>
+
+    <!-- ajax를 편리하게 사용할 수 있는 자바스크립트 라이브러리 -->
+    <script src = "https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('form').addEventListener('submit', function(e){
+            e.preventDefault()
+
+            //전송할 데이터 생성
+            const formData = new FormData()
+            formData.append('image1', e.target.image1.files[0])
+            formData.append('image2', e.target.image2.files[0])
+            formData.append('title', e.target.title.value)
+            //ajax 전송
+            axios.post('/multiparamupload', formData)
+
+        })
+    </script>
+</html>
+
+=>ajax 요청을 처리할 코드를 app.js에 추가
+app.post('/multiparamupload', upload.fields([{name:'image1'}, {name:'image2'}]),
+(req, res) => {
+    console.log(req.files)
+    console.log(req.body.title)
+    res.send("OK")
+})
+
+10.Routing
+=>클라이언트의 요청을 구분해서 처리하도록 하는 것
+=>url로 구분하고 method로 구분합니다.
+1)라우팅 모듈화
+=>라우팅 하는 코드를 별도의 파일에 작성하는 것
+=>웹 서비스가 커지면 요청 처리 코드가 많아지고 그렇게 되면 코드도 길어지게 되서 가독성이 떨어지기 때문입니다.
+=>Spring Web Service 를 만들었을 때 여러 개의 Controller 를 만드는 것 과 같은 원리
+
+=>라우팅 파일들이 위치할 디렉토리를 생성 - routes
+
+=>routes 디렉토리에 라우팅을 위한 js 파일을 생성 - index.js(기본 요청을 처리하도록 설정)
+const express = require('express')
+
+const router = express.Router()
+
+router.get('/', (req, res) => {
+    res.send('Hello  Express Web Server')
+})
+
+module.exports = router;
+
+=>routes 디렉토리에 라우팅을 위한 js 파일을 생성 - user.js(user 와 관련된 요청을 처리하도록 설정)
+const express = require('express')
+
+const router = express.Router()
+
+router.get('/', (req, res) => {
+    res.send('Hello  User')
+})
+
+module.exports = router;
+
+
+=>routes 디렉토리에 라우팅을 위한 js 파일을 생성 - board.js(board 와 관련된 요청을 처리하도록 설정)
+const express = require('express')
+
+const router = express.Router()
+
+router.get('/', (req, res) => {
+    res.send('Hello  Board')
+})
+
+module.exports = router;
+
+=>app.js 파일에 라우팅 설정을 위한 코드를 작성
+//라우팅 모듈화
+//라우팅 내용이 작성된 모듈을 전부 읽어오기
+//index.js 는 파일 이름을 작성할 필요가 없습니다.
+const indexRouter = require('./routes');
+const userRouter = require('./routes/user');
+const boardRouter = require('./routes/board');
+
+app.use('/', indexRouter)
+app.use('/user', userRouter)
+app.use('/board', boardRouter)
+
+
+=>실행하고 브라우저에 localhost:3000, localhost:3000/user, localhost:3000/board 라고 입력하고 각 라우터에 작성한 내용이 출력되는지 확인
+
+2)next
+=>next()는 다음 미들웨어로 넘어가는 함수 호출
+=>next('route')를 하게 되면 다음 라우팅 처리 함수로 이동
+=>node는 동일한 라우팅 처리 함수를 여러 개 만들 수 있습니다.
+
+app.use('/', (req, res)=>{
+	//아래 처리 함수로 이동하고자 할 때 
+	next('route')
+})
+
+
+app.use('/', (req, res)=>{
+	
+})
+
+3)URL의 일부분을 파라미터 처럼 사용
+=>예전에는 파라미터가 1개일 때도 파라미터를 query string의 형태로 전송했는데 최근에는 파라미터가 1개인 경우는 URL에 파라미터를 포함시킵니다.
+
+=>라우팅 처리 함수의 URL 부분에 경로/:변수명 의 형태로 작성하고 req.params.변수명으로 읽어냅니다.
+
+
+
