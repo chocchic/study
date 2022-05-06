@@ -178,7 +178,7 @@ app.listen(app.get('port'), () => {
       html
         head
           title=titles
-          link(rel='stylesheet', href='/style/css')
+          link(rel='stylesheet', href='/style.css')
         body
           block content
       block content
@@ -196,3 +196,11 @@ app.listen(app.get('port'), () => {
           color: red;
         }  
       ```
+      * 프로젝트에 public 디렉토리를 만들고 style.css 파일을 만든 후 작성
+        ```css
+          li{
+            color:blue;
+          }
+        ```
+        
+      * 서버를 실행하고 브라우저에 localhost:3000을 입력하고 데이터가 출력되는지, 스타일이 적용되는지 확인
