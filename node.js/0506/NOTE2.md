@@ -34,10 +34,13 @@
   brew install mysql : 설치
   brew services start mysql : mysql server 실행(root 비밀번호는 없음)  
   brew services stop mysql : mysql server 중지  
-### 3) ubuntu linux
-  sudo apt install -y mysql-server
-### 4) docker같은 가상화 애플리케이션에 설치
-  docker pull mysql
-  서버 시작은 docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=비밀번호 -d -p 3306:3306 mysql:latest
-  비밀번호에 관리자 비밀번호 입력
-  클라우드 환경 개발이나 일반 애플리케이션 개발자가 되고자 하는 경우 추천
+### 3) ubuntu linux  
+  sudo apt install -y mysql-server  
+### 4) docker같은 가상화 애플리케이션에 설치  
+  docker pull mysql  
+  서버 시작은 docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=비밀번호 -d -p 3306:3306 mysql:latest  
+  비밀번호에 관리자 비밀번호 입력  
+  클라우드 환경 개발이나 일반 애플리케이션 개발자가 되고자 하는 경우 추천  
+## 2. MySQL 버전  
+  * 5.X 버전과 최근의 8.X 버전으로 구분  
+  * 8.X 버전은 처음부터 비밀번호가 암호화되어 있으며 기본 설정이 외부에서는 root 계정에 접근할 수 없도록 되어있음  
