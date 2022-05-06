@@ -112,3 +112,43 @@
     Grant & Revoke : 권한을 부여하고 회수하는 명령
   
     * Commit & Rollback : 작업 내역을 DB에 반영하고 취소하는 명령 (Transaction Control Language로 분리를 하고 개발자의 언어)
+
+
+
+  
+
+
+
+  ### 1) Select의 구조
+    5  SELECT : 열단위 추출을 위한 컬럼이나 연산식을 나열 - 별명 부여할 수 있음, 필수  
+    1  FROM : 테이블 이름 나열하는데 다른 이름을 부여할 수 있음 - 필수  
+    2  WHERE : 행 단위 추출을 위한 조건 나열   
+    3  GROUP BY : 그룹화하기 위한 컬럼이나 연산식을 나열 - 그룹 함수 생성 시점  
+    4  HAVING : 그룹화한 후 행 단위 추출을 위한 조건 나열  
+    6  ORDER BY : 정렬할 컬럼이나 연산식 나열  
+    7  LIMIT : 추출할 행의 시작 인덱스와 개수 나열 가능(오라클은 이 옵션이 없어서 inline view를 최근의 버전의 다른 옵션을 이용해서 이 부분을 해결)  
+  
+  ### 2) 테이블의 전체 데이터 확인  
+    select * from 테이블이름;
+    접속 도구에서는 블럭을 잡아서 실행하므로 ;을 입력하지 않아도 됩니다.
+    콘솔 환경이라면 반드시 입력해주어야 합니다.
+    프로그래밍 언어에서 embedded sql의 형태로 많이 사용하는데, 이 경우 ;이 있으면 에러가 나는 경우가 많습니다.
+    ;을 생략하고 입력하는 것이 일반적입니다.
+
+    usertbl 테이블과 buytbl테이블을 조회
+    select * from usertbl;
+    select * from buytbl;
+
+    Oracle은 테이블이름과 컬럼 이름을 대문자로 사용하는데 MySQL은 소문자로 사용합니다.
+    Oracle은 SQL 조건절을 제외한 경운 대소문자 구분을 하지 않지만 MySQL은 대소문자 구분을 하는 경우가 많습니다.  
+  
+  ### 3) 특정 컬럼이나 연산식 출력
+    select 컬럼이름 이나 연산식 나열 from 테이블이름;
+    -> 연산식을 사용하게 되면 연산식은 컬럼으로 만들어지는 것이 아니고 출력할 때 연산을 수행해서 출력합니다.
+    -> 별명을 붙이고자 할 때는 공백이나 as를 붙이고 별명을 입력하면 됩니다.
+    별명에 공백이 있는 경우에는 별명을 반드시 ' '로 감싸야 합니다.
+    -> 테이블을 만들 때는 컬럼 이름을 길게 하고 사용을 할 때 별명을 이용해서 사용하는 경우가 많습니다.
+
+    -> buytbl 테이블에서 nu, userid, amount*price 결과를 조회
+    select num userid, amount * price from buytbl;
+    select num as 번호, userid as 아이디, amount * price as 금액 from buytbl;
