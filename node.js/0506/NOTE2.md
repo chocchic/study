@@ -12,3 +12,32 @@
         노드 진영에서는 Mongo DB를 많이 사용
         
       - 최근에는 클라우드 기반의 DB도 많이 사용
+
+## 2. 연동 방법
+### 1) 언어 차원에서 제공하는 기본 라이브러리 이용  
+
+### 2) framework 이용  
+  SQL Mapper Framework : SQL과 로직을 처리하는 코드를 분리해서 사용하는 방식으로 MyBatis(iBatis)가 대표적  
+  ORM(Object Relation Mapper) Framework : 하나의 객체와 하나의 record(row, tuple 등)를 매핑하는 방식으로 사용하는데, SQL없이 관계형 데이터베이스 사용이 가능  
+  JAVA에ㅓ는 JPA가 표준으로 채택되었으며 다른 언어에도 이러한 프레임워크가 존재.  
+  최근에는 ORM 방식으로 DB연동을 많이하고 SQL Mapper를 보조적인 역할을 수행하는 형태로 사용하는 경우가 많음.  
+  
+## 3. 데이터베이스 사용 준비
+  * 데이터베이스 서버 준비  
+  * 데이터베이스 접속 도구 : 서버를 직접 설치하면 제공되는 경우가 있음  
+
+# MYSQL
+## 1. 설치
+### 1) Windows는 mysql site에 가서 installer 버전을 다운로드해서 설치
+### 2) mac은 homebrew이용해서 설치
+  homebrew설치(M1, Intel chip이냐에 따라서 다르게 설치)  
+  brew install mysql : 설치
+  brew services start mysql : mysql server 실행(root 비밀번호는 없음)  
+  brew services stop mysql : mysql server 중지  
+### 3) ubuntu linux
+  sudo apt install -y mysql-server
+### 4) docker같은 가상화 애플리케이션에 설치
+  docker pull mysql
+  서버 시작은 docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=비밀번호 -d -p 3306:3306 mysql:latest
+  비밀번호에 관리자 비밀번호 입력
+  클라우드 환경 개발이나 일반 애플리케이션 개발자가 되고자 하는 경우 추천
