@@ -60,5 +60,11 @@
 ### 4) 변경 내용 적용
   flush privileges;
 ### 5) 계정 생성 실습
-  create user 'user00'@'%' identified by 'user00';
-  grant all previleges on *.* 'user00'@'%';
+  create user 'user00'@'%' identified by 'user00';  
+  grant all previleges on *.* 'user00'@'%';  
+  alter user 'user00'@'%' identified with mysql_native_password by 'user00';  
+  
+  flush privileges;
+  
+  * mac에서 계정이 만들어졌는지 테스트  
+    mysql -u user00 -p
