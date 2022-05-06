@@ -61,3 +61,4 @@
   flush privileges;
 ### 5) 계정 생성 실습
   create user 'user00'@'%' identified by 'user00';
+  grant all previleges on *.* 'user00'@'%';
