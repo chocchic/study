@@ -48,3 +48,14 @@
   * 관리자 계정은 root이고 설치할 때 관리자 비밀번호를 설정하면 기본 포트는 3306번  
   * 처음부터 제공되는 DB는 mysql이 있습니다  
   * MySQL의 데이터베이스는 user보다 큰 개념으로 하나의 database를 만들면 여러 명의 user가 공유해서 사용할 수 있습니다  
+
+## 4. 계정 생성
+### 1) 계정 생성  
+  create user '사용자 이름'@'%' identified by '비밀번호'  
+  -> % 대신에 localhost를 사용하거나 ip를 넣으면 localhost나 ip에서만 접속이 가능  
+### 2) 계정에 권한 부여  
+  grant all privileges on *.* to '사용자이름'@'%'
+### 3) 일반 비밀번호로 접속이 가능하도록 수정
+  alter usere '사용자이름'@'%' identified with mysql_native_password by '비밀번호'
+### 4) 변경 내용 적용
+  flush 
