@@ -58,4 +58,6 @@
 ### 3) 일반 비밀번호로 접속이 가능하도록 수정
   alter usere '사용자이름'@'%' identified with mysql_native_password by '비밀번호'
 ### 4) 변경 내용 적용
-  flush 
+  flush privileges;
+### 5) 계정 생성 실습
+  create user 'user00'@'%' identified by 'user00';
