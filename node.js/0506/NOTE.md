@@ -1,13 +1,13 @@
 # node _ express
 
 ## 1. 에러 처리
-  1) 에러 발생 즉시 처리  
+  ### 1) 에러 발생 즉시 처리  
   ```javascript  
     res.status(상태 코드).수행할 코드
   ```  
-      : 수행할 코드 부분은 매개변수가 4개가 되는데 error 객체, req 객체, next  
+  : 수행할 코드 부분은 매개변수가 4개가 되는데 error 객체, req 객체, next  
   
-  2) 에러 별도 처리  
+  ### 2) 에러 별도 처리  
   ```javascript  
     app.use((err,req,res, next) =>  
       // 에러 처리 코드  
@@ -65,225 +65,289 @@
     
   * 서버의 데이터를 html파일에서 자바스크립트 코드없이 바로 출력하고자 하는 경우 사용  
   
-  1) Jade  
-    * Jade로 배포되었다가 저작권 문제로 Pug로 개명  
-    * 공식 문서 : https://pugjs.org/api/getting-started.html  
-    * html도 jade 문법으로 출력  
-    * 설치 : npm install pug  
-    * 설정  
-  ```javascript  
-    app.get('views', path.join(__dirname, '실제 pug파일이 위치할 디렉토리')  
-    app.set('view engine', 'pug')  
-  ```  
-    
-    * 라우팅 시 pug로 출력  
-      res.render('출력할 뷰 이름') : 실제 pug 파일이 위치할 디렉토리에 뷰이름.html이나 뷰이름.pug파일을 이용해서 출력합니다.  
-      render함수를 호출할 때 뒤에 데이터를 같이 전송할 수 있으며, pug를 이용한 출력 파일에서는 이 데이터를 사용할 수 있고, 변수 생성이나 제어문도 가능합니다.  
-      
-  2) jade를 이용한 데이터 출력
-    * node 프로젝트 생성  
-    * 필요한 라이브러리 설치  
-      일반 설치 : express, morgan, session-file-store, multer, cookie-parser, express-session, dotenv, pug  
-      ```bash
-        npm i express morgan session-file-store multer cookie-parser express-session dotenv pug
-      ```  
-       
-      개발용 설치 : nodemon  
-      ```bash
-        npm i --save-dev nodemon
-      ```  
-    
-    * package.json 수정 : main 부분과 scripts부분 설정과 같게 수정  
-      ```json
-        "main": "index.js",
-        "scripts": {
-          "start": "nodemon index",
-          "test": "echo \"Error: no test specified\" && exit 1"
-        },
-      ```
+### 1) Jade  
+  * Jade로 배포되었다가 저작권 문제로 Pug로 개명  
+  * 공식 문서 : https://pugjs.org/api/getting-started.html  
+  * html도 jade 문법으로 출력  
+  * 설치 : npm install pug  
+  * 설정  
+```javascript  
+  app.get('views', path.join(__dirname, '실제 pug파일이 위치할 디렉토리')  
+  app.set('view engine', 'pug')  
+```  
 
-    * index.js 작성
-    ```javascript
-      // 필요한 모듈 가져오기
-      const express = require('express')
-      const morgan = require('morgan')
-      const cookieParser = require('cookie-parser')
-      const session = require('express-session')
-      const dotenv = require('dotenv')
-      const path = require('path')
-      const fs = require('fs')
-      const exp = require('constants')
+  * 라우팅 시 pug로 출력  
+    res.render('출력할 뷰 이름') : 실제 pug 파일이 위치할 디렉토리에 뷰이름.html이나 뷰이름.pug파일을 이용해서 출력합니다.  
+    render함수를 호출할 때 뒤에 데이터를 같이 전송할 수 있으며, pug를 이용한 출력 파일에서는 이 데이터를 사용할 수 있고, 변수 생성이나 제어문도 가능합니다.  
 
-      // dotenv 사용 설정
-      // dotenv파일에 만든 내용을 읽어서 process.env(express가 생성)에 속성으로 넣어줌
-      dotenv.config();
-
-      // express app 생성
-      const app = express()
-
-      // 포트 설정
-      app.set('port', process.env.PORT)
-
-      // 로그 기록 설정 - 로그를 콘솔에 출력
-      // 실제 개발용이면 대부분 파일에 출력
-      app.use(morgan('dev'))
-
-      // 정적 파일(css, javascript, 그 이외의 필요한 자원) 경로 설정
-      app.use('/', express.static(path.join(__dirname, 'public')))
-
-      // 클라이언트에서 데이터를 json형식으로 전송한 경우 처리하기 위한 설정
-      app.use(express.json())
-      app.use(express.urlencoded({extended:false}))
-
-      // 쿠키를 req.cookies로 읽을 수 있도록 해주는 설정
-      app.use(cookieParser(process.env.COOKIE_SECRET))
-
-      // 세션을 req.session으로 사용할 수 있도록 해주는 설정
-      app.use(session({
-      resave : false,
-      saveUninitialized : false,
-      secret : process.env.COOKIE_SECRET,
-      cookie:{
-        httpOnly : true,
-        secure:false
-      },
-      name:'session-cookie'
-      }))
-
-      // pug 설정
-      app.set('views', path.join(__dirname, 'views'))
-      app.set('view engine', 'pug')
-
-      // 요청 처리
-      app.get('/', (req,res)=> {
-          // pug가 설정된 디렉토리의 index.html이나 index.pug로 출력
-          // title과 Jade라는 데이터를 가지고 넘어갑니다.
-          res.render('index', {
-              title:'Jade',
-              Jade:['A','B','C','D','E']
-          })
-      })
-
-      // 서버 실행
-      app.listen(app.get('port'), () => {
-          console.log(app.get('port'), '번 포트에서 대기 중')
-      })
-    ```
-
-   * 프로젝트에 views 디렉토리를 생성하고 index.pug 추가한 후 수행
-     ```pug
-        doctype html
-        html
-            head
-                title=title
-                link(rel='stylesheet', href='/style.css')
-            body
-                block content
-        block content
-            h1 Welcome to #{title}
-
-            #Jade
-                ul
-                    each a in Jade
-                        li=a
-
-            - const msg = 'Hello'
-            p #{msg}
-
-            script
-                alert(#{title})
-
-        style.
-            h1{
-                font-size:24px;
-                color: red;
-            }
-     ```
-   * 프로젝트에 public 디렉토리를 만들고 style.css 파일을 만든 후 작성
-     ```css
-       li{
-         color:blue;
-       }
-     ```
-        
-   * 서버를 실행하고 브라우저에 localhost:3000을 입력하고 데이터가 출력되는지, 스타일이 적용되는지 확인  
-
-  3) numjucks  
-    * 템플릿 엔진 중의 하나로 태그는 그대로 사용하고 데이터를 출력하는 부분이나 제어문 사용하는 부붐만 별도의 문법으로 작성하는데 {% 내용 %}의 형태로 사용  
-    * 설치  
-      ```  
-        npm install nunjucks  
-      ```  
-    * 설정  
-      ```javascript  
-        const nunjucks = require('nunjucks')  
-        app.set('view engine', 'html')  
-        nunjucks.configure('디렉토리 이름', {  
-          express:app,  
-          watch:true  
-        });  
-      ```  
-    * 출력  
-      res.render('뷰이름', {데이터이름 : 데이터, ...})  
-    
-    * html 파일에서 데이터를 단순 출력  
-      {{데이터 이름}}  
-      
-    * 반복문  
-      {% for 임시변수 in 컬렉션일름 %}  
-        {{임시변수}}  
-    * 조건문  
-      {% if 조건식 %}  
-        true일 때 수행할 내용  
-      {% elif 다른 조건식 %}  
-        ...  
-      ...  
-      {% else %}  
-        수행할 내용  
-    * 다른 파일 가져오기  
-      {% include "파일경로" %}  
-  4) nunjucks로 데이터 출력  
-    * 설치  
-      npm install nunjucks  
-    * index.js파일 수정  
-    ```javascript  
-      const nunjucks = require('nunjucks')  
-      
-      // 템플릿 엔진 부분 수정
-      app.set('view engine', 'html')
-      nunjucks.configure('views', {
-        express:app,
-        watch:true
-      })
+### 2) jade를 이용한 데이터 출력
+  * node 프로젝트 생성  
+  * 필요한 라이브러리 설치  
+    일반 설치 : express, morgan, session-file-store, multer, cookie-parser, express-session, dotenv, pug  
+    ```bash
+      npm i express morgan session-file-store multer cookie-parser express-session dotenv pug
     ```  
-    
-    * views 디렉토리에 index.html 파일을 생성  
-    ```html
-    <!DOCTYPE html>
-    <html>
-        <head>
-    <meta charset="utf-8"/>
-    <title>nunjucks</title>
+
+    개발용 설치 : nodemon  
+    ```bash
+      npm i --save-dev nodemon
+    ```  
+
+  * package.json 수정 : main 부분과 scripts부분 설정과 같게 수정  
+  ```json
+    "main": "index.js",
+    "scripts": {
+      "start": "nodemon index",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+  ```
+
+  * index.js 작성
+  ```javascript
+    // 필요한 모듈 가져오기
+    const express = require('express')
+    const morgan = require('morgan')
+    const cookieParser = require('cookie-parser')
+    const session = require('express-session')
+    const dotenv = require('dotenv')
+    const path = require('path')
+    const fs = require('fs')
+    const exp = require('constants')
+
+    // dotenv 사용 설정
+    // dotenv파일에 만든 내용을 읽어서 process.env(express가 생성)에 속성으로 넣어줌
+    dotenv.config();
+
+    // express app 생성
+    const app = express()
+
+    // 포트 설정
+    app.set('port', process.env.PORT)
+
+    // 로그 기록 설정 - 로그를 콘솔에 출력
+    // 실제 개발용이면 대부분 파일에 출력
+    app.use(morgan('dev'))
+
+    // 정적 파일(css, javascript, 그 이외의 필요한 자원) 경로 설정
+    app.use('/', express.static(path.join(__dirname, 'public')))
+
+    // 클라이언트에서 데이터를 json형식으로 전송한 경우 처리하기 위한 설정
+    app.use(express.json())
+    app.use(express.urlencoded({extended:false}))
+
+    // 쿠키를 req.cookies로 읽을 수 있도록 해주는 설정
+    app.use(cookieParser(process.env.COOKIE_SECRET))
+
+    // 세션을 req.session으로 사용할 수 있도록 해주는 설정
+    app.use(session({
+    resave : false,
+    saveUninitialized : false,
+    secret : process.env.COOKIE_SECRET,
+    cookie:{
+      httpOnly : true,
+      secure:false
+    },
+    name:'session-cookie'
+    }))
+
+    // pug 설정
+    app.set('views', path.join(__dirname, 'views'))
+    app.set('view engine', 'pug')
+
+    // 요청 처리
+    app.get('/', (req,res)=> {
+        // pug가 설정된 디렉토리의 index.html이나 index.pug로 출력
+        // title과 Jade라는 데이터를 가지고 넘어갑니다.
+        res.render('index', {
+            title:'Jade',
+            Jade:['A','B','C','D','E']
+        })
+    })
+
+    // 서버 실행
+    app.listen(app.get('port'), () => {
+        console.log(app.get('port'), '번 포트에서 대기 중')
+    })
+  ```
+
+ * 프로젝트에 views 디렉토리를 생성하고 index.pug 추가한 후 수행
+   ```pug
+      doctype html
+      html
+          head
+              title=title
+              link(rel='stylesheet', href='/style.css')
+          body
+              block content
+      block content
+          h1 Welcome to #{title}
+
+          #Jade
+              ul
+                  each a in Jade
+                      li=a
+
+          - const msg = 'Hello'
+          p #{msg}
+
+          script
+              alert(#{title})
+
+      style.
+          h1{
+              font-size:24px;
+              color: red;
+          }
+   ```
+ * 프로젝트에 public 디렉토리를 만들고 style.css 파일을 만든 후 작성
+ ```css
+   li{
+     color:blue;
+   }
+ ```
+
+ * 서버를 실행하고 브라우저에 localhost:3000을 입력하고 데이터가 출력되는지, 스타일이 적용되는지 확인  
+### 3) numjucks  
+  * 템플릿 엔진 중의 하나로 태그는 그대로 사용하고 데이터를 출력하는 부분이나 제어문 사용하는 부붐만 별도의 문법으로 작성하는데 {% 내용 %}의 형태로 사용  
+
+  * 설치  
+  ```  
+    npm install nunjucks  
+  ```  
+
+  * 설정  
+  ```javascript  
+    const nunjucks = require('nunjucks')  
+    app.set('view engine', 'html')  
+    nunjucks.configure('디렉토리 이름', {  
+      express:app,  
+      watch:true  
+    });  
+  ```  
+
+  * 출력  
+    res.render('뷰이름', {데이터이름 : 데이터, ...})  
+
+  * html 파일에서 데이터를 단순 출력  
+    {{데이터 이름}}  
+
+  * 반복문  
+    {% for 임시변수 in 컬렉션일름 %}  
+      {{임시변수}}  
+  * 조건문  
+    {% if 조건식 %}  
+      true일 때 수행할 내용  
+    {% elif 다른 조건식 %}  
+      ...  
+    ...  
+    {% else %}  
+      수행할 내용  
+  * 다른 파일 가져오기  
+    {% include "파일경로" %}  
+### 4) nunjucks로 데이터 출력  
+  * 설치  
+    npm install nunjucks  
+  * index.js파일 수정  
+  ```javascript  
+    const nunjucks = require('nunjucks')  
+
+    // 템플릿 엔진 부분 수정
+    app.set('view engine', 'html')
+    nunjucks.configure('views', {
+      express:app,
+      watch:true
+    })
+  ```  
+
+  * views 디렉토리에 index.html 파일을 생성  
+  ```html
+  <!DOCTYPE html>
+  <html>
+      <head>
+  <meta charset="utf-8"/>
+  <title>nunjucks</title>
+  </head>
+  <body>
+  <h1>{{title}}</h1>
+  <ul>
+      {% for item in aespa %}
+          <li>{{loop.index}} 번째 {{itme}}</li>
+      {% endfor %}
+  </ul>
+  <p>변수 생성</p>
+  {% set fruit = 'orange' %}
+
+  {% if fruit === 'apple' %}
+      <p>apple</p>
+  {% elif fuit ==='orange' %}
+      <p>orange</p>
+  {% else %}
+      <p>other fruit</p>
+  {% endif %}
+  </body>
+  </html>
+  ```
+
+### 5) nunjucks는 python의 django에서도 사용 가능  
+
+### 6) rest api를 전송해서 ajax로 출력
+  * index.js 파일에 추가
+  ```javascript
+    app.get('/rest',(req, res)=>{
+    res.sendFile(path.join(__dirname, 'rest.html'))
+    })
+
+    app.get('/json', (req,res)=> {
+        res.json({
+            title:'Jade',
+            Jade:['A','B','C','D','E']
+        })
+    })
+  ```  
+### 7) public 디렉토리에 출력하는 파일인 rest.html 파일을 생성하고 작성
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ajax를 이용한 출력</title>
     </head>
     <body>
-    <h1>{{title}}</h1>
-    <ul>
-        {% for item in aespa %}
-            <li>{{loop.index}} 번째 {{itme}}</li>
-        {% endfor %}
-    </ul>
-    <p>변수 생성</p>
-    {% set fruit = 'orange' %}
-
-    {% if fruit === 'apple' %}
-        <p>apple</p>
-    {% elif fuit ==='orange' %}
-        <p>orange</p>
-    {% else %}
-        <p>other fruit</p>
-    {% endif %}
+        <div id="content"></div>
     </body>
-    </html>
-    ```
-    
-  5) nunjucks는 python의 django에서도 사용 가능  
+    <script>
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', '/json', true)
+        xhr.send
+        xhr.addEventListener('load', function(){
+            var result = xhr.responseText;
+            // 위의 데이터를 javascript 객체로 변환
+            var obj = JSON.parse(result)
+            document.getElementById('content').innerHTML = obj.title;
+            //alert(result)
+        })
+    </script>
+</html>
+```  
+### 8) 서버를 구동하고 브라우저에 localhost:3000/rest를 입력하고 데이터가 읽어져 오는지 확인
+
+### 9) java에서 데이터를 가져다가 사용
+```java
+  try {
+    URL url = new URL("http://ip:3000/rest")
+    HTTPURLConnection con = (HttpURLConnection)url.openConnection();
+    StringBuilder sb = new StringBuilder();
+    BufferedReader br = newe BufferedReeader(new InputStreamReader(con.getInputStream()));
+    while(true){
+      String line = br.readLine();
+      if(line == null) break;
+      sb.append(line+"\n");
+    }
+
+    br.close();
+    con.disconnect();
+    System.out.println(sb.toString());
+  } catch(Exception e){
+    System.out.println(e.printStackTrace());
+  }
+```
