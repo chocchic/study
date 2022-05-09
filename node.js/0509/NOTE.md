@@ -134,4 +134,54 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 ```sql
   select userid from buytbl group by userid having count(userid) >= 3;
 ```  
-** 집계함수는 from과 where에는 사용불가능하므로 having에서만 사용할 수 있다. **
+** 집계함수는 from과 where에는 사용불가능하므로 having에서만 사용할 수 있다. **  
+
+  * 비효율적인 having의 사용 : where절에 사용가능한 조건은 where절에 사용  
+    buytbl테이블에서 price가 30이상인 데이터가 두번 이상 등장하는 데이터의 userid를 조회  
+    ```sql  
+      select userid from buytbl where price >= 30 group by userid having count(userid) >=2;
+    ```  
+
+  * group by절에서 그룹화를 하게되면 그룹함수와 group by에서 그룹화 하지 않은 컬럼을 같이 출력 못함.  
+    mysql은 그룹화하지 않은 항목을 출력하면 첫번째 것 하나만 출력  
+    ```sql  
+      select addr, name, count(*) from usertbl group by addr;
+    ```  
+
+### 5) 전체 총계나 중간 소계를 조회 - with rollup이용  
+```sql
+  select userid, avg(price) from buytbl group by userid, with rollup;
+```
+
+## 6. alias
+  * 열 이름이나 연산식에 별명을 사용할 수 있는데, 열 이름이나 연산식 뒤에 공백을 하나주고 별명을 입력하면 됩니다.  
+    한글을 사용하거나 공백이 있는 경우는 " "로 묶어주어야 합니다.  
+    별명 앞에 as를 추가해도 됩니다. 이 형태는 별명이라서 select 절 이후에 사용되는 order by에서 사용이 가능합니다.  
+
+  * from절에서 테이블 이름 뒤에 다름 이름을 부여할 수 있는데, 이 경우는 별명이 아니라 다른 이름으로 변경하는 것입니다.  
+    from절에서 테이블 이름에 다른 이름을 부여하면 그 이후 절에서는 그 이름만 사용해야 합니다.  
+
+  * order by절에서 주소 대신 addr로 작성해도 됩니다.  
+  ```sql  
+    select addr as "주소" from usertbl order by 주소;
+  ```  
+
+  * select절에서 U 대신에 usertbl을 사용하면 에러가 발생  
+  ```sql
+    select U.addr as "주소" from usertbl U order by 주소;
+  ```  
+
+## 7. 함수
+  매개변수를 받아서 작업을 수행한 후 리턴을 해주는 개체  
+  그룹 함수가 아닌 함수는 컬럼을 매개변수로 대입하면 컬럼의 각 행에 작업을 수행한 후 결과를 모아서 컬럼으로 리턴  
+
+### 1) 제어 흐름 함수
+  * DB에서는 null과 다른 종류의 데이터가 산술 연산을 하게되면 결과가 null  
+  * null관련 함수  
+    - ifnull(수식1, 수식2) : 수식1이 null이 아니면 수식1리턴, 수식1이 null이면 수식2가 리턴  
+    - nullif(수식1, 수식2) : 수식1과 수식2가 같으면 null을 리턴하고 다르면 수식1을 리턴  
+
+  * EMPLOYEE_SALARY테이블에서 SALARY의 값이 null이면 0, 아니면 원래의 값으로 조회  
+  ```sql
+    
+  ```

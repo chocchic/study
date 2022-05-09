@@ -104,3 +104,18 @@ select userid, avg(amount) from buytbl group by userid;
 select * from buytbl;
 -- buytbl 테이블에서 userid의 개수가 3번이상 등장한 데이터의 userid를 조회  
 select userid from buytbl group by userid having count(userid) >= 3;
+
+-- buytbl테이블에서 price가 30이상인 데이터가 두번 이상 등장하는 데이터의 userid를 조회
+select userid from buytbl where price >= 30 group by userid having count(userid) >=2;
+
+-- mysql은 그룹화하지 않은 항목을 출력하면 첫번째 것 하나를 출력
+select addr, name, count(*) from usertbl group by addr;
+
+select userid, avg(price) from buytbl group by userid with rollup;
+
+select addr as "주소" from usertbl order by 주소;
+select usertbl.addr as "주소" from usertbl U order by 주소; -- 에러
+select U.addr as "주소" from usertbl U order by 주소;
+
+-- EMPLOYEE_SALARY테이블에서 SALARY의 값이 null이면 0, 아니면 원래의 값으로 조회
+select ifnull(salary, 0) from employee_salary;
