@@ -192,7 +192,7 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
     관계형 데이터베이스는 하나의 컬럼에 여러 개의 값을 저장할 수 없습니다.  
 
     사진파일 이름 - a.png|b.png|c.png
-    , 로 구분 : csv (comma s)
+    , 로 구분 : csv (Comma-Separated-Values)
   
 ### 3) 숫자 함수
   * 반올림, 올림, 버림 함수 : CELIING, FLOOR, ROUND  
@@ -226,3 +226,45 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
   * subquery를 이용한 추가  
     insert into 테이블이름(컬럼 이름 나열)  
     select 구문  
+
+## 9. 데이터 수정  
+  update 테이블이름 set 컬럼이름=수정할 값, ... [where 조건];
+  where절이 없으면 테이블의 모든 데이터를 수정  
+  where절이 있으면 그 조건에 해당하는 데이터만 수정  
+
+  * usertbl 테이블에서 userid가 kjn인 데이터의 name을 김제니로 수정
+  ```sql
+    update usertbl set name='김제니' where userid='kjn';
+  ```
+
+## 10. 데이터 삭제
+  delete from 테이블 이름 [where 조건식];
+
+  * usertbl 테이블에서 userid가 kjn인 데이터 삭제  
+  ```sql
+    delete from usertbl where userid='kjn';
+  ```  
+
+## 11. join  
+  * 2개의 테이블을 합쳐서 하나의 테이블을 만드는  작업
+
+### 1) cartesian product - cross join  
+  * 2개의 테이블의 모든 조합을 만들어내는 것  
+  * 행의 개수는 양쪽 테이블의 행의 개수를 곱한 것과 같고 열의 개수는 양쪽 테이블의 열의 개수를 더한 것과 같음.  
+  * from절에 ,로 구분해서 테이블 이름을 2개 나열하거나 테이블이름 사이에 ,대신에 cross join이라고 입력하면 됩니다.
+
+  * usertbl테이블과 buytbl테이블의 cross join  
+  ```sql
+    select * from usertbl, buytbl;
+    select * from usertbl cross join buytbl;
+  ```
+
+### 2) Inner Join
+  양쪽 테이블의 동일한 의미를 갖는 2개의 컬럼에서 값이 같은 데이터만 합쳐 새로운 테이블을 만드는 join  
+  실제 구문 상에서는 자료형만 동일하면 되고, 컬럼의 이름은 아무 상관없음  
+  외래키로 설정된 컬럼을 가지고하는 것을 권장  
+  컬럼값을 비교할 때 =로 비교하면 equi join이라고 하고, =가 아닌 연산자로 비교하면 non equi join이라고 합니다.  
+
+  조인 조건은 where절에 기술하기도 하고 on을 이용해서 기술할 수도 있고 natural join을 이용할 수도 있는데, natural jpin을 사용할려면 양쪽 테이블의 컬럼이름이 같아야 합니다.  
+
+  

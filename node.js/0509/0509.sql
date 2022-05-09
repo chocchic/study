@@ -125,3 +125,15 @@ select ifnull(salary, 0) from employee_salary;
 insert into usertbl(userid, name, birthyear, addr, mobile, mdate) values('kjn', '제니', 1996, '서울', '01012341234', '1996-01-16');
 commit;
 select * from usertbl;
+
+update usertbl set name='김제니' where userid='kjn';
+select * from usertbl;
+
+delete from usertbl where userid='kjn';
+select * from usertbl;
+
+-- usertbl : 열은 6개 행은 10개
+-- buytbl : 열은 6개 행은 13개
+select * from usertbl, buytbl;
+select * from usertbl cross join buytbl;
+-- 카티션 곱 : 열은 12개, 행은 130개
