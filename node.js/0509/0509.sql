@@ -82,3 +82,25 @@ select name, birthyear from usertbl order by 2;
 -- usertbl테이블의 name과 birthyear를 조회하는데 birthyear의 오름차순으로 정렬해서 출력하는데 
 -- birthyear의 값이 같으면 name의 내림차순으로 정렬
 select name, birthyear from usertbl order by birthyear asc, name desc;
+
+-- usertbl 테이블에서 addr의 값을 중복되지 않게 조회
+select distinct addr from usertbl;
+
+-- usertbl 테이블에서 birthyear가 가장 큰 5개의 데이터를 조회
+select * from usertbl order by birthyear desc limit 0, 10;
+
+-- usertbl 테이블에서 birthyear가 다섯번째로 큰 데이터부터 나머지 모든 데이터를 조회
+select * from usertbl order by birthyear desc limit 5;
+
+-- usertbl 테이블의 데이터 개수 조회
+select count(userid) from buytbl;
+select count(*) from buytbl;
+
+-- buytbl의 평균 amount 조회
+select avg(amount) from buytbl;
+
+-- buytbl 테이블에서 userid별 평균 amount 조회
+select userid, avg(amount) from buytbl group by userid;
+select * from buytbl;
+-- buytbl 테이블에서 userid의 개수가 3번이상 등장한 데이터의 userid를 조회  
+select userid from buytbl group by userid having count(userid) >= 3;
