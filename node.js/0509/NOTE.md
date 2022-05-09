@@ -26,7 +26,6 @@ select * from usertbl where birthyear >= 1989;
 select * from usertbl where birthyear >= (select birthyear from usertbl where name ='김태연');
 ```
 
-
 ### 5) usertbl테이블에서 addr이 광주인 데이터와 birthyear가 같은 데이터의 모든 컬럼 조회  
 ```sql  
 -- usertbl테이블에서 addr이 광주인 데이터와 birthyear가 같은 데이터의 모든 컬럼 조회
@@ -183,5 +182,47 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * EMPLOYEE_SALARY테이블에서 SALARY의 값이 null이면 0, 아니면 원래의 값으로 조회  
   ```sql
-    
-  ```
+    select ifnull(salary, 0) from employee_salary;
+  ```  
+### 2) 문자열 함수
+  * 좌우 공백 제거 : trim  
+  * 대소문자 변환 : upper, lower  
+
+  * 분할 : substring(문자열, 시작위치, 길이) - 문자열에서 시작 위치부터 길이만큼 잘라서 리턴  
+    관계형 데이터베이스는 하나의 컬럼에 여러 개의 값을 저장할 수 없습니다.  
+
+    사진파일 이름 - a.png|b.png|c.png
+    , 로 구분 : csv (comma s)
+  
+### 3) 숫자 함수
+  * 반올림, 올림, 버림 함수 : CELIING, FLOOR, ROUND  
+
+### 4) 날짜 관련 함수
+  * 날짜 연산 함수 : addtime(날짜, 시간), subtime(날짜, 시간)  
+    adddate(날짜, 날짜 차이), subdate(날짜, 날짜차이)  
+  
+  * 현재 날짜 및 시간
+    current_date(), currnet_time(), now(), current_timestamp()  
+
+  * 문자열을 날짜로 변환 : 일반적이니 날짜 포맷의 문자열은 날짜로 인식  
+    str_to_date(날짜 형식의 문자열, 날짜 포맷)  
+
+## 8. 데이터 삽입  
+  insert into 테이블이름(컬럼이름 나열) values(값을 나열);  
+  테이블을 만들 때 작성한 컬럼의 순서대로 모든 값을 입력할 때는 컬럼 이름을 나열하지 않아도 됩니다.  
+  auto_increment가 적용된 컬럶에 값을 대입하지 않으면 일련번호가 대입됩니다.  
+  default가 설ㅈ렁된 경우는 값을 대입하지 않으면 default 값이 대입됩니다.  
+  auto_increment나 default가 설정되지 않은 경우 값을 대입하지 않으면 null이 대입됩니다.  
+
+  * usertbl테이블에 userid가 kjn이고 name은 제니, birthyear는 1996, addr은 서울, mobile은 01012341234, mdate는 1996-01-16인 데이터를 삽입
+  ```sql
+    insert into usertbl(userid, name, birthyear, addr, mobile, mdate) values('kjn', '제니', 1996, '서울', '01012341234', '1996-01-16');
+  ```  
+
+  * 여러 개의 데이터를 한꺼번에 삽입 가능  
+    insert into 테이블이름(컬럼 이름 나열) values(값1, 값2, ... ), (값1, 값2, ... ), ... ,(값1, 값2, ... );  
+    값은 컬럼에 해당하는 값들을 나열  
+  
+  * subquery를 이용한 추가  
+    insert into 테이블이름(컬럼 이름 나열)  
+    select 구문  

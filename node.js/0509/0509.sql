@@ -119,3 +119,9 @@ select U.addr as "주소" from usertbl U order by 주소;
 
 -- EMPLOYEE_SALARY테이블에서 SALARY의 값이 null이면 0, 아니면 원래의 값으로 조회
 select ifnull(salary, 0) from employee_salary;
+
+-- usertbl테이블에 userid가 kjn이고 name은 제니, birthyear는 1996, addr은 서울, mobile은 01012341234, 
+-- mdate는 1996-01-16인 데이터를 삽입
+insert into usertbl(userid, name, birthyear, addr, mobile, mdate) values('kjn', '제니', 1996, '서울', '01012341234', '1996-01-16');
+commit;
+select * from usertbl;
