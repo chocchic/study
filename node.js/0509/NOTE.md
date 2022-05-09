@@ -54,13 +54,13 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
 ### 1) usertbl 테이블의 name과 birthyear를 조회하는데 birthyear의 오름차순으로 정렬해서 출력  
 ```sql  
-  select name, birthyear from usertbl order by birthyear asc;
-  select name, birthyear from usertbl order by 2; -- asc는 생략가능
+select name, birthyear from usertbl order by birthyear asc;
+select name, birthyear from usertbl order by 2; -- asc는 생략가능
 ```  
 
 ### 2) usertbl테이블의 name과 birthyear를 조회하는데 birthyear의 오름차순으로 정렬해서 출력하는데 birthyear의 값이 같으면 name의 내림차순으로 정렬  
 ``` sql
-  select name, birthyear from usertbl order by birthyear asc, name desc;
+select name, birthyear from usertbl order by birthyear asc, name desc;
 ```
 
 ## 3. distinct  
@@ -68,7 +68,7 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
   select 절의 나열된 모든 컬럼의 값이 일치하는 경우만 조회  
 ### 1) usertbl테이블에서 addr의 값을 중복되지 않게 조회  
 ```sql  
-  select distinct addr from usertbl;  
+select distinct addr from usertbl;  
 ```  
 
 ## 4. 페이징, TOP-N  
@@ -78,12 +78,12 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
 ### 1) usertbl 테이블에서 birthyear가 가장 큰 5개의 데이터를 조회  
 ```sql
-  select * from usertbl order by birthyear desc;
+select * from usertbl order by birthyear desc;
 ```
 
 ### 2) usertbl 테이블에서 birthyear가 다섯번째로 큰 데이터부터 나머지 모든 데이터를 조회(birthyear를 내림차순 정렬후 처음부터 5개의 데이터만 조회)  
 ```sql  
-  select * from usertbl order by birthyear desc limit 5;
+select * from usertbl order by birthyear desc limit 5;
 ```
 
 ## 5. 데이터 그룹화  
@@ -115,41 +115,41 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 ### 4) 실습
   * usertbl 테이블의 데이터 개수 조회  
 ```sql  
-  select count(userid) from buytbl;
-  select count(*) from buytbl;
+select count(userid) from buytbl;
+select count(*) from buytbl;
 ```  
 
   * buytbl의 평균 amount 조회  
 ```sql  
-  select avg(amount) from buytbl;
+select avg(amount) from buytbl;
 ```  
 
   * buytbl 테이블에서 userid별 평균 amount 조회  
 ```sql  
-  select userid, avg(amount) from buytbl group by userid; -- amount함수를 사용하면 그 항목이 어느 값인지에 대한 컬럼은 자동으로 나오지 않으므로 해당 컬럼 값도 같이 찍어줘야함.
+select userid, avg(amount) from buytbl group by userid; -- amount함수를 사용하면 그 항목이 어느 값인지에 대한 컬럼은 자동으로 나오지 않으므로 해당 컬럼 값도 같이 찍어줘야함.
 ```  
 
   * buytbl 테이블에서 userid의 개수가 3번이상 등장한 데이터의 userid를 조회  
 ```sql
-  select userid from buytbl group by userid having count(userid) >= 3;
+select userid from buytbl group by userid having count(userid) >= 3;
 ```  
 ** 집계함수는 from과 where에는 사용불가능하므로 having에서만 사용할 수 있다. **  
 
   * 비효율적인 having의 사용 : where절에 사용가능한 조건은 where절에 사용  
     buytbl테이블에서 price가 30이상인 데이터가 두번 이상 등장하는 데이터의 userid를 조회  
     ```sql  
-      select userid from buytbl where price >= 30 group by userid having count(userid) >=2;
+    select userid from buytbl where price >= 30 group by userid having count(userid) >=2;
     ```  
 
   * group by절에서 그룹화를 하게되면 그룹함수와 group by에서 그룹화 하지 않은 컬럼을 같이 출력 못함.  
     mysql은 그룹화하지 않은 항목을 출력하면 첫번째 것 하나만 출력  
     ```sql  
-      select addr, name, count(*) from usertbl group by addr;
+    select addr, name, count(*) from usertbl group by addr;
     ```  
 
 ### 5) 전체 총계나 중간 소계를 조회 - with rollup이용  
 ```sql
-  select userid, avg(price) from buytbl group by userid, with rollup;
+select userid, avg(price) from buytbl group by userid, with rollup;
 ```
 
 ## 6. alias
@@ -162,12 +162,12 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * order by절에서 주소 대신 addr로 작성해도 됩니다.  
   ```sql  
-    select addr as "주소" from usertbl order by 주소;
+  select addr as "주소" from usertbl order by 주소;
   ```  
 
   * select절에서 U 대신에 usertbl을 사용하면 에러가 발생  
   ```sql
-    select U.addr as "주소" from usertbl U order by 주소;
+  select U.addr as "주소" from usertbl U order by 주소;
   ```  
 
 ## 7. 함수
@@ -182,7 +182,7 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * EMPLOYEE_SALARY테이블에서 SALARY의 값이 null이면 0, 아니면 원래의 값으로 조회  
   ```sql
-    select ifnull(salary, 0) from employee_salary;
+  select ifnull(salary, 0) from employee_salary;
   ```  
 ### 2) 문자열 함수
   * 좌우 공백 제거 : trim  
@@ -211,12 +211,12 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
   insert into 테이블이름(컬럼이름 나열) values(값을 나열);  
   테이블을 만들 때 작성한 컬럼의 순서대로 모든 값을 입력할 때는 컬럼 이름을 나열하지 않아도 됩니다.  
   auto_increment가 적용된 컬럶에 값을 대입하지 않으면 일련번호가 대입됩니다.  
-  default가 설ㅈ렁된 경우는 값을 대입하지 않으면 default 값이 대입됩니다.  
+  default가 설정된 경우는 값을 대입하지 않으면 default 값이 대입됩니다.  
   auto_increment나 default가 설정되지 않은 경우 값을 대입하지 않으면 null이 대입됩니다.  
 
   * usertbl테이블에 userid가 kjn이고 name은 제니, birthyear는 1996, addr은 서울, mobile은 01012341234, mdate는 1996-01-16인 데이터를 삽입
   ```sql
-    insert into usertbl(userid, name, birthyear, addr, mobile, mdate) values('kjn', '제니', 1996, '서울', '01012341234', '1996-01-16');
+  insert into usertbl(userid, name, birthyear, addr, mobile, mdate) values('kjn', '제니', 1996, '서울', '01012341234', '1996-01-16');
   ```  
 
   * 여러 개의 데이터를 한꺼번에 삽입 가능  
@@ -234,7 +234,7 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * usertbl 테이블에서 userid가 kjn인 데이터의 name을 김제니로 수정
   ```sql
-    update usertbl set name='김제니' where userid='kjn';
+  update usertbl set name='김제니' where userid='kjn';
   ```
 
 ## 10. 데이터 삭제
@@ -242,7 +242,7 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * usertbl 테이블에서 userid가 kjn인 데이터 삭제  
   ```sql
-    delete from usertbl where userid='kjn';
+  delete from usertbl where userid='kjn';
   ```  
 
 ## 11. join  
@@ -255,8 +255,8 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   * usertbl테이블과 buytbl테이블의 cross join  
   ```sql
-    select * from usertbl, buytbl;
-    select * from usertbl cross join buytbl;
+  select * from usertbl, buytbl;
+  select * from usertbl cross join buytbl;
   ```
 
 ### 2) Inner Join
@@ -267,4 +267,60 @@ select * from usertbl where birthyear < ALL(select birthyear from usertbl where 
 
   조인 조건은 where절에 기술하기도 하고 on을 이용해서 기술할 수도 있고 natural join을 이용할 수도 있는데, natural jpin을 사용할려면 양쪽 테이블의 컬럼이름이 같아야 합니다.  
 
+  * usertbl테이블과 buytbl테이블에는 userid라는 공통된 컬럼이 존재 -> 이 컬럼을 가지고 Inner Join(Equi Join) 수행  
+  ```sql
+  select * from usertbl, buytbl where usertbl.userid = buytbl.userid;
+  select * from usertbl inner join buytbl on usertbl.userid = buytbl.userid;
+  select * from usertbl natural join buytbl;
+  ```  
+
+### 3) outer join  
+  한쪽 테이블에만 존재하는 데이터도 조인에 참여하는 것  
+  inner join이라는 예약어 대신에 left outer join, right outer join, full outer join을 사용하면 됩니다.  
+
+  * usertbl 테이블에는 존재하지만 buytbl에는 존재하지 않는 데이터도 join에 참여  
+  ```sql
+  select * from usertbl left outer join buytbl on usertbl.userid = buytbl.userid;
+  ```  
+
+### 4) self join
+  동일한 테이블끼리 join  
+  이런 경우는 하나의 테이블에 동일한 의미를 갖는 2개의 컬럼이 존재하는 경우 수행  
+  하나의 테이블의 사원id가 존재하고, 관리자의 사원id가 존재하고 name이 있을 때, 특정 사원의 관리자 name을 알고자 하는 경우  
+  이와 유사한 경우가 SNS에서 친구 테이블의 경우, 회원id와 친구id가 같은 테이블에 존재하는데, 내 친구의 친구를 찾고자 할 때  
+
+  * 실습을 위해 필요한 쿼리
+  ```sql 
+  CREATE TABLE empTbl (emp CHAR(3), manager CHAR(3), empTel VARCHAR(8));
+  INSERT INTO empTbl VALUES(N'나사장',NULL,'0000');
+  INSERT INTO empTbl VALUES(N'김재무',N'나사장','2222');
+  INSERT INTO empTbl VALUES(N'김부장',N'김재무','2222-1');
+  INSERT INTO empTbl VALUES(N'이부장',N'김재무','2222-2');
+  INSERT INTO empTbl VALUES(N'우대리',N'이부장','2222-2-1');
+  INSERT INTO empTbl VALUES(N'지사원',N'이부장','2222-2-2');
+  INSERT INTO empTbl VALUES(N'이영업',N'나사장','1111');
+  INSERT INTO empTbl VALUES(N'한과장',N'이영업','1111-1');
+  INSERT INTO empTbl VALUES(N'최정보',N'나사장','3333');
+  INSERT INTO empTbl VALUES(N'윤차장',N'최정보','3333-1');
+  INSERT INTO empTbl VALUES(N'이주임',N'윤차장','3333-1-1');
+  ```
+  * emp는 자신의 이름이고, manager는 관리자의 이름이고, empTel은 자신의 전화번호
+    emp가 김부장인 사원의 관리자 번호를 알고자 하는 경우
+  ```sql
+  select e1.emp, e1.manager, e1.empTel, e2.empTel as managerTel from emptbl e1, emptbl e2 where e1.manager = e2.emp and e1.emp ='김부장';
+  ```  
+
+### 5) join과 subquery  
+  * select절과 질의결과가 하나의 테이블에서만 가져오는 경우는 subquery로 해결할 수 있습니다.  
+    2개 이상의 테이블에서 가져와야하는 경우는 join으로 해결해야 합니다.  
+
+    usertbl테이블에는 userid, name, birthyear, addr, mdate가 존재
+    buytbl테이블에는 num, userid, productname, groupname, price, amount가 존재
+
+  * addr이 서울인 유저의 name과 productname을 조회  
+    usertbl 테이블과 buytbl테이블을 이용해야하는데 name과 productname을 조회해야 하므로 join을 이용해서 해결  
   
+
+  * addr이 서울인 유저의 userid와 productname과 price, amount를 조회  
+    usertbl테이블과 buytbl 테이블을 이용해야 하는데, userid와 productname과 price, amount가 buytbl에 존재하기 때문에 이 경우는 subquery로도 해결가능  
+    

@@ -137,3 +137,33 @@ select * from usertbl;
 select * from usertbl, buytbl;
 select * from usertbl cross join buytbl;
 -- 카티션 곱 : 열은 12개, 행은 130개
+
+select * from usertbl, buytbl where usertbl.userid = buytbl.userid;
+select * from usertbl inner join buytbl on usertbl.userid = buytbl.userid;
+select * from usertbl natural join buytbl;
+
+-- usertbl에는 존재하지만 buytbl에 존재하지 않는 userid 조회
+select userid from usertbl where userid not in (select userid from buytbl);
+select * from usertbl inner join buytbl on usertbl.userid = buytbl.userid;
+select * from usertbl left outer join buytbl on usertbl.userid = buytbl.userid;
+
+CREATE TABLE empTbl (emp CHAR(3), manager CHAR(3), empTel VARCHAR(8));
+
+INSERT INTO empTbl VALUES(N'나사장',NULL,'0000');
+INSERT INTO empTbl VALUES(N'김재무',N'나사장','2222');
+INSERT INTO empTbl VALUES(N'김부장',N'김재무','2222-1');
+INSERT INTO empTbl VALUES(N'이부장',N'김재무','2222-2');
+INSERT INTO empTbl VALUES(N'우대리',N'이부장','2222-2-1');
+INSERT INTO empTbl VALUES(N'지사원',N'이부장','2222-2-2');
+INSERT INTO empTbl VALUES(N'이영업',N'나사장','1111');
+INSERT INTO empTbl VALUES(N'한과장',N'이영업','1111-1');
+INSERT INTO empTbl VALUES(N'최정보',N'나사장','3333');
+INSERT INTO empTbl VALUES(N'윤차장',N'최정보','3333-1');
+INSERT INTO empTbl VALUES(N'이주임',N'윤차장','3333-1-1');
+commit;
+
+select * from emptbl;
+
+-- emp는 자신의 이름이고, manager는 관리자의 이름이고, empTel은 자신의 전화번호
+-- emp가 김부장인 사원의 관리자 번호를 알고자 하는 경우
+select e1.emp, e1.manager, e1.empTel, e2.empTel as managerTel from emptbl e1, emptbl e2 where e1.manager = e2.emp and e1.emp ='김부장';
