@@ -23,3 +23,5 @@ react-native : 2주 정도
 - 블럭 체인 프로젝트
   Spring boot project로 서버를 구축한 후 go로 만든 서버와 통신을 하고 스마트폰과 연결  
   데이터베이스는 mysql 사용
+
+Client Application <-> Socker Server | Web Server <->Application Server <-> Repository(database)
