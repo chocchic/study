@@ -167,3 +167,10 @@ select * from emptbl;
 -- emp는 자신의 이름이고, manager는 관리자의 이름이고, empTel은 자신의 전화번호
 -- emp가 김부장인 사원의 관리자 번호를 알고자 하는 경우
 select e1.emp, e1.manager, e1.empTel, e2.empTel as managerTel from emptbl e1, emptbl e2 where e1.manager = e2.emp and e1.emp ='김부장';
+
+select name, productname from usertbl inner join buytbl on usertbl.userid = buytbl.userid;
+
+-- join으로 해결
+select usertbl.userid, productname, price, amount from usertbl inner join buytbl on usertbl.userid = buytbl.userid where addr='서울';
+-- subquery로 해결
+select buytbl.userid, productname, price, amount from buytbl where userid in (select userid from usertbl where addr='서울');

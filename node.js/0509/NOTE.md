@@ -133,7 +133,7 @@ select userid, avg(amount) from buytbl group by userid; -- amount함수를 사�
 ```sql
 select userid from buytbl group by userid having count(userid) >= 3;
 ```  
-** 집계함수는 from과 where에는 사용불가능하므로 having에서만 사용할 수 있다. **  
+**집계함수는 from과 where에는 사용불가능하므로 having에서만 사용할 수 있다.**  
 
   * 비효율적인 having의 사용 : where절에 사용가능한 조건은 where절에 사용  
     buytbl테이블에서 price가 30이상인 데이터가 두번 이상 등장하는 데이터의 userid를 조회  
@@ -319,8 +319,65 @@ select userid, avg(price) from buytbl group by userid, with rollup;
 
   * addr이 서울인 유저의 name과 productname을 조회  
     usertbl 테이블과 buytbl테이블을 이용해야하는데 name과 productname을 조회해야 하므로 join을 이용해서 해결  
-  
+    ```sql
+    select name, productname from usertbl inner join buytbl on usertbl.userid = buytbl.userid;
+    ```  
 
   * addr이 서울인 유저의 userid와 productname과 price, amount를 조회  
-    usertbl테이블과 buytbl 테이블을 이용해야 하는데, userid와 productname과 price, amount가 buytbl에 존재하기 때문에 이 경우는 subquery로도 해결가능  
+    usertbl테이블과 buytbl 테이블을 이용해야 하는데, userid와 productname과 price, amount가 buytbl에 존재하기 때문에 이 경우는 subquery로도 해결  
+    **join을 한 경우에는 양쪽 테이블에 모두 존재하는 컬럼 이름을 사용할 때는 테이블을 명시해야합니다.**  
+    ```sql
+    -- join으로 해결
+    select usertbl.userid, productname, price, amount from usertbl inner join buytbl on usertbl.userid = buytbl.userid where addr='서울';
+    select buytbl.userid, productname, price, amount from usertbl inner join buytbl on usertbl.userid = buytbl.userid where addr='서울';
+    -- subquery로 해결
+    select buytbl.userid, productname, price, amount from buytbl where userid in (select userid from usertbl where addr='서울');
+    ```  
+
+### 6) 집합 연산
+  * 동일한 구조(컬럼의 자료형과 개수 및 순서가 동일)를 갖는 테이블끼리 연산을 수행하는 것  
+  * 합집합  
+    select 구문  
+    union  
+    select 구문  
+
+    union대신에 union all을 하게되면 동일한 데이터를 2번 출력  
     
+  * 교집합 : union대신에 intersect
+  * 한쪽에만 존재하는 데이터는 except(oracle은 minus)  
+
+## 12. Transaction Control Language
+### 1) Transaction
+  * 한 번에 이루어져야 하는 작업의 논리적인 단위  
+  * 제가 gamemoney를 이용해서 상대방의 item을 구매
+    제 gamemoney의 값을 수정 - update  
+    상대방 item을 수정 - update  
+    상대방 gamemoney 수정 - update  
+    제 item 수정 - update  
+  
+  이런 경우는 4개의 update 구문이 모두 수행되거나 하나돋 수행되지 않아야 합니다.  
+  이렇게 한꺼번에 수행되어야 하는 작업의 단위를 트랜잭션이라고 합니다.  
+
+### 2) commit, rollback  
+  * commit : 작업이 완료  
+  * rollback : 작업을 철회
+
+### 3) Transaction의 성질  
+  * Atomicity(원자성) : All or nothing
+  * Consistency(일관성) : 트랜잭션 수행 전과 후가 일관성 있어야함(ex. 은행 예금 총액의 변동이 있어서는 안됨)  
+  * Isolation(격리성) : 트랜잭션 수행 중에는 다른 트랜잭션이 이 데이터를 수정하면 안된다.(동시 기록 방지)
+  * Durability(영속성) : 한 번 완료된 트랜잭션은 계속 되어야한다.(ex. atm이나 창구에서 발생한 거래는 취소가 안됨. 출금한 돈은 다시 입금하는 수밖에 없음 -> 거래를 취소할 수 있으면 많은 문제가 발생할 수 있다!)  
+
+### 4) savepoint  
+  * 트랜잭션이 수행완료되거나 철회가 될 때는 DB에 lock이 걸려서 다른 작업을 수행할 수 없습니다.
+  * commit을 일정한 주기를 가지고 하는 방법으로 위의 문제를 해결할 수 있는데 이렇게 만들면 rollback할 때 너무 많이 rollback을 수행해야 합니다.
+    중간 중간에 rollback할 수 있는 지점을 만드는데 이 지점을 savepoint 라고 합니다.  
+
+### 5)commit 되는 경우  
+  * DDL(Create, Alter, Drop, Truncate, Rename) 이나 DCL(Grant, Revoke)을 성공적으로 수행한 경우  
+  * 접속 프로그램이 정상 종료되는 경우  
+  * 명시적으로 commit을 호출하는 경우  
+
+### 6)rollback 되는 경우  
+  * 명시적으로 rollback을 호출하는 경우  
+  * 접속 프로그램의 비정상적인 종료  
