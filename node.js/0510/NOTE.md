@@ -215,4 +215,168 @@
   ```
 
 # Node와 MySQL연동  
+## 1. 데이터베이스 접속 정보를 확인  
+  종류 : MySQL  
+  host : localhost, 127.0.0.1
+  port : 3306  
+  username : root
+  password : 1234
+  database : node  
 
+## 2. 샘플 데이터 생성 : 데이터베이스 접속 도구에서 실행  
+  ```sql
+  -- 데이터베이스 확인
+  show databases;
+
+  -- 데이터베이스 생성
+  create database node;
+
+  -- 데이터베이스 사용
+  use node;
+
+  -- 테이블 생성
+  CREATE TABLE goods(
+    itemid int,
+    itemname VARCHAR(100), 
+    price int,
+    description VARCHAR(200), 
+    pictureurl VARCHAR(100),
+    updatedate varchar(20),
+    PRIMARY KEY (itemid)
+  )engine=InnoDB;
+
+  -- 테이블 구조 확인
+  desc goods;
+
+  -- 전체 데이터 조회
+  select * from goods;
+
+  -- 샘플 데이터 조회
+  insert into goods values(1, '레몬', 500,'비타민 C가 풍부한 쓴귤', 'lemon.jpg', '2020-08-01');
+  insert into goods values(2, '오렌지', 1500, '비타민 C가 풍부한 당귤', 'orange.jpg', '2020-08-01');
+  insert into goods values(3, '키위', 2000, '비타민 C가 풍부한 다래', 'kiwi.jpg', '2020-08-01');
+  insert into goods values(4, '포도', 1000, '항상화 성분과 당분이 높고 무기물이 많은 과일', 'grape.jpg', '2020-08-01'); 
+  insert into goods values(5, '딸기', 2000, '수분함량이 높은 과일', 'strawberry.jpg', '2020-08-01');
+  insert into goods values(6, '무화과', 300, '칼슘, 섬유질 및 항산화 물질을 많이 함유된 식물', 'fig.jpg', '2020-08-01');
+  insert into goods values(7, '레몬', 500,'비타민 C가 풍부한 쓴귤', 'lemon.jpg', '2020-08-01');
+  insert into goods values(8, '오렌지', 1500, '비타민 C가 풍부한 당귤', 'orange.jpg', '2020-08-01');
+  insert into goods values(9, '키위', 2000, '비타민 C가 풍부한 다래', 'kiwi.jpg', '2020-08-01');
+  insert into goods values(10, '포도', 1000, '항상화 성분과 당분이 높고 무기물이 많은 과일',  'grape.jpg', '2020-08-01'); 
+  insert into goods values(11, '딸기', 2000, '수분함량이 높은 과일', 'strawberry.jpg', '2020-08-01');
+  insert into goods values(12, '무화과', 300, '칼슘, 섬유질 및 항산화 물질을 많이 함유된 식물', 'fig.jpg', '2020-08-01');
+  insert into goods values(13, '레몬', 500,'비타민 C가 풍부한 쓴귤', 'lemon.jpg', '2020-08-01');
+  insert into goods values(14, '오렌지', 1500, '비타민 C가 풍부한 당귤', 'orange.jpg', '2020-08-01');
+  insert into goods values(15, '키위', 2000, '비타민 C가 풍부한 다래', 'kiwi.jpg', '2020-08-01');
+  insert into goods values(16, '포도', 1000, '항상화 성분과 당분이 높고 무기물이 많은 과일', 'grape.jpg', '2020-08-01'); 
+  insert into goods values(17, '딸기', 2000, '수분함량이 높은 과일', 'strawberry.jpg', '2020-08-01');
+  insert into goods values(18, '무화과', 300, '칼슘, 섬유질 및 항산화 물질을 많이 함유된 식물', 'fig.jpg', '2020-08-01');
+  insert into goods values(19, '딸기', 2000, '수분함량이 높은 과일', 'strawberry.jpg', '2020-08-01');
+  insert into goods values(20, '무화과', 300, '칼슘, 섬유질 및 항산화 물질을 많이 함유된 식물', 'fig.jpg', '2020-08-01');
+  insert into goods values(21, '레몬', 500,'비타민 C가 풍부한 쓴귤', 'lemon.jpg', '2020-08-01');
+  insert into goods values(22, '오렌지', 1500, '비타민 C가 풍부한 당귤', 'orange.jpg', '2020-08-01');
+  insert into goods values(23, '키위', 2000, '비타민 C가 풍부한 다래', 'kiwi.jpg', '2020-08-01');
+  insert into goods values(24, '포도', 1000, '항상화 성분과 당분이 높고 무기물이 많은 과일', 'grape.jpg', '2020-08-01'); 
+  insert into goods values(25, '딸기', 2000, '수분함량이 높은 과일', 'strawberry.jpg', '2020-08-01');
+  insert into goods values(26, '무화과', 300, '칼슘, 섬유질 및 항산화 물질을 많이 함유된 식물', 'fig.jpg', '2020-08-01');
+  insert into goods values(27, '레몬', 500,'비타민 C가 풍부한 쓴귤', 'lemon.jpg', '2020-08-01');
+  insert into goods values(28, '오렌지', 1500, '비타민 C가 풍부한 당귤', 'orange.jpg', '2020-08-01');
+  insert into goods values(29, '키위', 2000, '비타민 C가 풍부한 다래', 'kiwi.jpg', '2020-08-01');
+  insert into goods values(30, '포도', 1000, '항상화 성분과 당분이 높고 무기물이 많은 과일', 'grape.jpg', '2020-08-01');
+  commit;
+
+  select * from goods;
+  ```
+
+## 3. 프로젝트 생성 및 설정  
+### 1) 디렉토리 생성  
+### 2) VSCode에서 생성한 디렉토리를 열기  
+### 3) View - Terminal(ctrl+`)을 이용해서 터미널을 열고 npm init 명령을 수행한 후 필요한 옵션을 설정  
+### 4) 필요한 라이브러리 설치  
+  * npm i  
+    express(웹서버), morgan(로그 기록), multer(파일 업로드), cookie-parser(쿠키 사용), express-session(세션 사용), express-mysql-session(세션을 DB에 저장), dotenv(설정 내용을 사용), compression(출력내용을 압축해서 전송), file-stream-rotator(파일에 로그 기록)  
+  * npm i --save-dev  
+    nodemon(자동 재시작) - 개발용으로 설치  
+  * package.json 수정 : 코드를 수정했을 때 자동 재시작하기 위해서
+    ```json
+      "scripts": {
+      "start": "nodemon index",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    }
+    ```
+
+
+    + 추가  
+      서버 <-> 클라이언트  
+      클라이언트가 매번 서버에서 새로운 데이터를 받아오도록 만드는 것은 변화가 자주 없는 경우에는 자원의 낭비  
+      서버에서 데이터가 마지막으로 갱신된 날을 리턴하도록 만들고 클라이언트에도 마지막으로 데이터를 다운로드 받은 날을 저장해 놓고 클라이언트가 서버에 접속하면 제일 먼저 이 두개의 날짜를 비교해서 날짜가 다르면 서버에서 데이터를 다운받고 그렇지 않으면 클라이언트의 데이터를 가지고 작업을 수행  
+      **데이터가 바뀌었는지를 빠르게 인지하기 하여, 데이터를 적게 다운**  
+
+### 6) index.js 작성
+```javascript
+// 데이터베이스 접속 확인
+const mysql=require("mysql")
+
+// 접속 정보 생성 - 연결은 하지 않음
+var connection = mysql.createConnection({
+    host : '127.0.0.1',
+    port : 3306,
+    user : 'root',
+    password : '1234',
+    database : 'node'
+})
+
+// 데이터베이스 연결
+connection.connect(function(err){
+    if(err){
+        console.log('mysql connection error');
+        console.log(err)
+    }
+})
+
+console.log(connection)
+```
+
+* root 계정을 사용하는 경우는 mysql 8.0에서는 외부에서 접속이 안됨.  
+  ```sql
+  ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '비밀번호';  
+  FLUSH privileges;  
+  ```
+
+* node에서 접속 위치도 localhost로 변경  
+
+## 6. 데이터베이스 작업을 테스트  
+  * select를 제외한 sql구문 실행  
+  connection.query('sql작성', 파라미터)  
+  sql을 작성할 때 입력받는 값은 직접 기재하지 않고 ?로 일단 작성한 후 파라미터에서 값을 설정  
+
+  * index.js 파일의 최하단에 추가하고 실행  
+    ```javascript
+    // sql 실행 테스트
+    connection.query('create table family(id int auto_increment, name varchar(20), primary key KeyboardEvent(id))engine=innodb')
+    connection.query('insert into family(name) values(?)', '을지문덕')
+    ```  
+    -> 에러 메세지가 나오면 코드를 수정하고 에러 메세지가 없으면 데이터베이스 접속 도구에 가서 아래 코드 실행하여 확인  
+      ```sql
+        select * from family;
+      ```
+  * select 구문 실행
+    ```javascript
+    connection.query('sql구문',[파라미터], function(err, results, fields){  })
+    ```  
+    err는 에러가 발생한 경우에 에러 객체.  
+    results가 검색 결과. json 문자열 형태로 넘어옴.  
+  
+  * 앞의 구문 주석처리하고 다음 코드 index.js 최하단에 추가후 실행  
+    ```javascript
+    connection.query('select * from family', (err, results, fields)=>{
+      // 에러객체에 내용이 있다면 에러 메시지를 출력하고 종료
+      if(err){
+          console.log(err);
+          throw err;
+      }
+      // 결과를 출력
+      for(var idx = 0; idx<results.length; idx++){
+          console.log(results[idx].id + ':' + results[idx].name)
+      }
+    })
+    ```
