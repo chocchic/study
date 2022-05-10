@@ -40,3 +40,23 @@ connection.query('select * from family', (err, results, fields)=>{
     }
 })
 */
+
+// 웹서버를 만들기 위한 라이브러리
+const express = require('express')
+//.env파일의 내용을 읽어서 precss.env의 속성으로 만들어주는 설정
+const dotenv = require('dotenv')
+dotenv.config()
+
+// 서버 생성
+const app = express()
+app.set('port', process.env.PORT)
+
+
+const morgan = require('morgan')
+const compression = require('compression')
+const path = require('path')
+const mysql = require('mysql')
+const cp = require('cookie-parser')
+const session = require('session')
+const multer = require('multer')
+const dotenv = require('dotenv')
