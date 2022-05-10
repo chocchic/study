@@ -112,3 +112,107 @@
       * InnoDB : 트랜잭션 처리에 유리하도록 만드는 엔진  
     - DEFAULT CHARSET : 테이블을 생성할 때 인코딩 설정하는 옵션  
     - auto_increment : 일련번호 시작 숫자 설정  
+  
+  * 실습  
+    회원(Member)
+      회원id - 문자열 100자, 불변, primary key  
+      이름 - 문자열 50자, 가변, 필수  
+      별명 - 문자열100자, 불변, 유일  
+      나이 - 정수 기본값 1  
+      성별 - 문자열자인데 남 또는 여만 가져야함  
+
+    게시판(Board)
+      글번호 - 정수, primary key, 일련번호  
+      글제목 - 문자열 100자, 기본값 무제  
+      글내용 - 문자열 1000자, 기본값 냉무  
+      작성일 - 날짜 및 시간  
+      별명 - 회원 테이블의 별명을 외래키로 설정하고 삭제될 때 같아 삭제되도록 설정  
+    ```sql
+    create table Board(
+      bno int primary key auto_increment,
+      title char(100) default '무제',
+      content varchar(10000) default '냉무',
+      regdate datetime,
+      nick varchar(100) references member(nick) on delete cascade
+    )engine=InnoDB default charset = utf8;
+    create table Board(
+      bno int primary key auto_increment,
+      title char(100) default '무제',
+      content varchar(10000) default '냉무',
+      regdate datetime,
+      nick varchar(100) constraint boardfk references member(nick) on delete cascade
+    )engine=InnoDB default charset = utf8;
+
+    -- 테이블 구조 확인
+    desc member;
+    desc board;
+
+    -- 제약조건확인
+    select * from infomation_scheam.table_constraints;
+    ```
+### 2) 테이블 구조 변경 - alter  
+  * 컬럼 추가  
+    alter table 테이블이름 add 컬럼이름 자료형;
+  
+  * member 테이블에 email을 200자로 추가  
+    ```sql
+    alter table member add emaii varchar(200);
+    ```
+
+  * 컬럼 삭제  
+    ```sql
+    alter table 테이블이름 drop 컬럼명 나열;
+    ```
+  
+  * 컬럼 수정  
+    ```sql
+    --이름 변경
+    alter table 테이블이름 change 이전컬럼명 새로운컬럼이름 자료형;
+
+    -- 자료형 변경
+    alter table 테이블이름ㄹ modify 컬럼이름 자료형;
+    ```
+  * 제약조건 수정 : not null을 설정하는 것은 추가하는 것이 아니고 수정  
+    ```sql
+    alter table 테이블이름 modify 컬럼이름 자료형 제약조건;
+    ```  
+  * 제약조건 추가  
+    ```sql
+    alter table 테이블이름 add 제약조건(컬럼이름)
+    ```  
+  * 제약조건 삭제
+    ```sql
+    alter table 테이블이름 drop constraint 제약조건이름;
+    ```    
+### 3) 테이블 삭제  
+  ```sql
+  drop table 테이블 이름;
+  ```
+
+### 4) 테이블의 모든 데이터 삭제  
+  테이블 구조는 남고 데이터만 삭제  
+  ```sql
+  truncate table 테이블이름;
+  ```  
+
+### 5) 테이블 이름 변경  
+  ```sql
+  alter table 이전테이블이름 rename 새로운테이블이름
+  ```
+
+## 4. Index  
+  데이터를 빠르게 조회하기 위해서 데이터에 표시를 해두는 것  
+  primary key와 unique는 Index가 자동으로 생성됩니다.  
+  인덱스가 설정되면 조회는 빠르지만 메모리 사용량이 20%정도 늘어나고 삽입, 수정, 삭제 작업은 느려질 수 있습니다.  
+
+### 1) 인덱스 생성  
+  ```sql
+  create index 인덱스이름 on 테이블이름(컬럼이름 나열);
+  ```
+### 2) 인덱스 제거  
+  ```sql
+  drop index 인덱스이름;
+  ```
+
+# Node와 MySQL연동  
+
