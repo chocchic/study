@@ -6,5 +6,36 @@
     </head>
     <body>
         <h1>MySQL</h1>
+        <!-- 메뉴 -->
+        <a href="#" id="allbtn">전체데이터 가져오기</a>
+        <!-- 데이터 출력 영역-->
+        <div id="content"></div>
+        <!-- 데이터 삽입과 수정시 폼을 출력할 영역-->
+        <div id="updatearea"></div>
     </body>
+    <script>
+        var content = document.getElementById('content')
+        var updatearea = document.getElementById('updatearea')
+        // 전체 데이터 가져오기를 클릭했을 때
+        document.getElementById('allbtn').addEventListener('click',(e)=>{
+            // ajax 객체 생성
+            var request = new XMLHttpRequest();
+            // 요청 생성
+            request.open('GET', '/item/all', true);
+            // 요청 전송
+            request.send('');
+            // 응답을 받았을 때
+            request.addEventListener('load', ()=>{
+                //json형식으로 넘어오는지 확인
+                //alert(request.responseText); 
+
+                // json으로 받게 해놔서 responseText 사용 xml이면 객체임
+                // 읽어온 테이터 파싱
+                var data  = JSON.parse(request.responseText);
+                // count에는 데이터 개수가 list에는 데이터배열
+                var count = data.count;
+                var list = data.list;
+            })
+        })
+    </script>
 </html>
