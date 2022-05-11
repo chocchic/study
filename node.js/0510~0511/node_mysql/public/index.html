@@ -9,8 +9,14 @@
         <h1>MySQL</h1>
         <!-- 메뉴 -->
         <a href="#" id="allbtn">전체 데이터 가져오기</a>
-        <a href="#" id="listbtn">처음 5개의 데이터 가져오기</a>
+        <a href="#" id="listbtn">처음 5의 데이터 가져오기</a>
+        데이터 개수 : <select id="size">
+            <option value="5">5개</option>
+            <option value="10">10개</option>
+            <option value="15">15개</option>
+        </select>
         <!-- 데이터 출력 영역-->
+        
         <div id="content"></div>
         <!-- 데이터 삽입과 수정시 폼을 출력할 영역-->
         <div id="updatearea"></div>
@@ -102,8 +108,41 @@
                     display += "<tr><td align='center' colspan='3'><span id='addbtn'>더보기</span></td>";
                     display += "</tr></table>";
                 }
-                
+
                 content.innerHTML = display;
+
+                // 더보기 버튼 찾아오기
+                var addbtn = document.getElementById('addbtn');
+                if(addbtn != undefined){
+                    addbtn.addEventListener("click",(e)=> {
+                        // 페이지 번호 증가
+                        pageno = pageno + 1;
+
+                        var request = new XMLHttpRequest();
+                        request.open('GET', '/item/list?'+'pageno='+pageno+"&count="+count);
+                        request.send('');
+
+                        // 가져온 데이터의 개수 전체 데이터 개수보다 많으면 삭제
+                        if(pageno * count >= cnt){
+                            pageno = pageno-1;
+                            document.getElementById('tblbtn').remove()
+                        }
+
+                        request.addEventListener('load',()=>{
+                            var data = JSON.parse(request.responseText);
+                            var display = "";
+                            // 이전에 데이터를 출력했던 테이블을 찾아오기
+                            var table = document.getElementById('tbldata');
+                            for(var idx in data.list){
+                                var item = data.list[idx];
+                                display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
+                                display +="<td align='left'>"+item.itemname+"</td>";
+                                display +="<td align='right'>"+item.price+"원</td></tr>";
+                            }
+                            table.innerHTML += display;
+                        })
+                    })
+                }
             })
         })
     </script>
