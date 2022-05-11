@@ -3,11 +3,13 @@
     <head>
         <meta charset="utf-8"/>
         <title>Node_MySQL</title>
+        <link rel="stylesheet" href="/css/common.css"/>
     </head>
     <body>
         <h1>MySQL</h1>
         <!-- 메뉴 -->
-        <a href="#" id="allbtn">전체데이터 가져오기</a>
+        <a href="#" id="allbtn">전체 데이터 가져오기</a>
+        <a href="#" id="listbtn">처음 5개의 데이터 가져오기</a>
         <!-- 데이터 출력 영역-->
         <div id="content"></div>
         <!-- 데이터 삽입과 수정시 폼을 출력할 영역-->
@@ -35,6 +37,73 @@
                 // count에는 데이터 개수가 list에는 데이터배열
                 var count = data.count;
                 var list = data.list;
+
+                // 출력 내용 만들기
+                var display = "<div align='center' class='body'><h2>상품목록 화면</h2>";
+                display += "<table border='1'><tr><td colspan='3' align='right'> 전체 데이터 개수 : "+count+"</td></tr>";
+                display += "<tr class='header'><th align='center' width='80'>상품ID</th>";
+                display += "<th align='center' width='320'>상품이름</th>";
+                display += "<th align='center' width='100'>가격</th></tr>";
+
+                // 데이터 출력
+                for(var idx in list){
+                    var item = list[idx];
+                    // 하나의 행을 만들어서 출력
+                    display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
+                    display +="<td align='left'>"+item.itemname+"</td>";
+                    display +="<td align='right'>"+item.price+"원</td></tr>";
+                }
+                display += "</table></div>";
+
+                content.innerHTML = display;
+            })
+        })
+
+        // 데이터 일부분 가져오기
+        var pageno = 1;
+        var count = 5;
+
+        document.getElementById("listbtn").addEventListener('click', (e)=>{
+            pageno=1;
+            count=5;
+
+            var request=new XMLHttpRequest();
+            request.open("GET", "/item/list?" + 'pageno='+pageno+"&count="+count);
+            request.send('');
+
+            updatearea.innerHTML = "";
+            request.addEventListener('load',function(){
+                //alert(request.responseText);
+                var data = JSON.parse(request.responseText)
+                var list = data.list;
+                var cnt = data.count;
+                var display = "";
+            
+                 // 출력 내용 만들기
+                display = "<div align='center' class='body'><h2>상품목록 화면</h2>";
+                display += "<table border='1' id='tbldata'><tr><td colspan='3' align='right'> 전체 데이터 개수 : "+cnt+"</td></tr>";
+                display += "<tr class='header'><th align='center' width='80'>상품ID</th>";
+                display += "<th align='center' width='320'>상품이름</th>";
+                display += "<th align='center' width='100'>가격</th></tr>";
+
+                // 데이터 출력
+                for(var idx in list){
+                    var item = list[idx];
+                    // 하나의 행을 만들어서 출력
+                    display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
+                    display +="<td align='left'>"+item.itemname+"</td>";
+                    display +="<td align='right'>"+item.price+"원</td></tr>";
+                }
+                display += "</table></div>";
+                
+                // 다음 페이지의 데이터를 가져와서 추가할 UI를 추가
+                if((pageno -1)*count < cnt){
+                    display += "<table align='center' width='500' id='tblbtn'>";
+                    display += "<tr><td align='center' colspan='3'><span id='addbtn'>더보기</span></td>";
+                    display += "</tr></table>";
+                }
+                
+                content.innerHTML = display;
             })
         })
     </script>

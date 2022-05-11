@@ -190,6 +190,36 @@ app.get('/item/all', (req,res, next)=>{
         })
     })
 })
+
+// 데이터 일부분 가져오기
+app.get('/item/list', (req, res,next) =>{
+    // 파라미터 가져오기 : 일부분 가져오는 경우는 데이터개수와 페이지 번호
+    // get 방식에서 pageno와 count 파라미터 가져오기
+    const pageno = req.query.pageno;
+    const count = req.query.count;
+
+    // 일부분 가져오기 위한 변수를 선언
+    var start = 0;
+    var size = 5;
+
+    if(count != undefined){
+        size = parseInt(count);
+    }
+    if(pageno != undefined){
+        start = (parseInt(pageno) -1) *size;
+    }
+
+    var list = [];
+    connection.query('select * from goods order by itemid limit ?, ?', [start, size], (err,results, fields) =>{
+        list = results;
+
+        connection.query('select count(*) cnt from goods', (err, results, fields) =>{
+            res.json({'count':results[0].cnt, 'list':list})
+        })
+        
+    })
+})
+
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
 });
