@@ -147,18 +147,50 @@
             })
         })
         content.addEventListener('click', (e)=>{
-            e.preventDefault();
             if(e.target.id.startsWith('item')){
                 // itemid만 추출
                 var itemid = e.target.id.substring(4).trim();
-                
                 var request = new XMLHttpRequest();
-                request.open('GET', '/item/detail?itemid?'+itemid);
+                request.open('GET', '/item/detail?itemid='+itemid);
                 request.send('');
 
                 request.addEventListener('load', ()=>{
+                    // 자바스크립트의 데이터로 변환
                     var data = JSON.parse(request.responseText);
-                    alert(reequest.responseText);
+
+                    // 출력 영역 초기화
+                    updatearea.innerHTML = '';
+                    content.innerHTML ='';
+
+                    // 출력내용 만들기
+                    var display = "";
+                    display +="<div align='center' class='body'><h2>상품상세화면</h2>";
+                    
+                    // 데이터가 있다면
+                    if(data.result == true){
+                        var item = data.item;
+                        display +="<table><tr><td><img src='/img/"+item.pictureurl+"'></td>";
+                        display +="<td align='center'><table><tr height='50'><td width='80'>상품명</td>";
+                        display += "<td width='160'>"+item.itemname+"</td></tr>";
+                        display += "<tr height='50'><td width='80'>가격</td>";
+                        display += "<td width='160'>"+item.price+"원</td></tr>";
+                        display += "<tr height='50'><td width='80'>설명</td>";
+                        display += "<td width='160'>"+item.description+"</td></tr>";
+                        display += "<tr height='50'><td colspan='2' width='240' align='center'>";
+                        display += "<a href='#' id='mainbtn'>목록보기</a>"
+                        display += "</td></tr></table>";
+                    }else{
+                        display+="<p>데이터가 존재하지 않습니다.</p>";
+                    }
+
+                    content.innerHTML = display;
+
+                    var mainbtn = document.getElementById("mainbtn");
+                    if(mainbtn != undefined){
+                        mainbtn.addEventListener('click', (e)=>{
+                            document.getElementById('listbtn').click()
+                        })
+                    }
                 })
             }
             

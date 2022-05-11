@@ -223,9 +223,9 @@ app.get('/item/list', (req, res,next) =>{
 app.get('/item/detail', (req, res,next) =>{
     // 1개의 데이터를 찾아오기 위한 primary key 값 가져오기
     var itemid = req.query.itemid;
-    if(itemid== undefined){
+    /*if(itemid == undefined){
         itemid = 1;
-    }
+    }*/
     connection.query('select * from goods where itemid=?', itemid,(err, results, fields)=>{
         if(err){
             throw err;
@@ -238,6 +238,9 @@ app.get('/item/detail', (req, res,next) =>{
     })
 })
 
+app.get('/item/insert', (req, res, next)=>{
+    res.json()
+})
 
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
