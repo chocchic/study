@@ -1,0 +1,196 @@
+/*
+
+//데이터베이스 접속 확인
+const mysql = require("mysql")
+
+//접속 정보 생성 - 연결은 하지 않음
+var connection = mysql.createConnection({
+    host:'127.0.0.1',
+    port:3306,
+    user:'root',
+    password:'1234',
+    database:'node'
+})
+
+//데이터베이스 연결
+connection.connect(function(err){
+    if(err){
+        console.log('mysql connection error');
+        console.log(err)
+    }
+})
+
+//console.log(connection)
+
+//sql 실행 테스트
+
+
+connection.query(
+    'create table family(id int auto_increment, name varchar(20), primary key(id))engine=innodb default charset=utf8');
+connection.query('insert into family(name) values (?)', '을지문덕');
+
+
+connection.query('select * from family', (err, results, fields) => {
+    //에러 객체에 내용이 있다면 에러 메시지를 출력하고 종료
+    if(err){
+        console.log(err);
+        throw err;
+    }
+
+    //결과를 출력
+    for(var idx = 0; idx < results.length; idx++){
+        console.log(results[idx].id + ':' + results[idx].name);
+    }
+})
+
+*/
+
+//웹 서버를 만들기 위한 라이브러리
+const express = require('express')
+
+//.env 파일의 내용을 읽어서 process.env 의 속성으로 만들어 주는 설정
+const dotenv = require("dotenv")
+dotenv.config()
+
+//서버 생성
+const app = express()
+app.set('port', process.env.PORT)
+
+//일 단위 로그 파일 생성하기
+const morgan = require('morgan')
+const FileStreamRotator = require('file-stream-rotator')
+const fs = require('fs')
+const path = require('path')
+
+//로그 파일을 저장할 디렉토리를 설정
+//현재 디렉토리의 log 디렉토리
+var logDirectory = path.join(__dirname, 'log')
+//logDirectory가 없으면 생성
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+
+//로그 기록 옵션 설정
+var accessLogStream = FileStreamRotator.getStream({
+    date_format:'YYYYMMDD',
+    filename: path.join(logDirectory, 'access-%DATE%.log'),
+    frequency:'daily',
+    verbose:false
+})
+
+//로그 기록 설정
+app.use(morgan('combined', {stream:accessLogStream}))
+
+//응답을 보낼 때 압축을 하기 위한 설정
+//응답의 크기를 줄여서 트래픽을 줄이기 위한 목적
+const compression = require('compression')
+app.use(compression())
+
+//post 방식의 파라미터를 읽을 수 있도록 설정
+var bodyParser = require('body-parser')
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended:true
+}));
+
+//mysql 접속 옵션 생성
+var options = {
+    host:process.env.HOST,
+    port:process.env.MYSQLPORT,
+    user:process.env.USERID,
+    password:process.env.PASSWORD,
+    database:process.env.DATABASE
+}
+
+//세션을 MySQL에 저장
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
+const MySQLStore = require('express-mysql-session')(session)
+
+app.use(
+    session({
+        secret:process.env.COOKIE_SECRET,
+        resave:false,
+        saveUninitialized:true,
+        store:new MySQLStore(options)
+    })
+)
+
+//파일 업로드 설정
+const multer = require('multer')
+//업로드할 디렉토리를 설정
+try{
+    fs.readdirSync('public/img')
+}catch(error){
+    console.error('img 디렉토리가 없어서 생성')
+    fs.mkdirSync('public/img')
+}
+
+const upload = multer({
+    storage:multer.diskStorage({
+        destination(req, file, done){
+            done(null, 'public/img/')
+        },
+        filename(req, file, done){
+            const ext = path.extname(file.originalname);
+            done(null, path.basename(file.originalname, ext) 
+                + DataTransfer.now() + ext);
+        }
+    }),
+    limits:{fileSize: 10 * 1024 * 1024}
+})
+
+//정적 파일(html, css, js, 기타 파일)의 위치 설정
+//디렉토리가 만들어져 있어야 합니다.
+app.use('/', express.static('public'))
+
+//파일 다운로드를 위한 설정
+var util = require('util')
+var mime = require('mime')
+
+//데이터베이스 접속
+const mysql = require('mysql')
+var connection = mysql.createConnection(options)
+connection.connect(function(err){
+    if(err){
+        console.log('mysql connection error')
+        console.log(err)
+        throw err;
+    }
+})
+
+//기본 요청이 왔을 때 수행할 내용
+app.get('/', (req, res, next) => {
+    //res.send('MySQL Use')
+    res.sendFile(path.join(__dirname,'index.html'))
+})
+
+// 전체 데이터 가져오기 요청을 처리하는 라우팅 함수
+app.get('/item/all', (req,res, next)=>{
+    // 전체 데이터와 전체 데이터 개수를 가져와서 출력
+    var list = [] // 조회한 데이터 저장할 배열
+    var count = 0; // 조회한 데이터 개수를 저장할 변수
+
+    // 전체 데이터 가져오는 query
+    connection.query('select * from goods order by itemid desc', (err, results,fields)=>{
+        //에러가 발생했을 때
+        if(err){
+            throw err;
+        }
+        list = results;
+        //데이터 개수 가져오기
+        connection.query('select count(*) cnt from goods', (err, results, fields)=>{
+            //에러가 발생했을 때
+            if(err){
+                throw err;
+            }
+
+            //읽어온 데이터 개수를 count에 저장
+            count = results[0].cnt;
+            //json출력
+            res.json({'count': count, 'list':list})
+        })
+    })
+})
+app.listen(app.get('port'), ()=>{
+    console.log(app.get('port'), '에서 서버 대기 중');
+});
+
