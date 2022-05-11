@@ -56,7 +56,7 @@
                     var item = list[idx];
                     // 하나의 행을 만들어서 출력
                     display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
-                    display +="<td align='left'>"+item.itemname+"</td>";
+                    display +="<td align='left'><a href='#'id='item"+item.itemid+"'>"+item.itemname+"</a></td>";
                     display +="<td align='right'>"+item.price+"원</td></tr>";
                 }
                 display += "</table></div>";
@@ -71,7 +71,8 @@
 
         document.getElementById("listbtn").addEventListener('click', (e)=>{
             pageno=1;
-            count=5;
+            //count=5;
+            count = document.getElementById('size').value;
 
             var request=new XMLHttpRequest();
             request.open("GET", "/item/list?" + 'pageno='+pageno+"&count="+count);
@@ -97,7 +98,7 @@
                     var item = list[idx];
                     // 하나의 행을 만들어서 출력
                     display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
-                    display +="<td align='left'>"+item.itemname+"</td>";
+                    display +="<td align='left'><a href='#'id='item"+item.itemid+"'>"+item.itemname+"</a></td>";
                     display +="<td align='right'>"+item.price+"원</td></tr>";
                 }
                 display += "</table></div>";
@@ -119,7 +120,7 @@
                         pageno = pageno + 1;
 
                         var request = new XMLHttpRequest();
-                        request.open('GET', '/item/list?'+'pageno='+pageno+"&count="+count);
+                        request.open('GET', '/item/list?pageno='+pageno+"&count="+count);
                         request.send('');
 
                         // 가져온 데이터의 개수 전체 데이터 개수보다 많으면 삭제
@@ -136,14 +137,31 @@
                             for(var idx in data.list){
                                 var item = data.list[idx];
                                 display +="<tr class='record'><td align='center'>" + item.itemid +"</td>";
-                                display +="<td align='left'>"+item.itemname+"</td>";
+                                display +="<td align='left'><a href='#'id='item"+item.itemid+"'>"+item.itemname+"</a></td>";
                                 display +="<td align='right'>"+item.price+"원</td></tr>";
                             }
                             table.innerHTML += display;
                         })
                     })
-                }
+                }             
             })
+        })
+        content.addEventListener('click', (e)=>{
+            e.preventDefault();
+            if(e.target.id.startsWith('item')){
+                // itemid만 추출
+                var itemid = e.target.id.substring(4).trim();
+                
+                var request = new XMLHttpRequest();
+                request.open('GET', '/item/detail?itemid?'+itemid);
+                request.send('');
+
+                request.addEventListener('load', ()=>{
+                    var data = JSON.parse(request.responseText);
+                    alert(reequest.responseText);
+                })
+            }
+            
         })
     </script>
 </html>
