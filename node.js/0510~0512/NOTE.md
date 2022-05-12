@@ -530,7 +530,7 @@ console.log(connection)
           filename(req, file, done){
               const ext = path.extname(file.originalname);
               done(null, path.basename(file.originalname, ext) 
-                  + DataTransfer.now() + ext);
+                  + Date.now() + ext);
           }
       }),
       limits:{fileSize: 10 * 1024 * 1024}

@@ -197,7 +197,6 @@
         })
             
         document.getElementById("insertbtn").addEventListener('click',(e)=>{
-                e.preventDefault();
                 var request = new XMLHttpRequest();
                 request.open('GET', '/item/insert')
                 request.send('')
@@ -214,8 +213,8 @@
                             e.preventDefault();
 
                             // 폼의 데이터 가져오기
-                            const formData = new(f);
-
+                            const formData = new FormData(f);
+                            
                             // 폼의 데이터를 전송
                             var xhr = new XMLHttpRequest();
                             xhr.open("POST","/item/insert", true);
@@ -223,6 +222,7 @@
 
                             xhr.addEventListener('load',()=>{
                                 var data = JSON.parse(xhr.responseText);
+                                alert(data.result);
                             })
                         })
                     }
