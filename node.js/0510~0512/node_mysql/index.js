@@ -330,10 +330,39 @@ app.post('/item/delete', (req, res, next)=>{
     })
 })
 
-// 수정 요청 처리
+// 수정화면 요청 처리
 app.get("/item/update", (req,res,next)=>{
     fs.readFile('public/update.html', (err,data)=>{
         res.end(data);
+    })
+})
+
+// 수정 요청 처리
+app.post("/item/update", upload.single('pictureurl'),(req,res,next)=>{
+    // 파라미터 읽어오기
+    const itemid= req.body.itemid;
+    const itemname = req.body.itemname;
+    const description = req.body.description;
+    const price = req.body.price;
+    var pictureurl;
+    if(req.file){
+        pictureurl = req.file.filename;
+    }else{
+        pictureurl = req.body.oldpictureurl;
+    }
+    var update = getNow();
+    connection.query('update goods set itemname=?, price=?, description=?, pictureurl=?, updatedate=? where itemid=?', 
+    [itemname, price, description, pictureurl, update, itemid], (err,results,next)=>{
+        if(err) console.log(err);
+        if(results.affectedRows >= 0){
+            // 데이터를 수정한 시간을 update.txt에 기록
+            const writeStream = fs.createWriteStream('./update.txt')
+            writeStream.write(update);
+            writeStream.end();
+            res.json({"result":true});
+        }else{
+            res.json("result", false);
+        }
     })
 })
 

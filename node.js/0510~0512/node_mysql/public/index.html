@@ -149,6 +149,7 @@
         })
         content.addEventListener('click', (e)=>{
             if(e.target.id.startsWith('item')){
+                e.preventDefault();
                 // itemid만 추출
                 var itemid = e.target.id.substring(4).trim();
                 var request = new XMLHttpRequest();
@@ -239,6 +240,31 @@
                                 document.getElementById('description').value=item.description;
                                 document.getElementById('oldpictureurl').value=item.pictureurl;
                                 document.getElementById('picture').src="/img/"+item.pictureurl;
+
+                                // 수정 폼을 찾아옵니다.
+                                var updateform = document.getElementById('updateform');
+                                updateform.addEventListener('submit', (e)=>{
+                                    // 기본 이벤트 처리 내용을 수행하지 않음
+                                    e.preventDefault();
+
+                                    // 폼 데이터 가져오기
+                                    const formData = new FormData(updateform);
+
+                                    // 폼 데잍 ㅓ전송
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('POST','/item/update');
+                                    xhr.send(formData);
+
+                                    xhr.addEventListener('load',()=>{
+                                        var data = JSON.parse(xhr.responseText);
+                                        if(data.result){
+                                            alert("수정 성공~");
+                                            document.getElementById('listbtn').click();
+                                        }else{
+                                            alert("수정 실패!");
+                                        }
+                                    })
+                                })
                             })
                         })
                     }
