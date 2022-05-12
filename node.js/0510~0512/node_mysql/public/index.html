@@ -8,6 +8,7 @@
     <body>
         <h1>MySQL</h1>
         <!-- 메뉴 -->
+        <a href="#" id="insertbtn">데이터 삽입</a>
         <a href="#" id="allbtn">전체 데이터 가져오기</a>
         <a href="#" id="listbtn">처음 5의 데이터 가져오기</a>
         데이터 개수 : <select id="size">
@@ -193,7 +194,40 @@
                     }
                 })
             }
-            
         })
+            
+        document.getElementById("insertbtn").addEventListener('click',(e)=>{
+                e.preventDefault();
+                var request = new XMLHttpRequest();
+                request.open('GET', '/item/insert')
+                request.send('')
+                request.addEventListener('load',()=>{
+                    // 데이터 출력 영역 초기화
+                    content.innerHTML="";
+                    updatearea.innerHTML=request.responseText;
+
+                    // 폼을 찾아오기
+                    var f = document.getElementById("insertform");
+                    if(f != undefined){
+                        f.addEventListener('submit',(e)=>{
+                            // 기본이벤트 제거 - form 데이터를 submit하지 않음
+                            e.preventDefault();
+
+                            // 폼의 데이터 가져오기
+                            const formData = new(f);
+
+                            // 폼의 데이터를 전송
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("POST","/item/insert", true);
+                            xhr.send(formData);
+
+                            xhr.addEventListener('load',()=>{
+                                var data = JSON.parse(xhr.responseText);
+                            })
+                        })
+                    }
+                })
+            })
+
     </script>
 </html>

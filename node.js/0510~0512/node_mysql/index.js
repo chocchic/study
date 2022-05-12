@@ -237,11 +237,30 @@ app.get('/item/detail', (req, res,next) =>{
         }
     })
 })
-
+// 데이터 삽입 화면 출력 요청
 app.get('/item/insert', (req, res, next)=>{
-    res.json()
+    // public 디렉토리에 있는 insert.html파일을 비동기적으로 읽어서 에러가 발생하면 에러 내용을 err에 저장
+    // 그렇지 않으면 읽은 내용을 data에 저장
+    fs.readFile('public/insert.html',(err,data)=>{
+        // 문자열로 전송
+        res.end(data); // utf-8을 안먹여주면 다 깨져서 보임
+    })
 })
 
+// 데이터 삽입 요청
+app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
+    // 클라이언트가 전송한 데이터를 가져오기
+    const itemname = req.body.itemname;
+    const description = req.body.description;
+    const price = req.body.price;
+
+    var pictureurl;
+    if(req.file){
+        pictureurl = req.file.filename;
+    }else{
+        pictureurl = "default.png"
+    }
+})
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
 });
