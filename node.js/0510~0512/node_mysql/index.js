@@ -246,7 +246,24 @@ app.get('/item/insert', (req, res, next)=>{
         res.end(data); // utf-8을 안먹여주면 다 깨져서 보임
     })
 })
+function getNow(){
+     // 삽입하는 날짜(현재 날짜 및 시간)를 생성
+     var date = new Date();
 
+     var year = date.getFullYear();
+     var month = date.getMonth()+1;
+     month = month >= 10 ? month : '0' + month;
+     var day = date.getDate();
+     day = day >= 10 ? month : '0'+day;
+     var hour = date.getHours();
+     hour = hour >= 10 ? month : '0'+hour;
+     var min = date.getMinutes();
+     min = min >= 10 ? month : '0'+min;
+     var sec = date.getSeconds();
+     sec = sec >= 10 ? month : '0'+ sec;
+
+     return year+'-'+month+'-'+day+' '+hour+':'+min+':'+sec;
+}
 // 데이터 삽입 요청
 app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
     // 클라이언트가 전송한 데이터를 가져오기
@@ -273,21 +290,8 @@ app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
         }else{
             itemid = 1;
         }
-         // 삽입하는 날짜(현재 날짜 및 시간)를 생성
-        var date = new Date();
-
-        var year = date.getFullYear();
-        var month = date.getMonth()+1;
-        month = month >= 10 ? month : '0' + month;
-        var day = date.getDate();
-        day = day >= 10 ? month : '0'+day;
-        var hour = date.getHours();
-        hour = hour >= 10 ? month : '0'+hour;
-        var min = date.getMinutes();
-        min = min >= 10 ? month : '0'+min;
-        var sec = date.getSeconds();
-        sec = sec >= 10 ? month : '0'+ sec;
-        var update = year+'-'+month+'-'+day+' '+hour+':'+min+':'+sec;
+        
+        var update = getNow();
         connection.query('insert into goods(itemid, itemname, price, description, pictureurl, updatedate) values(?, ?, ?, ?, ?, ?)',
         [itemid, itemname, price, description, pictureurl,update], (err, results, fields)=>{
             if(results.affectedRows == 1){
@@ -303,6 +307,29 @@ app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
 
     })
 })
+app.post('/item/delete', (req, res, next)=>{
+    // 파라미터 읽어오기 : 삭제는 기본키만을 읽어옵니다.
+    // 클라이언트에서는 itemid라는 이름으로 itemid를 post방식으로 전송
+    const itemid = req.body.itemid;
+    // 삭제하는 날짜(현재 날짜 및 시간)을 생성
+    var update = getNow();
+    connection.query('delete from goods where itemid = ?', [itemid], (err,results,next)=>{
+        // 에러 내용확인
+        if(err){
+            console.log(err)
+        }
+        if(results.affectedRows >= 0){
+            // 데이터를 삭제한 시간을 update.txt에 기록
+            const writeStream = fs.createWriteStream('./update.txt')
+            writeStream.write(update);
+            writeStream.end();
+            res.json({"result":true});
+        }else{
+            res.json("result", false);
+        }
+    })
+})
+
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
 });

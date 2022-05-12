@@ -178,8 +178,10 @@
                         display += "<tr height='50'><td width='80'>설명</td>";
                         display += "<td width='160'>"+item.description+"</td></tr>";
                         display += "<tr height='50'><td colspan='2' width='240' align='center'>";
-                        display += "<a href='#' id='mainbtn'>목록보기</a>"
-                        display += "</td></tr></table>";
+                        display += "<a href='#' id='mainbtn'>목록보기</a></td></tr>"
+                        display += "<tr height='50'><td colspan='2' width='240' align='center'>";
+                        display += "<a href='#' id='deletebtn'>삭제하기</a></td></tr>"
+                        display += "</table>";
                     }else{
                         display+="<p>데이터가 존재하지 않습니다.</p>";
                     }
@@ -190,6 +192,21 @@
                     if(mainbtn != undefined){
                         mainbtn.addEventListener('click', (e)=>{
                             document.getElementById('listbtn').click()
+                        })
+                    }
+
+                    var deletebtn = document.getElementById("deletebtn");
+                    if(deletebtn != undefined){
+                        deletebtn.addEventListener('click', (e)=>{
+                            var request = new XMLHttpRequest();
+                            request.open('POST', '/item/delete', true);
+                            // 폼이 없고 파일이 없는 상태의 POST 방식 파라미터 만들기
+                            var params = "itemid="+data.item.itemid;
+                            request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                            request.send(params);
+                            request.addEventListener('load',()=>{
+                                var data = JSON.parse(xhr.responseText);
+                                alert(data.result);
                         })
                     }
                 })
@@ -222,7 +239,14 @@
 
                             xhr.addEventListener('load',()=>{
                                 var data = JSON.parse(xhr.responseText);
-                                alert(data.result);
+                                //alert(data.result);
+                                if(data.result){
+                                    updatearea.innerHTML="";
+                                    // 목록보기 실행
+                                    document.getElementById('listbtn').click();
+                                }else{
+                                    alert("삽입 실패!");
+                                }
                             })
                         })
                     }
