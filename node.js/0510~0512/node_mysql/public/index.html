@@ -181,6 +181,8 @@
                         display += "<a href='#' id='mainbtn'>목록보기</a></td></tr>"
                         display += "<tr height='50'><td colspan='2' width='240' align='center'>";
                         display += "<a href='#' id='deletebtn'>삭제하기</a></td></tr>"
+                        display += "<tr height='50'><td colspan='2' width='240' align='center'>";
+                        display += "<a href='#' id='updatebtn'>수정하기</a></td></tr>"
                         display += "</table>";
                     }else{
                         display+="<p>데이터가 존재하지 않습니다.</p>";
@@ -205,8 +207,39 @@
                             request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                             request.send(params);
                             request.addEventListener('load',()=>{
-                                var data = JSON.parse(xhr.responseText);
-                                alert(data.result);
+                                var data = JSON.parse(request.responseText);
+                                //alert(data.result);
+                                if(data.result){
+                                    document.getElementById('listbtn').click();
+                                }else{
+                                    alert("삭제 실패!");
+                                }
+                            })
+                        })
+                    }
+                    // 수정 버튼 눌렀을 때 
+                    var updatebtn = document.getElementById('updatebtn');
+                    if(updatebtn != undefined){
+                        updatebtn.addEventListener('click', (e)=>{
+                            var request = new XMLHttpRequest();
+                            request.open('GET', '/item/update');
+                            // 폼이 없고 파일이 없는 상태의 POST 방식 파라미터 만들기
+                            request.send('');
+                            request.addEventListener('load',()=>{
+                                // 수정화면 출력
+                                content.innerHTML='';
+                                updatearea.innerHTML =request.responseText;
+
+                                // 수정 화면에 데이터 매핑
+                                document.getElementById('itemid').value=item.itemid;
+                                //document.getElementById('itemid').readOnly=true;
+                                // update.html에 이미 걸어놔서 의미 X
+                                document.getElementById('itemname').value=item.itemname;
+                                document.getElementById('price').value=item.price;
+                                document.getElementById('description').value=item.description;
+                                document.getElementById('oldpictureurl').value=item.pictureurl;
+                                document.getElementById('picture').src="/img/"+item.pictureurl;
+                            })
                         })
                     }
                 })

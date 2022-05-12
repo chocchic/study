@@ -330,6 +330,14 @@ app.post('/item/delete', (req, res, next)=>{
     })
 })
 
+// 수정 요청 처리
+app.get("/item/update", (req,res,next)=>{
+    fs.readFile('public/update.html', (err,data)=>{
+        res.end(data);
+    })
+})
+
+
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
 });
