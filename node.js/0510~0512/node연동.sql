@@ -9,13 +9,14 @@ use node;
 
 -- 테이블 생성
 CREATE TABLE goods(
+	id int not null auto_increment,
 	itemid int,
 	itemname VARCHAR(100), 
 	price int,
 	description VARCHAR(200), 
 	pictureurl VARCHAR(100),
 	updatedate varchar(20),
-	PRIMARY KEY (itemid)
+	PRIMARY KEY (id)
 )engine=InnoDB;
 
 -- 테이블 구조 확인

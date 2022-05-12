@@ -171,7 +171,8 @@
                     // 데이터가 있다면
                     if(data.result == true){
                         var item = data.item;
-                        display +="<table><tr><td><img src='/img/"+item.pictureurl+"'></td>";
+                        display +="<table><tr><td>";
+                        display +="<a href='/img/"+item.pictureurl+"'><img src='/img/"+item.pictureurl+"'/></a></td>";
                         display +="<td align='center'><table><tr height='50'><td width='80'>상품명</td>";
                         display += "<td width='160'>"+item.itemname+"</td></tr>";
                         display += "<tr height='50'><td width='80'>가격</td>";

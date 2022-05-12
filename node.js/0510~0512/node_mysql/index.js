@@ -156,7 +156,14 @@ connection.connect(function(err){
         throw err;
     }
 })
-
+// ORM을 사용한 DB접속
+const {sequelize} = require('./models')
+sequelize.sync({force:false}).then(()=>{
+        console.log('DB 접속 성공')
+    }).catch((err)=>{
+        console.log(err)
+    })
+    
 //기본 요청이 왔을 때 수행할 내용
 app.get('/', (req, res, next) => {
     //res.send('MySQL Use')
@@ -366,6 +373,29 @@ app.post("/item/update", upload.single('pictureurl'),(req,res,next)=>{
     })
 })
 
+// 마지막 업데이트 한 시간을 전송
+app.get('/item/date', (req, res, next)=>{
+    fs.readFile('.update.txt', (err, data)=>{
+        res.json({'data':data.toString()});
+    })
+})
+
+// 이미지 다운로드 구현 
+// 최근에 클라이언트에서 서버로 데이터 1개를 보내야하는 경웅
+// 파라미터 형태보다는 url 마지막에 작성하는 경우가 많습니다.
+app.get('/img/:fileid', (req,res,next)=>{
+    var fileid = req.params.fileid;
+
+    // 다운받을 파일 경로를 설정 (절대경로로)
+    var file ='C:\\Users\\SAMSUNG\\Desktop\\java\\chocchic.github.io\\node.js\\0510~0512\\node_mysql\\public\\img' + fileid;
+    // 타입 설정
+    var mimetype = mime.lookup(fileid);
+
+    res.setHeader('Content-disposition', 'attachment; filename='+fileid);
+    res.setHeader('Content-type', mimetype);
+    var filestream = fs.createReadStream(file);
+    filestream.pipe(res);
+})
 
 app.listen(app.get('port'), ()=>{
     console.log(app.get('port'), '에서 서버 대기 중');
