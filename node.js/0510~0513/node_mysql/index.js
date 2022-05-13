@@ -157,7 +157,11 @@ connection.connect(function(err){
     }
 })
 // ORM을 사용한 DB접속
-const {sequelize} = require('./models')
+const {sequelize} = require('./models');
+const {Item} = require('./models');
+// 이 구문은 데이터베이스 접속 여부와는 아무런 상관이 없음
+// 필요한 설정이 제대로 되어있는지만 확인 
+// ORM은 
 sequelize.sync({force:false}).then(()=>{
         console.log('DB 접속 성공')
     }).catch((err)=>{
@@ -171,11 +175,16 @@ app.get('/', (req, res, next) => {
 })
 
 // 전체 데이터 가져오기 요청을 처리하는 라우팅 함수
-app.get('/item/all', (req,res, next)=>{
-    // 전체 데이터와 전체 데이터 개수를 가져와서 출력
-    var list = [] // 조회한 데이터 저장할 배열
-    var count = 0; // 조회한 데이터 개수를 저장할 변수
-
+app.get('/item/all', async(req,res, next)=>{
+    try{
+        // 전체 데이터와 전체 데이터 개수를 가져와서 출력
+        var list = await Item.findAll(); // 조회한 데이터 저장할 배열 원래 쿼리를 썼을 때 초기값 : []
+        var count = await Item.count(); // 조회한 데이터 개수를 저장할 변수 : 0
+        res.json({'count':count, 'list':list})
+    }catch(err){
+        console.log(err);
+    }
+    /*
     // 전체 데이터 가져오는 query
     connection.query('select * from goods order by itemid desc', (err, results,fields)=>{
         //에러가 발생했을 때
@@ -196,10 +205,11 @@ app.get('/item/all', (req,res, next)=>{
             res.json({'count': count, 'list':list})
         })
     })
+    */
 })
 
 // 데이터 일부분 가져오기
-app.get('/item/list', (req, res,next) =>{
+app.get('/item/list', async(req, res,next) =>{
     // 파라미터 가져오기 : 일부분 가져오는 경우는 데이터개수와 페이지 번호
     // get 방식에서 pageno와 count 파라미터 가져오기
     const pageno = req.query.pageno;
@@ -215,7 +225,17 @@ app.get('/item/list', (req, res,next) =>{
     if(pageno != undefined){
         start = (parseInt(pageno) -1) *size;
     }
-
+    try{
+        // start부터 size만큼 가져오기
+        var list = await Item.findAll({
+            offset:start, limit:size
+        });
+        var cnt = await Item.count();
+        res.json({'count':cnt, 'list':list})
+    }catch{
+        console.log(Err)
+    }
+    /*
     var list = [];
     connection.query('select * from goods order by itemid limit ?, ?', [start, size], (err,results, fields) =>{
         list = results;
@@ -225,6 +245,7 @@ app.get('/item/list', (req, res,next) =>{
         })
         
     })
+    */
 })
 // 상세보기 - 데이터 1개와서 리턴
 app.get('/item/detail', (req, res,next) =>{
@@ -267,12 +288,13 @@ function getNow(){
      var min = date.getMinutes();
      min = min >= 10 ? month : '0'+min;
      var sec = date.getSeconds();
-     sec = sec >= 10 ? month : '0'+ sec;
+     sec = sec >= 10 ? month : '0'+sec;
 
      return year+'-'+month+'-'+day+' '+hour+':'+min+':'+sec;
 }
+
 // 데이터 삽입 요청
-app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
+app.post('/item/insert',upload.single('pictureurl'), async(req,res, next)=>{
     // 클라이언트가 전송한 데이터를 가져오기
     const itemname = req.body.itemname;
     const description = req.body.description;
@@ -287,32 +309,51 @@ app.post('/item/insert',upload.single('pictureurl'), (req,res, next)=>{
     }
 
     // 가장 큰 itmeid를 조회해서 다음 itmeid를 생성
+    var itemid = 1;
+    try{
+        var x = await Item.max('itemid');
+        itemid += 1;
+    }catch(err){
+        console.log(err);
+    }
+    /*
     connection.query('select max(itemid) maxid from goods',(err, results, fields)=>{
         if(err){
             throw err;
-        }
+        }  
         var itemid;
         if(results.length > 0){
             itemid = results[0].maxid+1
         }else{
             itemid = 1;
         }
-        
+    */  
         var update = getNow();
+        
+        Item.create({
+            itemid:itemid,
+            itemname:itemname,
+            price:price,
+            description:description,
+            pictureurl:pictureurl,
+            updatedate:update
+        })
+        /* 
         connection.query('insert into goods(itemid, itemname, price, description, pictureurl, updatedate) values(?, ?, ?, ?, ?, ?)',
         [itemid, itemname, price, description, pictureurl,update], (err, results, fields)=>{
-            if(results.affectedRows == 1){
-                // 데이터를 삽입한 시간을 update.txt에 기록
-                const writeStream = fs.createWriteStream('./update.txt')
-                writeStream.write(update)
-                writeStream.end();
-                res.json({'result':true})
-            }else{
+           if(results.affectedRows == 1){
+        */
+            // 데이터를 삽입한 시간을 update.txt에 기록
+            const writeStream = fs.createWriteStream('./update.txt')
+            writeStream.write(update)
+            writeStream.end();
+            res.json({'result':true})
+        /*  }else{
                 res.json({'result':false})
             }
         })
-
     })
+    */
 })
 app.post('/item/delete', (req, res, next)=>{
     // 파라미터 읽어오기 : 삭제는 기본키만을 읽어옵니다.

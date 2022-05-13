@@ -27,6 +27,8 @@
         var updatearea = document.getElementById('updatearea')
         // 전체 데이터 가져오기를 클릭했을 때
         document.getElementById('allbtn').addEventListener('click',(e)=>{
+            updatearea.innerHTML = '';
+            content.innerHTML ='';
             // ajax 객체 생성
             var request = new XMLHttpRequest();
             // 요청 생성
