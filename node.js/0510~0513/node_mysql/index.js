@@ -228,7 +228,11 @@ app.get('/item/list', async(req, res,next) =>{
     try{
         // start부터 size만큼 가져오기
         var list = await Item.findAll({
-            offset:start, limit:size
+            offset:start,
+            limit:size,
+            order:[
+                ['itemid','DESC']
+            ]
         });
         var cnt = await Item.count();
         res.json({'count':cnt, 'list':list})
@@ -312,7 +316,7 @@ app.post('/item/insert',upload.single('pictureurl'), async(req,res, next)=>{
     var itemid = 1;
     try{
         var x = await Item.max('itemid');
-        itemid += 1;
+        itemid = x + 1;
     }catch(err){
         console.log(err);
     }
