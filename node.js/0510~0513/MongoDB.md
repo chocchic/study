@@ -124,3 +124,164 @@
         db.createCollection(컬렉션이름, {capped:true, size:크기})  
 ### 3) 관리 툴 사용
     db.enableFreeMonitoring()을 실행하고 나오는 URL을 웹 브라우저에 복사해서 실행  
+
+### 4) 데이터베이스 상태 조회  
+    * 현재 데이터베이스의 Collection 정보 확인 : db.getCollectionInfos()  
+    * 호스트, 프로세스 아이디, Lock정도 확인 : db.serverStatus()  
+    * 데이터베이스 정보 확인 : db.status()  
+
+### 5) CappedCollection 동작확인  
+    // CappedCollection 생성  
+    db.createCollection('cappedCollection',{capped:true, size:10000})  
+
+    // 데이터 1개 삽입  
+    db.cappedCollection.insertOne({x:1})  
+
+    // 데이터 확인  
+    db.cappedCollection.find()  
+
+    // 컬렉션 정보 확인  
+    db.cappedCollection.stats()  
+
+    // 여러 개의 데이터 삽입  
+    for(var i = 0; i < 1000; i++){ db.cappedCollection.insertOne({x:i}) }  
+
+    // 데이터 확인 - CappedCollection은 자신의 사이즈보다 더 많은 데이터를 저장하고자 하면 이전 데이터를 삭제 : 647 ~ 999 까지 저장  
+    db.cappedCollection.find()  
+
+## 13. 도큐먼트 삽입  
+### 1) 함수  
+    * insert : deprecated  
+    * save : 데이터가 없으면 추가하고 있으면 수정  
+    * insertOne, insertMany  
+
+### 2) MongoDB에서의 데이터 삽입  
+    * Collection에서는 _id라고 하는 ObjectId 타입의 기본키가 자동으로 생성됨  
+    * 삽입할 때 _id를 설정하지 않으면 시스템이 자동으로 _id 값을 생성해서 삽입을 합니다.  
+    * ObjectId를 생성해서 대입하면 insert는 중복된 데이터가 있으면 에러가 발생하지만 save는 수정을 합니다.  
+
+### 3) 데이터 삽입  
+    db.users.insert({name:"adam",age:25,gender:"man"})  
+    db.users.find()  
+
+# Node와 MongoDB 연동
+## 1. MongoDB에서 샘플 데이터 생성  
+    db.item.insert({'itemid':1, 'itemname':'레몬', 'price':500, 'description':'비타민 C가 풍부', 'pictureurl' : 'lemon.jpg'});  
+
+## 2. 노드 프로젝트 생성  
+    node_mongo로 생성  
+
+## 3. 프로젝트에 디렉터리와 텍스트 파일 생성  
+    * 이미지를 저장할 img 디렉터리를 생성하고 샘플 이미지 추가  
+    * 뷰 파일을 저장할 views 디렉터리  
+    * 수정된 날짜 및 시간을 저장할 update.txt 파일을 생성  
+    * 필요한 라이브러리 설치  
+        npm i express morgan multer mongodb ejs  
+
+        npm i --save-dev nodemon  
+    * package.json 수정
+        매번 start추가하는 그것 그대로 
+
+## 4. index.js 작성
+    ```javascript
+    const express = require('express')
+    const morgan = require('morgan')
+    const path=require('path')
+    const multer = require('multer')
+    const fs = require('fs')
+
+    const app = express()
+    app.set('port', 7000)
+    app.use(morgan('dev'))
+
+    var bodyParser = require('body-parser')
+    app.use(bodyParser.json())
+
+    app.use(bodyParser.urlencoded({
+        extended:true
+    }))
+
+    // 파일 다운로드
+    var util = require('util')
+    var mime = require('mime')
+    //img 디렉터리가 없으면 생성
+    try{
+        fs.readdirSync('img')
+    }catch(err){
+        console.err('img 디렉토리가 없어서 생성')
+        fs.mkdirSync('img')
+    }
+
+    // 이미지 업로드 설정
+    const upload = multer({
+        storage:multer.diskStorage({
+            destination(req,file,done){
+                done(null,'img/')
+            },
+            filename(req,file,done){
+                const ext = path.extname(file.originalname)
+                done(null, path.basename(file.originalname, ext)+Date.now()+ext)
+            }
+        }),
+        limits:{fileSize:10*10*1024}
+    })
+    // 뷰 템블릿 엔진 : Spring의 Controller 또는 Router가 넘겨준 데이터를 출력하기 위한 뷰
+    // html에 서버의 데이터를 출력하기 위한 것
+    app.set('view engine', 'html')
+    app.engine('html', require('ejs').renderFile)
+
+    // MongoDB 연결
+    var MongoClient = require('mongodb').MongoClient
+    var db;
+    var databaseUrl = 'mongodb://localhost:27017/'
+
+    app.use((err,req,res,next)=>{
+        console.error(err)
+        res.status(500).send(err.message)
+    })
+
+    app.listen(app.get('port'),()=>{
+        console.log(app.get('port'),'번 포트에서 대기중')
+    })
+    ```  
+
+## 5. index.js파일에 전체 데이터 가져오기 요청을 생성
+    ```javascript
+    // 데이터 전체 가져오기
+    app.get('/item/all',(req,res,next)=>{
+        MongoClient.connect(databaseUrl,(err,database)=>{
+            db = database.db('node')
+            db.collection('item').find().sort({'itemid':-1}).toArray((err, items)=>{
+                res.json({'count':items.length,'list':items})
+            });
+        })
+    })
+    ```
+
+## 6. index.js파일에 데이터 일부분 가져오기
+    ```javascript
+    app.get('/item/list',(req,res,next)=>{
+    var start = 0;
+    var cnt = 3;
+    MongoClient.connect(databaseUrl,(err,database)=>{
+            db = database.db('node');
+            db.collection('item').find().sort({'itemid':-1}).skip(start).limit(cnt).toArray((err, items)=>{
+                res.json({'count':items.length,'list':items})
+            });
+        })
+    })
+    ```  
+
+## 7. index.js파일에 id=1인 데이터 하나 가져오기
+    ```javascript
+    // 데이터 1 가져오기
+    app.get('/item/detail',(req,res,next)=>{
+        var itemid = 1;
+        MongoClient.connect(databaseUrl,(err,database)=>{
+            db = database.db('node');
+            db.collection('item').findOne({'itemid':itemid}, (err, item)=>{
+                res.json({'result':true,'item':item})
+            });
+        })
+    })
+    ```
