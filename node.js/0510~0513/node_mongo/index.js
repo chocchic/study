@@ -88,6 +88,45 @@ app.get('/item/detail',(req,res,next)=>{
         });
     })
 })
+
+app.get('/item/insert', (req,res,next)=>{
+    MongoClient.connect(databaseUrl,(err,database)=>{
+        db = database.db('node');
+        // 가장 큰 itemid를 찾아서 +1을 해서 itemid 생성
+        db.collection('item').find({},{projection:{_id:0, itemid:1}}).sort({itemid:-1}).limit(1).toArray((err,result)=>{
+            var itemid = 1;
+            if(result[0] != null){
+                itemid = itemid+1;
+            }
+            db.collection('item').insert({"itemid":itemid, "itemname":"사과", 
+            "description":"달고 맛있어요. 제가 제일 좋아하는 과일입니다.", "price":5000, 
+            "pictureurl":"apple.jpg"},(err,result)=>{
+                res.json({"result":true});
+            });
+        });
+
+    })
+})
+
+app.get('/item/delete', (req,res,next)=>{
+    MongoClient.connect(databaseUrl,(err,database)=>{
+        db = database.db('node');
+        db.collection('item').deleteOne({itemid:2},(err,result)=>{
+            res.json({"result":true});
+        });
+    });
+})
+
+app.get('/item/update', (req,res,next)=>{
+    MongoClient.connect(databaseUrl,(err,database)=>{
+        db = database.db('node');
+        db.collection('item').updateOne({itemid:2},{$set: {itemname:"유기농 사과"}}, { upsert: true },(err,result)=>{
+            res.json({"result": true});
+        });
+    });
+})
+// upsert : true -> update + insert , 없으면 insert기능 수행
+
 app.listen(app.get('port'),()=>{
     console.log(app.get('port'),'번 포트에서 대기중')
 })

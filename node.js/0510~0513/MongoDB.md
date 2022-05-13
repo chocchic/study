@@ -285,3 +285,28 @@
         })
     })
     ```
+
+## 8. index.js파일에 id = 2인 데이터 삭제
+    ```javascript
+    app.get('/item/delete', (req,res,next)=>{
+        MongoClient.connect(databaseUrl,(err,database)=>{
+            db = database.db('node');
+            db.collection('item').deleteOne({itemid:2},(err,result)=>{
+                res.json({"result":true});
+            });
+        });
+    });
+    ```  
+
+## 9. index.js 파일에 id=2인 데이터의 itemname을 유기농 사과로 update
+    * upsert : true -> update + insert , 없으면 insert기능 수행
+    ```javascript
+    app.get('/item/update', (req,res,next)=>{
+        MongoClient.connect(databaseUrl,(err,database)=>{
+            db = database.db('node');
+            db.collection('item').updateOne({itemid:2},{$set: {itemname:"유기농 사과"}}, { upsert: true },(err,result)=>{
+                res.json({"result": true});
+            });
+        });
+    });
+    ```
