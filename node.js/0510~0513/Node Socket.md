@@ -322,4 +322,152 @@
     ```  
 
 ### +) 채팅
-    서버가 접속한 클라이언트 정보를 모두 가지고 있다가 클라이언트가 메세지를 전송하면 그 메세지를 모든 클라이언트에게 전송해서 출력하면 채팅
+    서버가 접속한 클라이언트 정보를 모두 가지고 있다가 클라이언트가 메세지를 전송하면 그 메세지를 모든 클라이언트에게 전송해서 출력하면 채팅  
+### +) 
+    다른 곳에서 작성된 노드 프로젝트를 가져왔을 때에는 npm init만 해주면 OK  
+
+## 6. 채팅 구현  
+### 1) socket.js 파일을 수정
+    ```javascript
+    // socket.io 모듈 가져오기
+    const SocketIO = require('socket.io');
+    // 서버를 생성해서 다른 곳에서 사용할 수 있도록 설정
+    module.exports = (server) => {
+        //웹 소켓 서버 생성
+        const io = SocketIO(server, {path:'/socket.io'});
+
+        //클라이언트가 접속을 하면
+        io.on('connection', (socket)=>{
+            //클라이언트의 IP 확인
+            const req = socket.request;
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            
+            console.log('새로운 클라이언트 접속:' + ip);
+            // 접속을 해제했을 때 처리 - 타이머 종료
+            socket.on('disconnect', () => {
+                clearInterval(socket.interval);
+            });
+
+            // reply 이벤트가 발생했을 때 처리 - 사용자가 보내는 reply 이벤트
+            // 원래 존재하는 이벤트가 아님
+            socket.on('reply', (data) => {
+                console.log(data);
+            })
+
+            // 타이머 생성 - 3초마다 강제로 news라는 이벤트를 발생
+            socket.interval = setInterval(()=>{
+                //emit 은 강제로 이벤트를 발생시키는 것입니다.
+                //news 라는 이벤트를 안녕이라는 파라미터로 발생
+                socket.emit('news', '안녕');
+            }, 3000)
+
+            // 클라이언트가 메세지를 전송하면
+            socket.on('message',(data)=>{
+                // 모든 클라이언트에게 메세지 전송
+                io.sockets.emit('message', data);
+            });
+        })
+    };
+    ```
+    
+    * 클라이언트가 메세지를 전송한 것을 받아오는 부분만 추가
+
+### 2) websocket.html 수정
+    ```javascript
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="UTF-8" />
+            <title>웹 소켓</title>
+
+            <!-- 모바일 웹 페이지 생성시 옵션 설정 -->
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+            <!-- jquery mobile 설정 -->
+            <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css"/>
+            <!-- jquery mobile은 기본적으로 single page application을 제작 내부 코드는 ajax로 동작-->
+            <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+            <script src="https://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+            <!-- 소켓 설정 -->
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                $(document).ready(()=>{
+                    // 웹 소켓 생성
+                    var socket = io.connect('http://localhost:8001');
+
+                    // 소켓 서버로부터 message 이벤트가 오면
+                    socket.on('message', function(data){
+                        // 받은 메세지를 이용해서 출력할 내용을 생성
+                        var output = '';
+                        output += '<li>';
+                        output += '<h3>' + data.name + '</h3>';
+                        output += '<p>'+data.message+'</p>';
+                        output += '<p>'+data.date+'</p>';
+                        output += '</li>';
+
+                        // 메세지 출력
+                        $(output).prependTo('#content'); // content앞에 가져다 붙이고
+                        $('#content').listview('refresh'); // content 새로고침
+                    });
+
+                    // 버튼 눌렀을 때 메세지 전송
+                    $('button').click(()=>{
+                        socket.emit('message',{
+                            name:$('#name').val(),
+                            message:$('#message').val(),
+                            date: new Date().toUTCString()
+                        });
+                        $('#message').val('');
+                    })
+                })
+            </script>
+        </head>
+        <body>
+            <!--data-role은 jquery mobile에서 사용하는 출력 영역의 역할을 설정하는 속성 -->
+            <div data-role='page'>
+                <div data-role="header">
+                    <h1>socket.io chatting</h1>
+                </div>
+                <div data-role="content">
+                    <h3>별명</h3>
+                    <input id="name" />
+                    <a data-role="button" href="#chatpage">채팅 시작</a>
+                </div>
+            </div>
+            <div data-role="page" id="chatpage">
+                <div data-role="header">
+                    <h1>socket.io chatting</h1>
+                </div>
+                <div data-role="content">
+                    <input id="message"/>
+                    <button>전송</button>
+                    <ul id="content" data-role="listview" data-inset="true">
+
+                    </ul>
+                </div>
+            </div>
+        </body>
+    </html>
+    ```  
+
+## 7. 전자 칠판 구현  
+### 1) 프로젝트에 public 디렉터리를 생성 - 정적인 데이터 저장이 목적  
+
+### 2) websocket.html 파일 수정
+
+### public 디렉터리에 images 디렉터리를 생성하고 blackboard.jpg 파일을 추가
+
+### 4) public 디렉터리에 stylesheet 디렉터리를 생성하고 style.css파일을 추가한 후 작성
+    ```css
+    body{
+        margin:0px;
+    }
+
+    #cv{
+        width: 860px;
+        height: 645px;
+        background-color: url('../images/blackboard.jpg');
+    }
+    ```
+
+### 5) public 디렉터리에 js 디렉터리를 생성하고 board.js 파일을 추가한후 작성

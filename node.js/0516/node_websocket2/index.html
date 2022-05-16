@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>웹 소켓</title>
+    </head>
+    <body>
+        소켓 연결 상태:<span id="status"></span>
+        <br />
+        메시지:<ul id="message"></ul>
+    </body>
+
+    <script>
+        //브라우저의 웹 소켓 여부 확인
+        if('WebSocket' in window){
+            //DOM(Document Object Model) 찾아오기
+            var status = document.getElementById('status');
+            var message = document.getElementById('message');
+
+            //웹 소켓 연결
+            //IP는 서버의 IP적어야 하고 이름은 서버에서 만든 이름을 적어야 합니다.
+            var ws = new WebSocket('ws://127.0.0.1:8000', 'example-echo');
+
+            ws.addEventListener('open', (e) => {
+                status.innerHTML = '연결 성공';
+                for(var i = 0; i<10; i++){
+                    //웹 소켓 서버에게 전송
+                    ws.send('Hello ' + i);
+                }
+            });
+
+            ws.addEventListener('message', (evt) =>{
+                message.innerHTML += 
+                    '<li>받은 메시지:' + evt.data + '</li>';
+            })
+        }
+    </script>
+</html>

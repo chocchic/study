@@ -1,0 +1,9 @@
+body{
+    margin:0px;
+}
+
+#cv{
+    width: 860px;
+    height: 645px;
+    background-image: url('../images/blackboard.jpg');
+}

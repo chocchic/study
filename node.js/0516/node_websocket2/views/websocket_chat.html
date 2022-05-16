@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>웹 소켓</title>
+
+        <!-- 모바일 웹 페이지 생성시 옵션 설정 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <!-- jquery mobile 설정 -->
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css"/>
+        <!-- jquery mobile은 기본적으로 single page application을 제작 내부 코드는 ajax로 동작-->
+        <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <!-- 소켓 설정 -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            $(document).ready(()=>{
+                // 웹 소켓 생성
+                var socket = io.connect('http://localhost:8001');
+
+                // 소켓 서버로부터 message 이벤트가 오면
+                socket.on('message', function(data){
+                    // 받은 메세지를 이용해서 출력할 내용을 생성
+                    var output = '';
+                    output += '<li>';
+                    output += '<h3>' + data.name + '</h3>';
+                    output += '<p>'+data.message+'</p>';
+                    output += '<p>'+data.date+'</p>';
+                    output += '</li>';
+
+                    // 메세지 출력
+                    $(output).prependTo('#content'); // content앞에 가져다 붙이고
+                    $('#content').listview('refresh'); // content 새로고침
+                });
+
+                // 버튼 눌렀을 때 메세지 전송
+                $('button').click(()=>{
+                    socket.emit('message',{
+                        name:$('#name').val(),
+                        message:$('#message').val(),
+                        date: new Date().toUTCString()
+                    });
+                    $('#message').val('');
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <!--data-role은 jquery mobile에서 사용하는 출력 영역의 역할을 설정하는 속성 -->
+        <div data-role='page'>
+            <div data-role="header">
+                <h1>socket.io chatting</h1>
+            </div>
+            <div data-role="content">
+                <h3>별명</h3>
+                <input id="name" />
+                <a data-role="button" href="#chatpage">채팅 시작</a>
+            </div>
+        </div>
+        <div data-role="page" id="chatpage">
+            <div data-role="header">
+                <h1>socket.io chatting</h1>
+            </div>
+            <div data-role="content">
+                <input id="message"/>
+                <button>전송</button>
+                <ul id="content" data-role="listview" data-inset="true">
+
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
