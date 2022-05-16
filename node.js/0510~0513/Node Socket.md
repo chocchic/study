@@ -470,4 +470,109 @@
     }
     ```
 
-### 5) public 디렉터리에 js 디렉터리를 생성하고 board.js 파일을 추가한후 작성
+### 5) websocket.html파일을 수정
+    * 캔버스 아레에 메뉴와 버튼을 추가
+    ```html
+    <div class="menu"></div>
+    <button id="clear"></button>
+    ```
+
+    * css도 수정
+    ```css
+    body{
+        margin:0px;
+    }
+
+    #cv{
+        width: 860px;
+        height: 645px;
+        background-image: url('../images/blackboard.jpg');
+        float: left;
+    }
+
+    .menu{
+        float: left;
+    }
+    button{
+        width:100px;
+        height: 50px;
+    }
+    ```  
+
+### 6) public 디렉터리에 js 디렉터리를 생성하고 board.js 파일을 추가한후 작성  
+    ```javascript
+    var ctx;
+    $(()=>{
+        ctx = $('#cv').get(0).getContext('2d');
+        // 기본 설정
+        shape.setShape();
+
+        $('#cv').bind('mousedown', draw.start);
+        $('#cv').bind('mousemove', draw.move);
+        $('#cv').bind('mouseup', draw.end);
+        $('#clear').bind('click', draw.clear);
+        
+    })
+
+    var shape = {
+        color:'white',
+        width:3,
+        setShape : function(color,width){
+            if(color != null){
+                this.color = color;
+            }
+            if(width != null){
+                this.width = width;
+            }
+            ctx.strokeStyle=this.color;
+            ctx.lineWidth = this.width;
+        }
+    }
+
+    var draw = {
+        drawing : null,
+        start : function(e){
+            this.drawing=true;
+            ctx.beginPath();
+            ctx.moveTo(e.pageX, e.pageY);
+        },
+        move : function(e){
+            if(this.drawing){
+                ctx.lineTo(e.pageX,e.pageY);
+                ctx.stroke();
+            }
+        },
+        end : function(){
+            this.drawing=false;
+        },
+        clear:function(){
+            ctx.clearRect(0,0,cv.width,cv.height);
+        }
+    }
+    ```  
+### 7) 현재까지 작성한 후 실행해서 마우스로 선이 그려지고 버튼을 누르면 삭제되는지 확인
+
+### 8) websocket.html 파일에 메뉴 영역에 색상변경, 펜 두께, 펜 모양 메뉴를 추가
+    ```html
+    <div class="menu">
+        <button id="clear"></button>
+        <fieldset>
+            <legend>색상 변경</legend>
+            <select id="pen_color">
+                <option></option>
+            </select>
+        </fieldset>
+        <fieldset>
+            <legend>두께</legend>
+            <select id="pen_width">
+                
+            </select>
+        </fieldset>
+        <fieldset id="pen_shape">
+            <legend>모양</legend>
+            
+        </fieldset>
+    </div>
+    ```
+
+### 9) style.css파일에 추가한 요소  style.css파일에 추가
