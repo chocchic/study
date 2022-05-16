@@ -179,58 +179,147 @@
     ```  
 
 ### 5) 프로젝트의 index.js 파일을 수정  
-    ```javascirpt
+    ```javascript
     // ws 모듈을 이용한 웹 소켓 구현 - 서버에서 일정한 주기를 가지고 메세지 전송
-const express = require('express');
-const path = require('path');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const nunjucks = require('nunjucks');
-const dotenv = require('dotenv');
+    const express = require('express');
+    const path = require('path');
+    const morgan = require('morgan');
+    const cookieParser = require('cookie-parser');
+    const session = require('express-session');
+    const nunjucks = require('nunjucks');
+    const dotenv = require('dotenv');
 
-dotenv.config();
+    dotenv.config();
 
-const webSocket = require('./socket');
-// 파일 이름을 생략하면 index.js입니다
-const indexRouter = require('./routes');
+    const webSocket = require('./socket');
+    // 파일 이름을 생략하면 index.js입니다
+    const indexRouter = require('./routes');
 
-const app = express();
-app.set('port', 8001);
-// 뷰 템플릿(서버의 데이터를 출력할 수 있는 html 파일) 설정
-app.set('view engine', html);
-nunjucks.configure('views',{
-    express:app,
-    watch:true
-})
+    const app = express();
+    app.set('port', 8001);
+    // 뷰 템플릿(서버의 데이터를 출력할 수 있는 html 파일) 설정
+    app.set('view engine', 'html');
+    nunjucks.configure('views',{
+        express:app,
+        watch:true
+    })
 
-app.use(morgan('dev'));
-app.use(express.static(path.join(__dirname, 'public')));
+    app.use(morgan('dev'));
+    app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+    app.use(express.json());
+    app.use(express.urlencoded({extended:false}));
 
-app.use(session({
-    resave:false,
-    saveUninitialized:false,
-    secret:'websocket',
-    cookie:{
-        httpOnly:true,
-        secure:false
-    }
-}))
+    app.use(session({
+        resave:false,
+        saveUninitialized:false,
+        secret:'websocket',
+        cookie:{
+            httpOnly:true,
+            secure:false
+        }
+    }))
 
-// /로 시작하는 요청은 indexRouter가 처리
-app.use('/', indexRouter);
+    // /로 시작하는 요청은 indexRouter가 처리
+    app.use('/', indexRouter);
 
-const server = app.listen(app.get('port'), () =>{
-    console.log(app.get('port'), '번 포트에서 대기 중');
-})
+    const server = app.listen(app.get('port'), () =>{
+        console.log(app.get('port'), '번 포트에서 대기 중');
+    })
 
-webSocket(server);
-```
+    webSocket(server);
+    ```
 
 ### 6) 프로젝트에 views디렉토리를 생성하고 websocket.html을 생성한 후 작성  
     ```html
-    
-    ```
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Web Socket</title>
+        </head>
+        <body>
+            <div>
+                검사를 이용해서 console과 network를 확인하세요.
+            </div>
+        </body>
+        <script>
+            const webSocket = new WebSocket("ws://127.0.0.1:8001");
+            webSocket.addEventListener("open", ()=>{
+                console.log("웹 소켓 서버와 연결");
+            });
+            webSocket.addEventListener('message',(evt)=>{
+                console.log(evt.data);
+                webSocket.send("클라이언트가 서버에게 보내는 메세지");
+            })
+        </script>
+    </html>
+    ```  
+
+    * +) 로컬에서 접속했을 때 ip주소는 ipv4는 127.0.0.1, ipv6는 0000:0000:0000:0001 => :::1
+
+## 5. node에서 웹 소켓 구현 - socket.IO모듈  
+### 1) 설치  
+    npm i socket.io  
+
+### 2) 프로젝트의 socket.js 파일을 수정 - 없으면 생성  
+    ```javascript
+    const SocketIO = require('socket.io');
+    module.exports = (server)=>{
+        // 웹 소켓 서버 생성
+        const io = SocketIO(server, {path:'/socket.io'});
+
+        // 클라이언트가 접속을 하면
+        io.on('connection', (socket)=>{
+            // 클라이언트의 IP 확인
+            const req = socket.request;
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            console.log('새로운 클라이언트 접속 : ' + ip);
+
+            socket.on('disconnect',() =>{
+                clearInterval(socket.interval);
+            });
+
+            socket.on('reply', (data)=>{
+                console.log(data);
+            });
+            var i = 0;
+            socket.interval = setInterval(()=>{
+                // emit은 강제로 이벤트를 발생시키는 것
+                // news라는 이벤트를 안녕이라는 파라미터로 발생
+                socket.emit('news','안녕');
+            },3000);
+
+        })
+    };
+    ```  
+### 3) websocket.html 파일 수정  
+    ```html
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Web Socket</title>
+        </head>
+        <body>
+            <div>
+                검사를 이용해서 console과 network를 확인하세요.
+            </div>
+        </body>
+        <script src="/socket.io/socket.io.js"/>
+        <script>
+            const socket = io.connect('http://localhost:8001', {
+                path:'/socket.io',
+                transports:['websocket']
+            })
+
+            socket.on('news', (data)=>{
+                console.log(data);
+                socket.emit('reply', 'Hello socket.io');
+            })
+        </script>
+    </html>
+    ```  
+
+### +) 채팅
+    서버가 접속한 클라이언트 정보를 모두 가지고 있다가 클라이언트가 메세지를 전송하면 그 메세지를 모든 클라이언트에게 전송해서 출력하면 채팅

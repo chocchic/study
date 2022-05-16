@@ -9,14 +9,25 @@
             검사를 이용해서 console과 network를 확인하세요.
         </div>
     </body>
+    <script src="/socket.io/socket.io.js"/>
     <script>
-        const webSocket = new WebSocket("ws://127.0.0.1:8001");
-        webSocket.addEventListener("open", ()=>{
-            console.log("웹 소켓 서버와 연결");
-        });
-        webSocket.addEventListener('msg',(evt)=>{
-            console.log(evt.data);
-            webSocket.send("클라이언트가 서버에게 보내는 메세지");
+        const socket = io.connect('http://localhost:8001', {
+            path:'/socket.io',
+            transports:['websocket']
         })
+
+        socket.on('news', (data)=>{
+            console.log(data);
+            socket.emit('reply', 'Hello socket.io');
+        })
+        
+        //const webSocket = new WebSocket("ws://127.0.0.1:8001");
+        // webSocket.addEventListener("open", ()=>{
+        //     console.log("웹 소켓 서버와 연결");
+        // });
+        // webSocket.addEventListener('message',(evt)=>{
+        //     console.log(evt.data);
+        //     webSocket.send("클라이언트가 서버에게 보내는 메세지");
+        // })
     </script>
 </html>
