@@ -18,3 +18,33 @@ var server = http.createServer((req,res)=>{
 server.listen(8000, ()=>{
     console.log('Server is listening on port 8000');
 })
+
+wsServer = new WebSocketServer({
+    httpServer:server, 
+    autoAcceptConnections:false
+});
+
+//클라이언트 서버에서 연결요청이 오면
+wsServer.on('request',(req)=>{
+    // 클라이언트와 example-echo라는 이름으로 연결
+    var connection = req.accept('example-echo', req.origin);
+
+    // 연결된 클라이언트에서 메세지가 오면
+    connection.on('message', (msg)=>{
+        // 텍스트 데이터라면
+        if(MessageChannel.type == 'utf8'){
+            // 메세지 출력
+            console.log('받은 메세지 : ' + msg.utf8Data);
+            // 받은 메세지를 클라이언트에게 전송
+            connection.sendUTF(msg.utf8Data);
+        }
+        // 일반 파일 데이터라면
+        else if(msg.type == 'binary'){
+            connection.sendUTF(msg.binaryData);
+        }
+
+        connection.on('close', (reasonCode, desc)=>{
+            console.log('Peer' + connection.remoteAddress+ ' disconnected.');
+        });
+    })
+})

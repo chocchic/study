@@ -46,7 +46,22 @@
 ### 2) 필요한 패키지 설치  
     * web socket, express, morgan  
     * 개발용으로 nodemon  
+
 ### 3) 프로젝트에 index.html 파이릉 생성하고 작성
+    ```html
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>Web Socket</title>
+        </head>
+        <body>
+            소켓 연결 상태 : <span id = "status" ></span>
+            <br/>
+            메세지 : <ul id="message"></ul>
+        </body>
+    </html>
+    ```
 
 ### 4) 프로젝트에 index.js파일을 추가하고 작성 - websocket 모듈을 이용한 웹소켓 구현 
     ```javascript
@@ -73,3 +88,53 @@
     ```  
 
 ### 5) 프로젝트를 실행하고 브라우저에 localhost:8000, localhost:8000/index 요청을 확인  
+
+### 6) 빼먹음
+    ```javascript
+    ```  
+
+### 7) index.html에 웹 소켓 사용을 위한 스크립트 코드 추가
+    ```javascript
+    // 브라우저의 웹 소켓 여부 확인
+    if('WebSocket' in window){
+        // DOM(Document Object model) 찾아오기
+        var status = document.getElementById('status')
+        var message = document.getElementById('message')
+
+        // 웹 소켓 연결
+        // IP는 서버의 IP를 적어야하고, 이름은 서버에서 만든 이름을 적어줘야 합니다.
+        var ws = new WebSocket('ws://127.0.0.1:8000', 'example-echo');
+
+        ws.addEventListener('open', (e)=>{
+            status.innerHTML = '연결 성공!';
+            for(var i = 0; i < 10; i++){
+                // 웹소켓에게 전송
+                ws.send('Hello '+ i);
+            }
+        });
+
+        ws.addEventListener('message', (evt)=>{
+            message.innerHTML += '<li>받은 메세지 : ' + evt.data + '</li>';
+        })
+    }
+    ```  
+
+## 4. Node에서의 Web Socket - websocket 모듈 이용  
+### 1) 패키지를 추가 설치  
+    cookie-parser, dotenv, express, express-session, morgan, nunjucks, ws  
+
+### 2) 프로젝트에 라우팅 모듈화를 위한 routes 디렉토리를 생성  
+
+### 3) routes 디렉토리에 index.js 파일을 생성하고 요청처리 코드를 작성  
+    ```javascript
+    const express = require('express')
+const router = express.Router();
+
+router.get('/',(req,res)=>{
+    res.render('websocket');
+});
+
+module.exports = router;
+    ```
+
+### 4) 
