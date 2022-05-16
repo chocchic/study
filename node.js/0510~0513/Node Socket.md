@@ -89,9 +89,14 @@
 
 ### 5) 프로젝트를 실행하고 브라우저에 localhost:8000, localhost:8000/index 요청을 확인  
 
-### 6) 빼먹음
+### 6) index.js 파일에 웹 소켓 서버 구현 코드를 추가  
     ```javascript
-    ```  
+    //웹 소켓 서버 구현
+    wsServer = new WebSocketServer({
+        httpServer:server,
+        autoAcceptConnections:false
+    });
+    ```
 
 ### 7) index.html에 웹 소켓 사용을 위한 스크립트 코드 추가
     ```javascript
@@ -128,13 +133,104 @@
 ### 3) routes 디렉토리에 index.js 파일을 생성하고 요청처리 코드를 작성  
     ```javascript
     const express = require('express')
-const router = express.Router();
+    const router = express.Router();
 
-router.get('/',(req,res)=>{
-    res.render('websocket');
-});
+    router.get('/',(req,res)=>{
+        res.render('websocket');
+    });
 
-module.exports = router;
+    module.exports = router;
     ```
 
-### 4) 
+### 4) 웹 소켓 로직을 위한 socket.js 파일을 생성하고 작성  
+    ```javascript
+    const WebSocket = require('ws');
+
+    module.exports = (server) => {
+        //웹 소켓 서버 생성
+        const wss = new WebSocket.Server({server});
+
+        //클라이언트가 접속을 하면
+        wss.on('connection', (ws, req)=>{
+            //클라이언트의 IP 확인
+            const ip = req.headers['x-forwarded-for'] 
+                || req.connection.remoteAddress;
+            console.log('새로운 클라이언트 접속:' + ip);
+
+            ws.on('message', (message) => {
+                console.log("클라이언트에게 받은 메시지:", message);
+            });
+
+            ws.on('close', () => {
+                console.log("클라이언트 접속 종료:", ip);
+                //타이머 종료
+                clearInterval(ws.interval);
+            });
+
+            //타이머를 이용해서 클라이언트에게 주기적으로 메시지를 전송
+            ws.interval = setInteval(() => {
+                if(ws.readyState === ws.OPEN){
+                    ws.send('서버에서 클라이언트에게 메시지를 전송합니다.');
+                }
+            }, 3000)
+
+        })
+    };
+    ```  
+
+### 5) 프로젝트의 index.js 파일을 수정  
+    ```javascirpt
+    // ws 모듈을 이용한 웹 소켓 구현 - 서버에서 일정한 주기를 가지고 메세지 전송
+const express = require('express');
+const path = require('path');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const nunjucks = require('nunjucks');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const webSocket = require('./socket');
+// 파일 이름을 생략하면 index.js입니다
+const indexRouter = require('./routes');
+
+const app = express();
+app.set('port', 8001);
+// 뷰 템플릿(서버의 데이터를 출력할 수 있는 html 파일) 설정
+app.set('view engine', html);
+nunjucks.configure('views',{
+    express:app,
+    watch:true
+})
+
+app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(express.json());
+app.use(express.urlencoded({extended:false}));
+
+app.use(session({
+    resave:false,
+    saveUninitialized:false,
+    secret:'websocket',
+    cookie:{
+        httpOnly:true,
+        secure:false
+    }
+}))
+
+// /로 시작하는 요청은 indexRouter가 처리
+app.use('/', indexRouter);
+
+const server = app.listen(app.get('port'), () =>{
+    console.log(app.get('port'), '번 포트에서 대기 중');
+})
+
+webSocket(server);
+```
+
+### 6) 프로젝트에 views디렉토리를 생성하고 websocket.html을 생성한 후 작성  
+    ```html
+    
+    ```

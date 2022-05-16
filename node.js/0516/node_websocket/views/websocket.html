@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Web Socket</title>
+    </head>
+    <body>
+        <div>
+            검사를 이용해서 console과 network를 확인하세요.
+        </div>
+    </body>
+    <script>
+        const webSocket = new WebSocket("ws://127.0.0.1:8001");
+        webSocket.addEventListener("open", ()=>{
+            console.log("웹 소켓 서버와 연결");
+        });
+        webSocket.addEventListener('msg',(evt)=>{
+            console.log(evt.data);
+            webSocket.send("클라이언트가 서버에게 보내는 메세지");
+        })
+    </script>
+</html>
