@@ -39,7 +39,13 @@
 var ctx;
 var socket;
 $(()=>{
-    socket = io.connect('http://' + window.location.host);
+    // 소켓 생성
+    socket = io.connect('http://localhost:8001',{
+        path:'/socket.io',
+        transport:['websocket']
+    }); //+ window.location.host);
+    // 소켓에서 linesend_toclient 이벤트가 발생했을 때 처리
+    socket.on('linesend_toclient', (data)=>{draw.drawfromServer(data)});
     ctx = $('#cv').get(0).getContext('2d');
 
     //색상 선택 select 설정
@@ -116,6 +122,22 @@ var draw = {
         ctx.clearRect(0,0,cv.width,cv.height);
         shape.setShape(); // clear하면 현재 붓의 모양까지 날아가니깐 다시 설정
         msg.line.send('clear');
+    },
+    drawfromServer: (data)=>{
+        if(data.type=='start'){
+            ctx.beginPath();
+            ctx.moveTo(data.x, data.y);
+            ctx.strokeStyle = data.color;
+            ctx.lineWidth = data.width;
+        }
+        if(data.type=='move'){
+            ctx.lineTo(data.x, data.y);
+            ctx.stroke();
+        }
+        if(data.type=='clear'){
+            ctx.clearRect(0,0,cv.width,cv.height);
+            shape.setShape();
+        }
     }
 }
 

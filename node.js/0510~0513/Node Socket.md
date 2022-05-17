@@ -659,5 +659,71 @@
     socket = io.connect('http://' + window.location.host);
     ```  
 
-### 17) 
+### 17) board.js 파일에 msg 객체 생성
+    ```javascript
+    var msg = {
+        line:{
+            send:function(type,x,y){
+                socket.emit('linesend',{
+                    'type': type,
+                    'x': x,
+                    'y': y,
+                    'color': shape.color,
+                    'width': shape.width
+                });
+            }
+        }
+    }
+    ```
 
+### 18) board.js 파일의 draw 객체 수정  
+    ```javascript
+    var draw = {
+        drawing : null,
+        start : function(e){
+            this.drawing=true;
+            ctx.beginPath();
+            ctx.moveTo(e.pageX, e.pageY);
+            msg.line.send('start', e.pageX,e.pageY);
+        },
+        move : function(e){
+            if(this.drawing){
+                ctx.lineTo(e.pageX,e.pageY);
+                ctx.stroke();
+                msg.line.send('move',e.pageX,e.pageY);
+            }
+        },
+        end : function(){
+            this.drawing=false;
+            msg.line.send('end');
+        },
+        clear:function(){
+            ctx.clearRect(0,0,cv.width,cv.height);
+            shape.setShape(); // clear하면 현재 붓의 모양까지 날아가니깐 다시 설정
+            msg.line.send('clear');
+        }
+    }
+    ```  
+
+### +) 통신 방식의 분류
+    TCP & UDP
+    Simplex (단방향 통신)  
+    Half Duplex(반 이중 : 동시에 주고 받을 수는 없는 방식)  
+    Full Duplex(전 이중 : 동시에 주고 받는 것이 가능한 방식)  
+
+    Unicast : 1대1 통신 (PtoP)  
+    Multicast : 1 대 group 통신  
+    Broadcast : 방송, 모든 곳에서 전송  
+    Anycast : 아무 곳이나 하나에게 전송  
+
+### 19) socket.js 파일에 메세지를 받았을 때 메세지를전송하는 코드를 작성
+    ```javascript
+    // 클라이언트에서 linesend라는 이벤트가 발생하면 연결된 모든클라이언트에게 linesend_toclient 이벤트를 발생시킴
+        socket.on('linesend',(data)=>{
+            socket.broadcast.emit('linesend_toclient',data);
+        });
+    ```  
+
+### 20) board.js
+
+### 21) board.js

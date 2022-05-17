@@ -72,7 +72,7 @@ const SocketIO = require('socket.io');
 // 서버를 생성해서 다른 곳에서 사용할 수 있도록 설정
 module.exports = (server) => {
     //웹 소켓 서버 생성
-    const io = SocketIO(server, {path:'/socket.io'});
+    const io = SocketIO(server, {path:'/socket.io', transport:['websocket']});
 
     //클라이언트가 접속을 하면
     io.on('connection', (socket)=>{
@@ -103,6 +103,11 @@ module.exports = (server) => {
         socket.on('message',(data)=>{
             // 모든 클라이언트에게 메세지 전송
             io.sockets.emit('message', data);
+        });
+
+        // 클라이언트에서 linesend라는 이벤트가 발생하면 연결된 모든클라이언트에게 linesend_toclient 이벤트를 발생시킴
+        socket.on('linesend',(data)=>{
+            socket.broadcast.emit('linesend_toclient',data);
         });
     })
 };
