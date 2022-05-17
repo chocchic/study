@@ -1,7 +1,7 @@
 var http = require('http');
 // TCP 통신을 위한 객체 생성
 var client = require('net').Socket();
-var fromServer = '';
+var fromServer = '서버가 보냅니다.!!';
 
 // 서버에 접속
 client.connect(9999, function() {
@@ -29,7 +29,6 @@ http.createServer((req,res)=>{
     res.writeHead(200, {
         'Content-Type':'text/plain;charset=utf-8'
     })
-
     res.end(fromServer);
 }).listen(1338,'127.0.0.1');
 console.log('Server 구동 중');
