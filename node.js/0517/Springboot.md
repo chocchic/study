@@ -43,3 +43,24 @@
 
 ### 2) 옵션 설정을 하고 프로젝트를 생성  
     * start.spring.io를 브라우저에서 입력하고 들어가서 웹에서 생성 가능  
+    
+### 3)기본 패키지 안에 Web 요청을 처리해주는 Controller 클래스를 생성하고 작성
+    ```java
+    //기본 패키지 안에 있으면 인스턴스를 생성 -  @Controller, RestController, Servcie, Repository, Component
+    //Controller 와 RestController는 매칭되는 URL이 있으면 메서드를 호출
+    //Controller 와 RestController는 서블릿이 됩니다.
+    //Controller 는 view 이름을 이용해서 출력을 만들고 
+    //RescController는 문자열이나 json 문자열을 출력
+    @RestController
+    public class CommonController {
+        @GetMapping("/")
+        public String home() {
+            return "Hello Spring Boot";
+        }
+    }
+    ```
+### 4)기본 패키지 안에 있는 SpringbootApplication.java 파일을 선택하고 마우스 오른쪽을 클릭해서 [Run As] - [Spring Boot App] 메뉴를 실행
+
+### 5)브라우저에서 localhost:8080 으로 접속해서 리턴한 내용이 출력되는지 확인
+
+
