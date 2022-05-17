@@ -640,7 +640,7 @@
     ```javascript
     const io = require('socket.io')(server)
     ```  
-
+    * 근데 이거 추가하면 socket 오류남. 주석처리
     * require할때 ('모듈이름')의 경우와 ('모듈이름')(객체나열)의 차이는 객체 지향 언어의 관점에서 보면
     앞의 경우는 Default Constructor를 호출해서 만든 객체를 리턴받는 것이고 뒤의 경우는 Default Constructor가 아닌 Constructor를 이용해서 생성한 객체를 리턴받는 경우입니다.  
 ### 14) websocket.html 파일에 socket.io.js파일을 사용할 수 있도록 링크 추가
@@ -727,3 +727,97 @@
 ### 20) board.js
 
 ### 21) board.js
+
+
+## 8. Node의 Socket 프로그래밍  
+    * TCP와 UDP 통신 모두 가능  
+### 1) TCP  
+    * 연결형 프로토콜을 이용한 통신  
+    * 요청하는 쪽에서 서버에게 요청을 하면 서버는 클라이언트에게 메타 데이터(데이터에 대한 정보)를 전송하고, 클라이언트는 이 메타데이터를 읽고 전송 가능 여부와 데이터에 대한 정보를 파악해서 서버에게 실제 데이터 전송을 요청.  
+        서버는 실제 데이터를 전송하고, 전송받은 쪽에서는 이에 대한 응답을 합니다.  
+    * 신뢰성이 높은 통신 방식이지만 실제 데이터 이외에도 다른 데이터를 많이 전송하기 때문에 효율은 떨어질 수 있습니다.  
+
+### 2) UDP  
+    * 비 연결형 통신으로 일방적으로 데이터를 전송하고 종료하는 방식  
+    * 신뢰성이 낮지만 효율이 좋습니다.  
+    * DNS(Domain Name Service), APNS(Apple Push Notification Service), FCM(Google의 Firebase Cloud Messaging)등은 UDP입니다.  
+
+## 9. Java와 Node간의 UDP통신
+### 1) Java 프로젝트를 생성해서 main을 가진 클래스 생성  
+    ```java
+    import java.net.DatagramPacket;
+    import java.net.DatagramSocket;
+    import java.net.InetAddress;
+
+    public class UDPServer {
+
+    public static void main(String[] args) {
+        try {         
+            //UDP 소켓 클래스 생성
+            DatagramSocket dsoc = new DatagramSocket(4445);
+            //데이터를 저장하기 위한 바이트 배열 생성
+            byte [] data = new byte[65536];
+            while(true) {
+                System.out.println("받을 준비 완료");
+                //데이터를 전송받기 위한 준비가 완료 됨 - 데이터를 전송받아야 다음으로 넘어감
+                DatagramPacket dp = new DatagramPacket(data, data.length);
+                dsoc.receive(dp);
+                
+                //보낸 곳 주소 확인
+                System.out.println("보낸 곳:" + dp.getAddress().getHostAddress());
+                //전송 받은 데이터 확인
+                String utf8String = 
+                    new String(new String(dp.getData()).trim().getBytes("UTF-8"));
+                System.out.println("받은 메시지:" + utf8String);   
+                
+                String msg = "message";
+                // 보낸 곳의 주소
+                InetAddress address = dp.getAddress();
+                int port = dp.getPort();
+                dp = new DatagramPacket(msg.getBytes(), msg.getBytes().length, address,port);
+                
+                // 데이터 전송
+                dsoc.send(dp);
+                
+            }
+        }catch(Exception e) {
+            System.out.println("소켓 통신 에러");
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+
+    }
+    ```  
+
+### 2) node프로젝트에 udp.js파일을 생성하고 작성  
+    ```javascript
+        var http = require('http')
+    // UDP 통신을 위한 객체 생성
+    var client = require('dgram').createSocket('udp4');
+    var message = '보낼 데이터 : node에서 보냄.';
+
+
+    // 메세지를 받았을 때 수행할 내용 
+    client.on('message', (msg, rinfo)=>{
+        message = msg;
+    });
+
+    // 에러가 발생했을 때 수행할 내용
+    client.on('error', (err)=>{
+        console.log('error', err);
+    })
+
+    http.createServer((req,res)=>{
+        var data = new Buffer.from('Client Buffer : 안녕안녕 노드로부터'); // 그냥 buffer쓰면 뭐라고 warning남
+        client.send(data,0,data.length, 4445, 'localhost'); // java에서의 포트번호와 같아야함
+
+        res.writeHead(200, {
+            'Content-Type':'text/plain;charset=utf-8'
+        })
+
+        res.end(message);
+    }).listen(1338,'127.0.0.1');
+    console.log('Server 구동 중');
+    ```
+
+### 3) 서로 다른 프로그래밍 언어간에 문자열을 주고 받을 때는 인코딩에 주의를 해야합니다.
