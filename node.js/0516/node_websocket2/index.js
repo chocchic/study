@@ -131,3 +131,7 @@ const server = app.listen(app.get('port'), () => {
 
 // 웹 소켓 생성
 webSocket(server);
+
+// socket.io 파일에 있는 exports된 함수 중에서 express 서버를 매개변수로 받는 함수를 호출
+// exports된 내용이 하나의 객체일 때는 ()를 추가할 필요가 없는데, 객체가 아니고 함수일 때는 매개변수를 대입해주어야 합니다.
+const io = require('socket.io')(server)

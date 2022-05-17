@@ -4,13 +4,14 @@
         <meta charset="UTF-8" />
         <title>웹 소켓</title>
         <script src="https://code.jquery.com/jquery-1.8.2.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="js/board.js"></script>
         <link rel="stylesheet" type="text/css" href="stylesheet/style.css">
     </head>
     <body>
         <canvas id="cv" width="860px" height="645px"></canvas>
         <div class="menu">
-            <button id="clear"></button>
+            <button id="clear">전부 지우기</button>
             <fieldset>
                 <legend>색상 변경</legend>
                 <select id="pen_color">

@@ -576,3 +576,88 @@
     ```
 
 ### 9) style.css파일에 추가한 요소  style.css파일에 추가
+    ```css
+    .menu{
+        float: left;
+    }
+    button{
+        width:100px;
+        height: 50px;
+    }
+
+    #cv_pen{
+        width:100px;
+        height: 50px;
+        float: left;
+        background-image:url('images/blackboard.jpg');
+    }
+    fieldset{
+        width:100px;
+        height: 60px;
+        float: left;
+    }
+
+    #pen_shape{
+        position: absolute;
+        top:10px;
+        left:700px;
+        color:white;
+    }
+    ```  
+
+
+### 10) board.js 파일에 초기화를 위한 코드를 추가 - $(function(){ '여기에 추가' })  
+    ```javascript
+       //색상 선택 select 설정
+    for(var key in color_map){
+        $('#pen_color').append('<option value=' + color_map[key].value + '>' + color_map[key].name + '</option>');
+    }
+
+    //두께 선택 select 설정
+    for(var i = 1 ; i < 16 ; i++){
+        $('#pen_width').append('<option value=' + i + '>' + i + '</option>');
+    }
+    ```  
+
+### 11) board.js파일의 shape객체에 select 값이 변경되었을 때 호출될 함수 추가
+    ```javascript
+    //색 두께 변경 메서드
+    change : function() {
+        // jquery에서 select에서 선택된 항목을 찾을 때 사용
+        var color = $('#pen_color option:selected').val();
+        var width = $('#pen_width option:selected').val();
+        shape.setShape(color, width);
+    },
+    ```  
+ 
+### 12) board.js파일에 select 값이 변경될때 호출할 함수 설정  - $(function(){ '여기에 추가' })
+    ```javascript
+        //select에 이벤트 연결
+    $('select').bind('change', shape.change);
+    ```  
+
+### 13) index.js 파일에 소켓 서버 설정 코드 추가
+    ```javascript
+    const io = require('socket.io')(server)
+    ```  
+
+    * require할때 ('모듈이름')의 경우와 ('모듈이름')(객체나열)의 차이는 객체 지향 언어의 관점에서 보면
+    앞의 경우는 Default Constructor를 호출해서 만든 객체를 리턴받는 것이고 뒤의 경우는 Default Constructor가 아닌 Constructor를 이용해서 생성한 객체를 리턴받는 경우입니다.  
+### 14) websocket.html 파일에 socket.io.js파일을 사용할 수 있도록 링크 추가
+    ```html
+    <script src="/socket.io/socket.io.js"></script>
+    ```
+    * 스크립트의 순서가 중요!! 어떤 스크립트를 먼저 사용하는지에 맞춰서 추가
+
+### 15) board.js파일에 전역변수 선언  
+    ```javascript
+    var socket;
+    ```
+    ctx 근처에 선언
+### 16) board.js파일에 소켓 생성 코드를 추가 - $(function(){ '여기에 추가' })  
+    ```javascript
+    socket = io.connect('http://' + window.location.host);
+    ```  
+
+### 17) 
+
