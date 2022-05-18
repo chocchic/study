@@ -140,47 +140,47 @@ In-Memory DB의 기본값으로 테스트 할 때 이 방식이 사용됩니다.
 
 ### 5) 빼먹음
 ```java
-package kr.co.adamsoft.entity;
+	package kr.co.adamsoft.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+	import javax.persistence.Column;
+	import javax.persistence.Entity;
+	import javax.persistence.GeneratedValue;
+	import javax.persistence.GenerationType;
+	import javax.persistence.Id;
+	import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+	import lombok.AllArgsConstructor;
+	import lombok.Builder;
+	import lombok.Getter;
+	import lombok.NoArgsConstructor;
+	import lombok.ToString;
 
-//데이터베이스의 테이블 과 연동
-@Entity
-//테이블 이름 설정
-@Table(name="tbl_memo")
+	//데이터베이스의 테이블 과 연동
+	@Entity
+	//테이블 이름 설정
+	@Table(name="tbl_memo")
 
-//toString메서드 생성
-@ToString
-// get 메서드 생성
-@Getter
-// build라는 메서드를 이용해서 매개변수가 없는 생성자(default constructor)를 이용해서 인스턴스를 생성하고 속성을 호출해서 값을 설정하도록 해주는 설정
-@Builder
-// 모든 속성을 매개변수로 받는 생성자
-@AllArgsConstructor
-// 매개변수가 없는 생성자
-@NoArgsConstructor
-public class Memo {
-	//기본키 연결
-	@Id
-	//기본키는 설정하는 데이터베이스 옵션에 따라 자동 생성 - Hibernate 가 결정
-	//MySQL 연결하면 auto_increment, Oracle 이면 Sequence 사용
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long mno;
-	
-	@Column(length=200, nullable=false)
-	private String memoText;
-}
+	//toString메서드 생성
+	@ToString
+	// get 메서드 생성
+	@Getter
+	// build라는 메서드를 이용해서 매개변수가 없는 생성자(default constructor)를 이용해서 인스턴스를 생성하고 속성을 호출해서 값을 설정하도록 해주는 설정
+	@Builder
+	// 모든 속성을 매개변수로 받는 생성자
+	@AllArgsConstructor
+	// 매개변수가 없는 생성자
+	@NoArgsConstructor
+	public class Memo {
+		//기본키 연결
+		@Id
+		//기본키는 설정하는 데이터베이스 옵션에 따라 자동 생성 - Hibernate 가 결정
+		//MySQL 연결하면 auto_increment, Oracle 이면 Sequence 사용
+		@GeneratedValue(strategy=GenerationType.AUTO)
+		private Long mno;
+		
+		@Column(length=200, nullable=false)
+		private String memoText;
+	}
 ```  
 
 ## 5. JpaRepository 인터페이스  
@@ -193,10 +193,10 @@ Repository <- CrudRepository <- PagingAndSortRepository <- JpaRepository
 
 * Memo Entity에 대한 데이터베이스 작업을 수행하는 Interface를 생성 - repository.MemoRepository  
 	```java
-	// Memo Entity에 대한 작업을 수행하기 위한 Repository 인터페이스
-	public interface MemoRepository extends JpaRepository<Memo, Long>{
+		// Memo Entity에 대한 작업을 수행하기 위한 Repository 인터페이스
+		public interface MemoRepository extends JpaRepository<Memo, Long>{
 
-	}
+		}
 	```
 	* 위 인터페이스에서는 insert나 update를 위한 save 그리고 id를 가지고 데이터를 조회하는 findById와 전체 데이터를 조회하는 findAll 그리고 데이터 개수를 확인하는 count 그리고 delete, deleteById와 같은 메서드가 구현되어 있습니다.  
 
@@ -204,68 +204,68 @@ Repository <- CrudRepository <- PagingAndSortRepository <- JpaRepository
 * Test에서 작업하는 테이블의 In-Memory DB입니다.  
 * src/test 디렉터리에 클래스를 만들고 주입하는 테스트
 ```java
-// 스프링 부트 테스트 클래스를 의미하는 어노테이션
-@SpringBootTest
-public class MemoRepositoryTest {
+	// 스프링 부트 테스트 클래스를 의미하는 어노테이션
+	@SpringBootTest
+	public class MemoRepositoryTest {
 
-	@Autowired
-	MemoRepository memoRepository;
-	
-	@Test
-	public void testDependency() {
-		System.out.println(memoRepository);
+		@Autowired
+		MemoRepository memoRepository;
+		
+		@Test
+		public void testDependency() {
+			System.out.println(memoRepository);
+		}
 	}
-}
 ```  
 
 ### 2) 데이터 삽입 테스트 - 테스트 클래스에 작성하고 테스트  
 ```java
-@Test
-public void testInsert() {
-	// 정수 스트림(여러 개의 데이터를 순회하면서 사용할 수 있도록 만든 데이터의 통로) 생성
-	// forEach는 데이터를 순회하면서 작업을 수행하는 메서드
-	// forEach의 매개변수는 매개변수가 1개이고 리턴이 없는 람다가 매개변수
-	// 이 때 매개변수는 스트림의 데이터가 순서대로 주입됩니다. 
-	
-	// List <Integer> list = new ArrayList<>();
-	// for(int i = 1; i< 101; i++) { list.add(i);}
-	// for(Integer i : list){Memo memo = new Memo(); memo.setMemoText("Sample..."+i); memoRepository.save(memo);}
-	// 이 코드와 같은 의미 
-	IntStream.rangeClosed(1, 100).forEach(i -> {
-		// builder()는 매개변수가 없는 생성자를 이용해서 객체를 생성하고 속성 이름에 값을 바로 대입해서 객체를 생성해주는 메서드 입니다.
-		Memo memo = Memo.builder().memoText("Sample..."+i).build();
-		memoRepository.save(memo);
-	});
-}
+	@Test
+	public void testInsert() {
+		// 정수 스트림(여러 개의 데이터를 순회하면서 사용할 수 있도록 만든 데이터의 통로) 생성
+		// forEach는 데이터를 순회하면서 작업을 수행하는 메서드
+		// forEach의 매개변수는 매개변수가 1개이고 리턴이 없는 람다가 매개변수
+		// 이 때 매개변수는 스트림의 데이터가 순서대로 주입됩니다. 
+		
+		// List <Integer> list = new ArrayList<>();
+		// for(int i = 1; i< 101; i++) { list.add(i);}
+		// for(Integer i : list){Memo memo = new Memo(); memo.setMemoText("Sample..."+i); memoRepository.save(memo);}
+		// 이 코드와 같은 의미 
+		IntStream.rangeClosed(1, 100).forEach(i -> {
+			// builder()는 매개변수가 없는 생성자를 이용해서 객체를 생성하고 속성 이름에 값을 바로 대입해서 객체를 생성해주는 메서드 입니다.
+			Memo memo = Memo.builder().memoText("Sample..."+i).build();
+			memoRepository.save(memo);
+		});
+	}
 ```  
 * 테스트를 실행한 후 콘솔에서 insert 구문이 수행되는지 확인  
 
 ### 3) 테이블의 전체 조회
 ```java
-@Test
-public void testAllSelect() {
-	//테이블의 전체 데이터 가져오기
-	List<Memo> list = memoRepository.findAll();
-	for(Memo memo : list) {
-		System.out.println(memo);
+	@Test
+	public void testAllSelect() {
+		//테이블의 전체 데이터 가져오기
+		List<Memo> list = memoRepository.findAll();
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
 	}
-}
 ```  
 
 ### 4) 테이블에 기본키를 가지고 조회
 ```java
-@Test
-public void testSelectOne() {
-	// 기본키를 가지고 데이터 가져오기
-	// 존재하는 경우는 데이터가 출력
-	System.out.println("Select One");
-	Optional<Memo> memo = memoRepository.findById(1L);
-	System.out.println(memo);
+	@Test
+	public void testSelectOne() {
+		// 기본키를 가지고 데이터 가져오기
+		// 존재하는 경우는 데이터가 출력
+		System.out.println("Select One");
+		Optional<Memo> memo = memoRepository.findById(1L);
+		System.out.println(memo);
 
-	// 존재하지 않는 경우는 optional.empty
-	memo = memoRepository.findById(300L);
-	System.out.println(memo);
-}
+		// 존재하지 않는 경우는 optional.empty
+		memo = memoRepository.findById(300L);
+		System.out.println(memo);
+	}
 ```  
 
 * 없는 데이터는 optional.empty라고만 나온다  
@@ -273,28 +273,28 @@ public void testSelectOne() {
 
 ### 5) 데이터 수정
 ```java
-@Test
-public void testUpdate() {
-	//mno가 100이고 memoText가 UpdateText인 인스턴스 생성
-	Memo memo = Memo.builder().mno(100L).memoText("Update Text").build();
-	
-	// save의 호출
-	// mno의 값이 없으면 삽입이 되고 있으면 수정
-	System.out.println(memoRepository.save(memo));
-	
-	System.out.println(memoRepository.findById(100L));
-}
+	@Test
+	public void testUpdate() {
+		//mno가 100이고 memoText가 UpdateText인 인스턴스 생성
+		Memo memo = Memo.builder().mno(100L).memoText("Update Text").build();
+		
+		// save의 호출
+		// mno의 값이 없으면 삽입이 되고 있으면 수정
+		System.out.println(memoRepository.save(memo));
+		
+		System.out.println(memoRepository.findById(100L));
+	}
 ```
 
 ### 6) 데이터 삭제  
 ```java
-@Test
-public void testDelete() {
-	// 기본키 값을 가지고 데이터를 삭제 
-	memoRepository.deleteById(100L);
-	
-	System.out.println(memoRepository.findById(100L)); //Optional.empty가 뜬다.
-}
+	@Test
+	public void testDelete() {
+		// 기본키 값을 가지고 데이터를 삭제 
+		memoRepository.deleteById(100L);
+		
+		System.out.println(memoRepository.findById(100L)); //Optional.empty가 뜬다.
+	}
 ```  
 
 ### 7) 페이징과 정렬  
@@ -304,14 +304,14 @@ public void testDelete() {
 	PageRequest.of(int page, int size) : 페이지 번호와 개수를 설정해서 Pagable객체를 만들고 이 객체를 findAll에 적용해서 페이징을 구현. 이 메서드를 오버로딩이 되어있는데 정렬을 위한 Sort 객체를 추가로 매개변수를 받을 수 있음  
 * 테스트 메서드를 작성하고 확인  
 ```java
-@Test
-public void testPaging() {
-	Pageable page = PageRequest.of(0, 10);
-	Page<Memo> list = memoRepository.findAll(page);
-	for(Memo memo : list) {
-		System.out.println(memo);
+	@Test
+	public void testPaging() {
+		Pageable page = PageRequest.of(0, 10);
+		Page<Memo> list = memoRepository.findAll(page);
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
 	}
-}
 ```  
 
 ### 8) 데이터 정렬  
@@ -319,16 +319,16 @@ public void testPaging() {
 * 여러 개의 정렬 조건을 생성하고자 하면 첫 번째 Sort객체를 생성하고 .and(두번째 Sort객체)를 이용하면 됩니다.  
 * 테스트 메서드를 작성하고 확인  
 ```java
-@Test
-public void testSort() {
-	// mno의 내림차순 정렬
-	Sort sort = Sort.by("mno").descending();
-	Pageable page = PageRequest.of(1, 10, sort);
-	Page<Memo> list = memoRepository.findAll(page);
-	for(Memo memo : list) {
-		System.out.println(memo);
+	@Test
+	public void testSort() {
+		// mno의 내림차순 정렬
+		Sort sort = Sort.by("mno").descending();
+		Pageable page = PageRequest.of(1, 10, sort);
+		Page<Memo> list = memoRepository.findAll(page);
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
 	}
-}
 ```
 
 ## 7. JpaRepository의 Query 방법  
@@ -436,13 +436,13 @@ public void betweenPagingTest() {
 
 * Test 클래스에 메서드를 생성해서 확인  
 ```java
-// 삭제하는 작업이므로 트랜젝션을 설정해주어야 함 
-@Test
-@Commit
-@Transactional
-public void deleteByMno() {
-	memoRepository.deleteByMnoLessThan(10L);
-}
+	// 삭제하는 작업이므로 트랜젝션을 설정해주어야 함 
+	@Test
+	@Commit
+	@Transactional
+	public void deleteByMno() {
+		memoRepository.deleteByMnoLessThan(10L);
+	}
 ``` 
 ## 9. @Query
 * JPA Repository가 제공하는 메서드들은 복잡한 SQL에 해당하는 구문을 만들어내기 어려움  
@@ -489,6 +489,23 @@ public void deleteByMno() {
 * 조회를 할 때 Paging처리를 할 것이라면 countQuery라는 속성에 데이터 개수를 구하는 JPQL이 추가되어야 합니다.  
 
 * mno와 Pageable을 매개변수로 받아서 mno보다 큰 mno를 가진 데이터에 페이징을 적용해서 리턴받는 메서드를 MemoRepository에 생성  
+```java
+	// mno보다 큰 mno를 가진 데이터를 조회
+	@Query("select m from Memo m where m.mno > :mno")
+	Page<Memo> getListWithQuery(@Param("mno")Long mno, Pageable pageable);
+```  
+
+* Test 클래스에서 위 메서드 호출  
+```java
+	@Test
+	public void testSelectQuery() {
+		Pageable pageable = PageRequest.of(0,10,Sort.by("mno").descending());
+		Page<Memo> page = memoRepository.getListWithQuery(50L, pageable);
+		for(Memo m : page) {
+			System.out.println(m);
+		}
+	}
+```  
 
 * +) 
 	사용자의 요청 하나당 서비스의 메서드는 1개인 것을 권장  
@@ -497,6 +514,56 @@ public void deleteByMno() {
 	서비스1 - 회원가입  
 	서비스2 - 회원가입  
 	서비스3 - 다른 작업  
+
+### 3) Object 타입 리턴
+* select 구문의 경우 Entity타입으로 리턴을 하게 되는데 불필요한 속성까지 호출되는 경우가 있습니다.  
+	또한 JOIN이나 GROUP BY 등을 수행하게 되면 Entity 타입이 만들어져 있지 않을 가능성이 높습니다.  
+* CURRENT_DATE나 CURRENT_TIME, CURRENT_TIMESTAMP와 같은 속성을 이용해서 현재 시간을 구할 수 있음.  
+
+* MemoRepository 인터페이스에 mno와 memoText 그리고 현재 날짜를 조회하는 메서드를 생성  
+```java
+	// mno보다 큰 mno를 가진 데이터를 조회
+	@Query("select m.mno, m.memoText, CURRENT_DATE from Memo m where m.mno > :mno")
+	Page<Object[]> getListWithQueryObject(@Param("mno")Long mno, Pageable pageable);
+```
+
+* Text 클래스에 메서드를 만들어서 확인
+```java
+	@Test
+	public void testSelectObjectQuery() {
+		Pageable pageable = PageRequest.of(0,10,Sort.by("mno").descending());
+		//Page<Memo> page = memoRepository.getListWithQueryObject(50L, pageable); // Memo에는 CURRENT_DATE를 담을 공간이 없으므로 error
+		Page<Object[]> page = memoRepository.getListWithQueryObject(50L, pageable);
+		for(Object[] m : page) {
+			System.out.println(Arrays.toString(m));
+		}
+	}
+```  
+
+=> Object타입의 배열로 리턴했으므로 속성 하나 하나를 사용할 때는 원래의 자료형으로 강제 형변환을 해서 사용  
+
+### 4) NativeSQL
+* 순수한 SQL 문장을 사용하기 위한 것으로 이 경우에는 nativeQuery 속성에 true를 설정해야 합니다.  
+  리턴되는 데이터 타입은 Object[]입니다.  
+
+* MemoRepository 인터페이스에 nativeQuery사용을 위한 메서드 생성  
+```java
+	//nativeQuery사용
+	@Query(value="select * from tbl_memo where mno > 0", nativeQuery=true)
+	List<Object[]> getNativeResult();
+```
+
+* Test 클래스에 테스트용 메서드를 만들어서 확인  
+```java
+	@Test
+	public void testNativeQuery() {
+		List<Object[]> list = memoRepository.getNativeResult();
+		for(Object[] ar : list) {
+			System.out.println(Arrays.toString(ar));
+		}
+	}
+```
+
 ## +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
 데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
 이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  

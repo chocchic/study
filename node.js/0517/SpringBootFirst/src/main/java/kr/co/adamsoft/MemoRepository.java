@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -39,5 +40,18 @@ public interface MemoRepository extends JpaRepository<Memo, Long>{
 	@Modifying
 	@Transactional
 	int updateMemoText(@Param("mmm")Memo memo);
+	
+	// mno보다 큰 mno를 가진 데이터를 조회
+	// 이렇게 작성했을 때 에러가 발생하면 (Spring JPA 하위 버전을 사용하는 경우) countQuery를 추가 Pageable을 위해.
+	// @Query(value = "select m from Memo m where m.mno > :mno", countQuery = "select count(m) from Memo m where m.mno > :mno")
+	@Query("select m from Memo m where m.mno > :mno")
+	Page<Memo> getListWithQuery(@Param("mno")Long mno, Pageable pageable);
+	
+	@Query("select m.mno, m.memoText, CURRENT_DATE from Memo m where m.mno > :mno")
+	Page<Object[]> getListWithQueryObject(@Param("mno")Long mno, Pageable pageable);
+	
+	//nativeQuery사용
+	@Query(value="select * from tbl_memo where mno > 0", nativeQuery=true)
+	List<Object[]> getNativeResult();
 	
 }

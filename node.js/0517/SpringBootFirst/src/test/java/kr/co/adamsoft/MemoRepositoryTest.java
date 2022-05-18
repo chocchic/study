@@ -1,5 +1,6 @@
 package kr.co.adamsoft;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -156,11 +157,39 @@ public class MemoRepositoryTest {
 		memoRepository.deleteByMnoLessThan(10L);
 	}
 	*/
-	
+	/*
 	@Test
 	public void testUpdateQuery() {
 		// 수정하는 메서드 호출
 		System.out.println(memoRepository.updateMemoText(11L, "반갑습니다."));
 		System.out.println(memoRepository.updateMemoText(Memo.builder().mno(12L).memoText("dkd안녕하세요").build()));
+	}
+	*/
+	
+	//@Test
+	public void testSelectQuery() {
+		Pageable pageable = PageRequest.of(0,10,Sort.by("mno").descending());
+		Page<Memo> page = memoRepository.getListWithQuery(50L, pageable);
+		for(Memo m : page) {
+			System.out.println(m);
+		}
+	}
+	
+	//@Test
+	public void testSelectObjectQuery() {
+		Pageable pageable = PageRequest.of(0,10,Sort.by("mno").descending());
+		//Page<Memo> page = memoRepository.getListWithQueryObject(50L, pageable); // Memo에는 CURRENT_DATE를 담을 공간이 없으므로 error
+		Page<Object[]> page = memoRepository.getListWithQueryObject(50L, pageable);
+		for(Object[] m : page) {
+			System.out.println(Arrays.toString(m));
+		}
+	}
+	
+	@Test
+	public void testNativeQuery() {
+		List<Object[]> list = memoRepository.getNativeResult();
+		for(Object[] ar : list) {
+			System.out.println(Arrays.toString(ar));
+		}
 	}
 } 
