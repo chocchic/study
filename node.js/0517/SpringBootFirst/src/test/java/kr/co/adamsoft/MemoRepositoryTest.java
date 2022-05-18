@@ -7,6 +7,10 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import kr.co.adamsoft.entity.Memo;
 
@@ -17,10 +21,12 @@ public class MemoRepositoryTest {
 	@Autowired
 	MemoRepository memoRepository;
 	
+	/*
 	@Test
 	public void testDependency() {
 		System.out.println(memoRepository);
 	}
+	*/
 	/*
 	@Test
 	public void testInsert() {
@@ -40,6 +46,7 @@ public class MemoRepositoryTest {
 		});
 	}
 	*/
+	/*
 	@Test
 	public void testAllSelect() {
 		//테이블의 전체 데이터 가져오기
@@ -49,7 +56,8 @@ public class MemoRepositoryTest {
 			System.out.println(memo);
 		}
 	}
-	
+	*/
+	/*
 	@Test
 	public void testSelectOne() {
 		// 기본키를 가지고 데이터 가져오기
@@ -61,5 +69,48 @@ public class MemoRepositoryTest {
 		// 존재하지 않는 경우는 optional.empty
 		memo = memoRepository.findById(300L);
 		System.out.println(memo);
+	}
+	*/
+	/*
+	@Test
+	public void testUpdate() {
+		//mno가 100이고 memoText가 UpdateText인 인스턴스 생성
+		Memo memo = Memo.builder().mno(100L).memoText("Update Text").build();
+		
+		// save의 호출
+		// mno의 값이 없으면 삽입이 되고 있으면 수정
+		System.out.println(memoRepository.save(memo));
+		
+		System.out.println(memoRepository.findById(100L));
+	}
+	*/
+	/*
+	@Test
+	public void testDelete() {
+		// 기본키 값을 가지고 데이터를 삭제 
+		memoRepository.deleteById(100L);
+		
+		System.out.println(memoRepository.findById(100L)); //Optional.empty가 뜬다.
+	}
+	*/
+	/*
+	@Test
+	public void testPaging() {
+		Pageable page = PageRequest.of(0, 10);
+		Page<Memo> list = memoRepository.findAll(page);
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
+	}
+	*/
+	@Test
+	public void testSort() {
+		// mno의 내림차순 정렬
+		Sort sort = Sort.by("mno").descending();
+		Pageable page = PageRequest.of(1, 10, sort);
+		Page<Memo> list = memoRepository.findAll(page);
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
 	}
 } 

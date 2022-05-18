@@ -15,7 +15,7 @@ client.on('error', (err)=>{
 })
 
 http.createServer((req,res)=>{
-    var data = new Buffer.from('Client Buffer : 안녕안녕 노드로부터');
+    var data = new Buffer.from('Client Buffer : 안녕안녕 노드로부터'); // 
     client.send(data,0,data.length, 4445, 'localhost'); // java에서의 포트번호와 같아야함
 
     res.writeHead(200, {
