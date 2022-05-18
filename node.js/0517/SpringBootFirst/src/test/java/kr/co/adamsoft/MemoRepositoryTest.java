@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Commit;
 
 import kr.co.adamsoft.entity.Memo;
 
@@ -103,6 +106,7 @@ public class MemoRepositoryTest {
 		}
 	}
 	*/
+	/*
 	@Test
 	public void testSort() {
 		// mno의 내림차순 정렬
@@ -112,5 +116,42 @@ public class MemoRepositoryTest {
 		for(Memo memo : list) {
 			System.out.println(memo);
 		}
+	}
+	*/
+	/*
+	@Test
+	public void betweenTest() {
+		List<Memo> list = memoRepository.findByMnoBetween(70L, 80L);
+		for(Memo m : list) {
+			System.out.println(m);
+		}
+	}
+	*/
+	/*
+	@Test
+	public void betweenOrderTest() {
+		List<Memo> list = memoRepository.findByMnoBetweenOrderByMnoDesc(70L, 80L);
+		for(Memo m : list) {
+			System.out.println(m);
+		}
+	}
+	*/
+	/*
+	@Test
+	public void betweenPagingTest() {
+		//mno의 내림차순 정렬 후 2페이지부터 10개를 가져오는 Pageable 객체 생성
+		Pageable page = PageRequest.of(1, 10, Sort.by("mno").descending());
+		List<Memo> list = memoRepository.findByMnoBetween(10L, 50L, page);
+		for(Memo memo : list) {
+			System.out.println(memo);
+		}
+	}
+	*/
+	// 삭제하는 작업이므로 트랜젝션을 설정해주어야 함 
+	@Test
+	@Commit
+	@Transactional
+	public void deleteByMno() {
+		memoRepository.deleteByMnoLessThan(10L);
 	}
 } 

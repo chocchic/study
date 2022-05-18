@@ -183,7 +183,7 @@ public class Memo {
 }
 ```  
 
-### 6) JpaRepository 인터페이스  
+## 5. JpaRepository 인터페이스  
 * Entity와 연결된 테이블의 CRUD 작업을 위한 인터페이스  
 * 기본적인 메서드는 이미 구현되어 있음  
 * 계층  
@@ -200,7 +200,7 @@ Repository <- CrudRepository <- PagingAndSortRepository <- JpaRepository
 	```
 	* 위 인터페이스에서는 insert나 update를 위한 save 그리고 id를 가지고 데이터를 조회하는 findById와 전체 데이터를 조회하는 findAll 그리고 데이터 개수를 확인하는 count 그리고 delete, deleteById와 같은 메서드가 구현되어 있습니다.  
 
-### 7) Spring의 Text 클래스를 생성해서 Repository 테스트  
+### 1) Spring의 Text 클래스를 생성해서 Repository 테스트  
 * Test에서 작업하는 테이블의 In-Memory DB입니다.  
 * src/test 디렉터리에 클래스를 만들고 주입하는 테스트
 ```java
@@ -218,7 +218,7 @@ public class MemoRepositoryTest {
 }
 ```  
 
-### 8) 데이터 삽입 테스트 - 테스트 클래스에 작성하고 테스트  
+### 2) 데이터 삽입 테스트 - 테스트 클래스에 작성하고 테스트  
 ```java
 @Test
 public void testInsert() {
@@ -240,7 +240,7 @@ public void testInsert() {
 ```  
 * 테스트를 실행한 후 콘솔에서 insert 구문이 수행되는지 확인  
 
-### 9) 테이블의 전체 조회
+### 3) 테이블의 전체 조회
 ```java
 @Test
 public void testAllSelect() {
@@ -252,7 +252,7 @@ public void testAllSelect() {
 }
 ```  
 
-### 10) 테이블에 기본키를 가지고 조회
+### 4) 테이블에 기본키를 가지고 조회
 ```java
 @Test
 public void testSelectOne() {
@@ -271,7 +271,7 @@ public void testSelectOne() {
 * 없는 데이터는 optional.empty라고만 나온다  
 <img src="./optional.jpg">
 
-### 11) 데이터 수정
+### 5) 데이터 수정
 ```java
 @Test
 public void testUpdate() {
@@ -286,7 +286,7 @@ public void testUpdate() {
 }
 ```
 
-### 12) 데이터 삭제  
+### 6) 데이터 삭제  
 ```java
 @Test
 public void testDelete() {
@@ -297,7 +297,7 @@ public void testDelete() {
 }
 ```  
 
-### 13) 페이징과 정렬  
+### 7) 페이징과 정렬  
 * RDBMS들은 페이징을 처리하는 방법이 제각각입니다.  
 	오라클의 경우는 inline view나 FETCH & OFFSET을 이용해서 처리하고, MySQL은 limit을 이용해서 처리  
 * JPA에서는 Pageable이라는 인터페이스를 이용해서 처리  
@@ -314,9 +314,10 @@ public void testPaging() {
 }
 ```  
 
-### 14) 데이터 정렬  
+### 8) 데이터 정렬  
 * Sort.by(컬럼이름).정렬방법()을 이용해서 Sort객체를 생성하고 Pageable을 생성해서 적용  
 * 여러 개의 정렬 조건을 생성하고자 하면 첫 번째 Sort객체를 생성하고 .and(두번째 Sort객체)를 이용하면 됩니다.  
+* 테스트 메서드를 작성하고 확인  
 ```java
 @Test
 public void testSort() {
@@ -330,7 +331,121 @@ public void testSort() {
 }
 ```
 
-### +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
+## 7. JpaRepository의 Query 방법  
+### 1) 종류  
+* 기본적으로 제공되는 메서드를 활용  
+* Query Method : 이름 자체가 쿼리 구문인 메서드  
+* @Query : 직접 쿼리를 작성하는 방식으로 Native SQL 사용 가능  
+* Querydsl : 동적 쿼리 생성  
+
+### 2) Query Method  
+* 메서드의 이름 자체가 질의문이 되는 기능  
+* https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods  
+
+### 3) 생성 방법  
+작업(find, delete 등) + By + 속성이름(매개변수)  
+-> 속성을 매개변수로 받아서 작업을 수행  
+
+* Item Entity에서 num을 가지고 조회  
+	findByNum(자료형 num);  
+
+### 4) 리턴 타입  
+	* 조회의 경우는 List나 배열  
+	* Pageable을 매개변수로 사용하면 Page<Entity>  
+	* 조회가 아닌 작업은 void  
+
+### 5) 키워드  
+Distinct  
+	: findDistinctByLastname - Lastname으로 조회하는데 중복 제거  
+And  
+	: findByLastnameAndFirstname - Lastname과 Firstname이 모두 일치  
+Or  
+Is, Equals  
+Between  
+LessThan  
+LessThanEqual  
+GraterThan  
+GraterThanEqual  
+기타 등등
+
+### 6) Memo Entity에서 mno값이 70에서 80사이인 데이터를 조회  
+* MemoRepository 인터페이스에 메서드를 선언  
+```java
+// Memo Entity에 대한 작업을 수행하기 위한 Repository 인터페이스
+public interface MemoRepository extends JpaRepository<Memo, Long>{
+	// mno값이 70에서 80사이인 데이터를 조회
+	List<Memo> findByMnoBetween(Long first, Long second);
+}
+```  
+
+* Test 클래스에 메서드를 생성해서 확인  
+```java
+@Test
+public void betweenTest() {
+	List<Memo> list = memoRepository.findByMnoBetween(70L, 80L);
+	for(Memo m : list) {
+		System.out.println(m);
+	}
+}
+```  
+
+### 7) Memo Entity에서 mno값이 70에서 80사이인 데이터를 내림차순 조회  
+* MemoRepository 인터페이스에 메서드를 선언  
+```java
+	// mno값이 70에서 80사이인 데이터를 mno를 내림차순 정렬하여 조회
+	List<Memo> findByMnoBetweenOrderByMnoDesc(Long first, Long second);
+```  
+
+* Test 클래스에 메서드를 생성해서 확인  
+```java
+@Test
+public void betweenOrderTest() {
+	List<Memo> list = memoRepository.findByMnoBetweenOrderByMnoDesc(70L, 80L);
+	for(Memo m : list) {
+		System.out.println(m);
+	}
+}
+```  
+
+### 8) MemoEntity에서 10부터 50사이의 데이터를 조회하는데 두번째 페이지부터 10개만 mno의 내림차순 정렬해서 조회  
+* MemoRepository 인터페이스에 메서드를 선언  
+```java
+	// mno값이 from에서 to사이인 데이터를 조회 - 페이징 적용
+	List<Memo> findByMnoBetween(Long from, Long to, Pageable pageable);
+```  
+
+* Test 클래스에 메서드를 생성해서 확인  
+```java
+@Test
+public void betweenPagingTest() {
+	//mno의 내림차순 정렬 후 2페이지부터 10개를 가져오는 Pageable 객체 생성
+	Pageable page = PageRequest.of(1, 10, Sort.by("mno").descending());
+	List<Memo> list = memoRepository.findByMnoBetween(10L, 50L, page);
+	for(Memo memo : list) {
+		System.out.println(memo);
+	}
+}
+```  
+
+### 9) MemoEntity에서 mno가 10보다 작은 데이터 삭제
+* MemoRepository 인터페이스에 메서드를 선언  
+```java
+	// mno가 매개변수보다 작은 데이터 삭제
+	void deleteByMnoLessThan(Long num);
+```  
+
+* Test 클래스에 메서드를 생성해서 확인  
+```java
+// 삭제하는 작업이므로 트랜젝션을 설정해주어야 함 
+@Test
+@Commit
+@Transactional
+public void deleteByMno() {
+	memoRepository.deleteByMnoLessThan(10L);
+}
+``` 
+
+## +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
 데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
 이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
 
@@ -348,12 +463,13 @@ Memo memo = API(); 이경우는 memo의 null 체크를 할 필요가 없음.
 Optional<Memo> memo = API(); 이 경우는 memo가 null일 수도 있음.  
 그리고 Memo를 사용할 때는 get메서드가 있습니다.  
 
-# lombok 설치  
-### 1) https://
-### 2) 터미널에서 java -jar 다운로드 파일 경로를 실행하면 IDE선택창이 나오는데 여기서 적용할 IDE를 선택하고 install을 한 후 IDE를 다시 시작하고 프로젝트를 rebuild하면 됩니다.  
-재시작한후 (project) - (clean)을 실행하면 됩니다.  
+## lombok 설치  
+### 1) https://projectlombok.org/download에서 파일 다운로드
+### 2) 터미널에서 java -jar '다운로드 파일 경로'를 실행하면 IDE선택창이 나오는데 여기서 적용할 IDE를 선택하고 install을 한 후 IDE를 다시 시작하고 프로젝트를 rebuild하면 됩니다.  
+* cmd키고 다운받은 lombok.jar파일을 드래그해서 올리면 자동으로 경로를 설정해줍니다.  
+* 재시작한후 (project) - (clean)을 실행하면 됩니다.  
 
-# Java
+## Java
 * Big Data Platform에서 많이 사용되는 Hadoop의 Echo System의 많은 부분이 Java로 개발되어 있습니다.  
 * 최근에는 Java를 플랫폼으로 많이 사용합니다.  
 	Jython, Kotlin 등이 JVM 기반의 언어입니다.  
