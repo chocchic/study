@@ -51,16 +51,16 @@ JavaCode <-> Spring Data JPA <-> Hibernate <-> JDBC <-> Database
 * jpa 가 포함된 프로젝트에서는 데이터베이스 접속 정보가 없으면 에러
 
 ### 3)데이터베이스 접속 정보 작성 - src/main/resources/application.properties 파일  
-
-* 웹 서버 포트 설정  
+```ini
+# 웹 서버 포트 설정  
 server.port=80
 
-* 데이터베이스 접속 정보  
+# 데이터베이스 접속 정보  
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver  
 spring.datasource.url=jdbc:mysql://localhost:3306/node?useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC  
 spring.datasource.username=root  
 spring.datasource.password=1234  
-
+```
 ### 4)프로젝트 실행 - 정보가 올바르다면 에러가 발생하지 않습니다.  
 
 ## 4.Entity 클래스 생성  
@@ -105,22 +105,23 @@ public class Memo {
 	private String memoText;
 }
 ```
-### 3)application.properties 파일에 데이터베이스 연동 설정을 추가  
-* 하이버네이트가 수행하는 sql을 콘솔에 출력  
-spring.jpa.properties.hibernate.show_sql=true  
+### 3)application.properties 파일에 데이터베이스 연동 설정을 추가
+```ini  
+# 하이버네이트가 수행하는 sql을 콘솔에 출력  
+spring.jpa.properties.hibernate.show_sql=true
 
-* 포맷팅해서 보기 좋게 출력  
-spring.jpa.properties.hibernate.format_sql=true  
+# 포맷팅해서 보기 좋게 출력  
+spring.jpa.properties.hibernate.format_sql=true
 
-* 쿼리에 물음표로 출력하는 바인드 파라미터 출력  
-logging.level.org.hibernate.type.descriptor.sql=trace  
+# 쿼리에 물음표로 출력하는 바인드 파라미터 출력  
+logging.level.org.hibernate.type.descriptor.sql=trace
 
-* ddl 옵션  
-spring.jpa.hibernate.ddl-auto=update  
+# ddl 옵션
+spring.jpa.hibernate.ddl-auto=update
 
-* 데이터베이스 플랫폼 설정  
+# 데이터베이스 플랫폼 설정  
 spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect  
-
+```
 * **properties쪽 코드 복붙시 뒤에 공백이 있는지 확인**
 ### 4)spring.jpa.hibernate.ddl-auto 옵션  
 * none을 설정하면 아무것도 실행하지 않음, 데이터베이스에서 DDL을 수행해야 합니다. 기본값  
@@ -251,6 +252,23 @@ Repository <- CrudRepository <- PagingAndSortRepository <- JpaRepository
 		}
 	}
 ```  
+### +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
+데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
+이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
+
+```java
+참조형 = api();  
+if(참조형 != null){
+	수행할 작업;
+}else{
+	// null일때 수행할 작업;
+}
+```
+자바에서는 이 구분을 Optional이라는 것으로 합니다.  
+
+Memo memo = API(); 이경우는 memo의 null 체크를 할 필요가 없음.  
+Optional<Memo> memo = API(); 이 경우는 memo가 null일 수도 있음.  
+그리고 Memo를 사용할 때는 get메서드가 있습니다.  
 
 ### 4) 테이블에 기본키를 가지고 조회
 ```java
@@ -653,24 +671,95 @@ compileQuerydsl{
 * T fetchFirst()  
 * Long fetchCount()  
 * QueryResult<T> fetchResults()  
-
-## +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
-데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
-이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
-
+### 7) Querydsl 테스트  
+* 테스트 클래스에 EntityManager를 주입받는 코드를 작성  
 ```java
-참조형 = api();  
-if(참조형 != null){
-	수행할 작업;
-}else{
-	// null일때 수행할 작업;
+	@PersistenceContext
+	EntityManager em;
+```  
+
+* 테스트용 메서드 추가 후 확인
+```java
+	@Test
+	public void queryDslTest() {
+		//JPAQuery 생성기를 생성
+		JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+		//querydsl에서는 Entity 클래스를 사용하지 않고 Entity 클래스 이름 앞에 Q가 추가된 클래스를 이용해서  쿼리를 생성
+		QMemo qMemo = QMemo.memo;
+		
+		// 쿼리를 생성
+		// mno가 12인 데이터를 조회하는 query 생성
+		JPAQuery<Memo> query = queryFactory.selectFrom(qMemo).where(qMemo.mno.eq(12L));
+		// 쿼리
+		List<Memo> list = query.fetch();
+		// 결과를 사용
+		for(Memo memo: list) {
+			System.out.println(memo);
+		}
+		
+	}
+```  
+
+## 11. Oracle로 변경  
+* application.properties 파일의 아래 부분을 수정  
+```ini
+#데이터베이스 접속 정보
+spring.datasource.url=jdbc:oracle:this:@IP주소:포트번호:sid 나 servicename
+spring.datasource.username=계정
+spring.datasource.password=비밀번호
+spring.jpa.database=oracle
+```  
+
+## 12. MyBatis 사용  
+### 1) 의존성 설정  
+* build.gradle : implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.1'
+
+* maven 사용시 pom.xml : mybatis와 mybatis-spring을 호환 가능한 버전으로 설정해야 함  
+
+### 2)MyBatisi에서 사용할 VO클래스를 생성 - domain.MemoVO
+```java
+import lombok.*;
+
+@ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class MemoVO {
+	private Long mno;
+	private String memoText;
+}
+```  
+### 3) MyBatis에서 사용할 Mapper 인터페이스를 생성 - mapper.MemoMapper
+```java
+import java.util.List;
+
+import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
+
+import kr.co.adamsoft.domain.MemoVO;
+
+@Repository
+public interface MemoMapper {
+	@Select("select * from tbl_memo")
+	public List<MemoVO> listMemo();
 }
 ```
-자바에서는 이 구분을 Optional이라는 것으로 합니다.  
+### 4) MyBatis 사용 설정을 위한 클래스 생성 - config.MyBatisConfig  
+```java
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-Memo memo = API(); 이경우는 memo의 null 체크를 할 필요가 없음.  
-Optional<Memo> memo = API(); 이 경우는 memo가 null일 수도 있음.  
-그리고 Memo를 사용할 때는 get메서드가 있습니다.  
+@Configuration
+@EnableTransactionManagement
+@MapperScan(basePackages = {"자신의 mapper package 경로"})
+public class MyBatisConfig {
+
+}
+
+```
 
 ## lombok 설치  
 ### 1) https://projectlombok.org/download에서 파일 다운로드

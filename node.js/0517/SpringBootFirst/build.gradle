@@ -32,6 +32,8 @@ dependencies {
 	
 	implementation 'com.querydsl:querydsl-jpa'
 	implementation 'com.querydsl:querydsl-apt'
+	
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.1'
 }
 
 tasks.named('test') {
@@ -39,23 +41,21 @@ tasks.named('test') {
 }
 
 //Entity 클래스를 변환해서 저장할 경로 설정
+// querydsl 추가 시작
 def querydslDir = "$buildDir/generated/querydsl"
-
-querydsl{
-	jpa=true
+querydsl {
+	jpa = true
 	querydslSourcesDir = querydslDir
 }
-
-sourceSets{
+sourceSets {
 	main.java.srcDir querydslDir
 }
-
-configurations{
-	complieOnly{
+configurations {
+	compileOnly {
 		extendsFrom annotationProcessor
 	}
 	querydsl.extendsFrom compileClasspath
 }
-compileQuerydsl{
+compileQuerydsl {
 	options.annotationProcessorPath = configurations.querydsl
 }

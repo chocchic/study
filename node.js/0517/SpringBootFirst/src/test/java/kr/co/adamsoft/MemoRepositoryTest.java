@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Commit;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import kr.co.adamsoft.entity.Memo;
+import kr.co.adamsoft.entity.QMemo;
 
 // 스프링 부트 테스트 클래스를 의미하는 어노테이션
 @SpringBootTest
@@ -185,11 +191,33 @@ public class MemoRepositoryTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testNativeQuery() {
 		List<Object[]> list = memoRepository.getNativeResult();
 		for(Object[] ar : list) {
 			System.out.println(Arrays.toString(ar));
 		}
+	}
+	
+	@PersistenceContext
+	EntityManager em;
+	
+	@Test
+	public void queryDslTest() {
+		//JPAQuery 생성기를 생성
+		JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+		//querydsl에서는 Entity 클래스를 사용하지 않고 Entity 클래스 이름 앞에 Q가 추가된 클래스를 이용해서  쿼리를 생성
+		QMemo qMemo = QMemo.memo;
+		
+		// 쿼리를 생성
+		// mno가 12인 데이터를 조회하는 query 생성
+		JPAQuery<Memo> query = queryFactory.selectFrom(qMemo).where(qMemo.mno.eq(12L));
+		// 쿼리
+		List<Memo> list = query.fetch();
+		// 결과를 사용
+		for(Memo memo: list) {
+			System.out.println(memo);
+		}
+		
 	}
 } 
