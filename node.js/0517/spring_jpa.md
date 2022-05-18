@@ -138,28 +138,85 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
 대부분의 경우는 none으로 설정해서 테이블을 직접 생성하는 경우가 많습니다.  
 스테이징 환경이나 운영환경에서는 validate를 사용하기도 합니다.  
 
+### 5) 빼먹음
+	```java
+	package kr.co.adamsoft.entity;
 
+	import javax.persistence.Column;
+	import javax.persistence.Entity;
+	import javax.persistence.GeneratedValue;
+	import javax.persistence.GenerationType;
+	import javax.persistence.Id;
+	import javax.persistence.Table;
 
+	import lombok.AllArgsConstructor;
+	import lombok.Builder;
+	import lombok.Getter;
+	import lombok.NoArgsConstructor;
+	import lombok.ToString;
 
+	//데이터베이스의 테이블 과 연동
+	@Entity
+	//테이블 이름 설정
+	@Table(name="tbl_memo")
 
+	//toString메서드 생성
+	@ToString
+	// get 메서드 생성
+	@Getter
+	// build라는 메서드를 이용해서 매개변수가 없는 생성자(default constructor)를 이용해서 인스턴스를 생성하고 속성을 호출해서 값을 설정하도록 해주는 설정
+	@Builder
+	// 모든 속성을 매개변수로 받는 생성자
+	@AllArgsConstructor
+	// 매개변수가 없는 생성자
+	@NoArgsConstructor
+	public class Memo {
+		//기본키 연결
+		@Id
+		//기본키는 설정하는 데이터베이스 옵션에 따라 자동 생성 - Hibernate 가 결정
+		//MySQL 연결하면 auto_increment, Oracle 이면 Sequence 사용
+		@GeneratedValue(strategy=GenerationType.AUTO)
+		private Long mno;
+		
+		@Column(length=200, nullable=false)
+		private String memoText;
+	}
+	```  
 
+### 6) JpaRepository 인터페이스  
+	* Entity와 연결된 테이블의 CRUD 작업을 위한 인터페이스  
+	* 기본적인 메서드는 이미 구현되어 있음  
+	* 계층  
+	Repository <- CrudRepository <- PagingAndSortRepository <- JpaRepository  
 
+	* 인터페이스를 생성할 때는 JpaRepository <Entity Class 클래스 이름, Entity의 Primary Key의 자료형>을 extends해서 인터페이스를 생성하면 되는데, 이 작업만으로 Entity Class에 CRUD 작업을 할 수 있는 상태가 됩니다.  
 
+	* Memo Entity에 대한 데이터베이스 작업을 수행하는 Interface를 생성 - repository.MemoRepository  
+		```java
+		// Memo Entity에 대한 작업을 수행하기 위한 Repository 인터페이스
+		public interface MemoRepository extends JpaRepository<Memo, Long>{
 
+		}
+		```
+		* 위 인터페이스에서는 insert나 update를 위한 save 그리고 id를 가지고 데이터를 조회하는 findById와 전체 데이터를 조회하는 findAll 그리고 데이터 개수를 확인하는 count 그리고 delete, deleteById와 같은 메서드가 구현되어 있습니다.  
 
+### 7) Spring의 Text 클래스를 생성해서 Repository 테스트  
+	* Test에서 작업하는 테이블의 In-Memory DB입니다.  
+	* src/test 디렉터리에 클래스를 만들고 주입하는 테스트
+	```java
+	// 스프링 부트 테스트 클래스를 의미하는 어노테이션
+	@SpringBootTest
+	public class MemoRepositoryTest {
 
+		@Autowired
+		MemoRepository memoRepository;
+		
+		@Test
+		public void testDependency() {
+			System.out.println(memoRepository);
+		}
+	}
+	```  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 8) 데이터 삽입 테스트 - 테스트 클래스에 작성하고 테스트  
 
