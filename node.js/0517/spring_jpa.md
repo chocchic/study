@@ -253,41 +253,41 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
 	```  
 
 ### 10) 
-	```java
-	@Test
-	public void testSelectOne() {
-		// 기본키를 가지고 데이터 가져오기
-		// 존재하는 경우는 데이터가 출력
-		System.out.println("Select One");
-		Optional<Memo> memo = memoRepository.findById(1L);
-		System.out.println(memo);
-		
-		// 존재하지 않는 경우는 optional.empty
-		memo = memoRepository.findById(300L);
-		System.out.println(memo);
-	}
-	```  
-
-	* 없는 데이터는 optional.empty라고만 나온다
-		<img src="./option.jpg">
+```java
+@Test
+public void testSelectOne() {
+	// 기본키를 가지고 데이터 가져오기
+	// 존재하는 경우는 데이터가 출력
+	System.out.println("Select One");
+	Optional<Memo> memo = memoRepository.findById(1L);
+	System.out.println(memo);
 	
-	* +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
-		데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
-		이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
+	// 존재하지 않는 경우는 optional.empty
+	memo = memoRepository.findById(300L);
+	System.out.println(memo);
+}
+```  
 
-		```java
-		참조형 = api();  
-		if(참조형 != null){
-			수행할 작업;
-		}else{
-			// null일때 수행할 작업;
-		}
-		```
-		자바에서는 이 구분을 Optional이라는 것으로 합니다.  
+* 없는 데이터는 optional.empty라고만 나온다
+	<img src="./option.jpg">
 
-		Memo memo = API(); 이경우는 memo의 null 체크를 할 필요가 없음.  
-		Optional<Memo> memo = API(); 이 경우는 memo가 null일 수도 있음.  
-		그리고 Memo를 사용할 때는 get메서드가 있습니다.  
+* +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
+	데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
+	이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
+
+	```java
+	참조형 = api();  
+	if(참조형 != null){
+		수행할 작업;
+	}else{
+		// null일때 수행할 작업;
+	}
+	```
+	자바에서는 이 구분을 Optional이라는 것으로 합니다.  
+
+	Memo memo = API(); 이경우는 memo의 null 체크를 할 필요가 없음.  
+	Optional<Memo> memo = API(); 이 경우는 memo가 null일 수도 있음.  
+	그리고 Memo를 사용할 때는 get메서드가 있습니다.  
 
 # lombok 설치  
 ### 1) https://
@@ -295,6 +295,6 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
 	재시작한후 (project) - (clean)을 실행하면 됩니다.  
 
 # Java
-	* Big Data Platform에서 많이 사용되는 Hadoop의 Echo System의 많으 부분이 Java로 개발되어 있습니다.  
+	* Big Data Platform에서 많이 사용되는 Hadoop의 Echo System의 많은 부분이 Java로 개발되어 있습니다.  
 	* 최근에는 Java를 플랫폼으로 많이 사용합니다.  
 		Jython, Kotlin 등이 JVM 기반의 언어입니다.  
