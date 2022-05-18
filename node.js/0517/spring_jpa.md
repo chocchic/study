@@ -564,6 +564,96 @@ public void betweenPagingTest() {
 	}
 ```
 
+## 10. Querydsl
+* http://querydsl.com
+### 1) @Query의 단점  
+* JPQL 문법으로 문자열 형태로 입력을 하기 때문에 compile할 때 에러를 확인할 수 없음  
+	에러가 많이 발생  
+* 동적인 쿼리 생성이 어려움  
+	문자열을 더하는 형태로 작성  
+
+### 2) Querydsl  
+* JPQL을 코드로 작성할 수 있도록 도와주는 Builder API  
+* 코드로 작성하기 때문에 컴파일 시에 에러가 발생 -> 오타가 적게 발생  
+* 코드로 작성하기 때문에 동적인 쿼리 생성이 편리  
+* 단점 : spring boot 버전에 따라 다르게 설정해야 함  
+
+### 3) spring boot 2.5.5버전에서 querydsl 사용을 위한 설정  
+* build.gradle 파일을 수정  
+```
+plugins {
+	id 'org.springframework.boot' version '2.5.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+}
+
+group = 'kr.co.adamsoft'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	implementation 'com.querydsl:querydsl-jpa'
+	implementation 'com.querydsl:querydsl-apt'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+//Entity 클래스를 변환해서 저장할 경로 설정
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl{
+	jpa=true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets{
+	main.java.srcDir querydslDir
+}
+
+configurations{
+	complieOnly{
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+```
+### 4) 프로젝트를 선택하고 마우스 오른쪽을 클릭해서 (gradle) - (refresh gradle project)를 실행  
+
+### 5) gradle tasks 탭을 열어서 (build) - (jar)를 더블 클릭  
+
+### 6) JPAQuery의 데이터 리턴 메서드  
+* List<T> fetch()  
+* T fetchOne()  
+* T fetchFirst()  
+* Long fetchCount()  
+* QueryResult<T> fetchResults()  
+
 ## +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
 데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
 이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  
