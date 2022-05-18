@@ -338,23 +338,23 @@ public void testSort() {
 * @Query : 직접 쿼리를 작성하는 방식으로 Native SQL 사용 가능  
 * Querydsl : 동적 쿼리 생성  
 
-### 2) Query Method  
+## 8. Query Method  
 * 메서드의 이름 자체가 질의문이 되는 기능  
 * https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods  
 
-### 3) 생성 방법  
+### 1) 생성 방법  
 작업(find, delete 등) + By + 속성이름(매개변수)  
 -> 속성을 매개변수로 받아서 작업을 수행  
 
 * Item Entity에서 num을 가지고 조회  
 	findByNum(자료형 num);  
 
-### 4) 리턴 타입  
+### 2) 리턴 타입  
 	* 조회의 경우는 List나 배열  
 	* Pageable을 매개변수로 사용하면 Page<Entity>  
 	* 조회가 아닌 작업은 void  
 
-### 5) 키워드  
+### 3) 키워드  
 Distinct  
 	: findDistinctByLastname - Lastname으로 조회하는데 중복 제거  
 And  
@@ -368,7 +368,7 @@ GraterThan
 GraterThanEqual  
 기타 등등
 
-### 6) Memo Entity에서 mno값이 70에서 80사이인 데이터를 조회  
+### 4) Memo Entity에서 mno값이 70에서 80사이인 데이터를 조회  
 * MemoRepository 인터페이스에 메서드를 선언  
 ```java
 // Memo Entity에 대한 작업을 수행하기 위한 Repository 인터페이스
@@ -389,7 +389,7 @@ public void betweenTest() {
 }
 ```  
 
-### 7) Memo Entity에서 mno값이 70에서 80사이인 데이터를 내림차순 조회  
+### 5) Memo Entity에서 mno값이 70에서 80사이인 데이터를 내림차순 조회  
 * MemoRepository 인터페이스에 메서드를 선언  
 ```java
 	// mno값이 70에서 80사이인 데이터를 mno를 내림차순 정렬하여 조회
@@ -407,7 +407,7 @@ public void betweenOrderTest() {
 }
 ```  
 
-### 8) MemoEntity에서 10부터 50사이의 데이터를 조회하는데 두번째 페이지부터 10개만 mno의 내림차순 정렬해서 조회  
+### 6) MemoEntity에서 10부터 50사이의 데이터를 조회하는데 두번째 페이지부터 10개만 mno의 내림차순 정렬해서 조회  
 * MemoRepository 인터페이스에 메서드를 선언  
 ```java
 	// mno값이 from에서 to사이인 데이터를 조회 - 페이징 적용
@@ -427,7 +427,7 @@ public void betweenPagingTest() {
 }
 ```  
 
-### 9) MemoEntity에서 mno가 10보다 작은 데이터 삭제
+### 7) MemoEntity에서 mno가 10보다 작은 데이터 삭제
 * MemoRepository 인터페이스에 메서드를 선언  
 ```java
 	// mno가 매개변수보다 작은 데이터 삭제
@@ -444,7 +444,59 @@ public void deleteByMno() {
 	memoRepository.deleteByMnoLessThan(10L);
 }
 ``` 
+## 9. @Query
+* JPA Repository가 제공하는 메서드들은 복잡한 SQL에 해당하는 구문을 만들어내기 어려움  
+* JPQL이라는 특별한 모양의 구문을 이용해서 처리  
+* insert, delete, update작업은 @Modifying이라는 어노테이션과 함게 작성해서 수행  
+* 예 - Memo Entity의 모든 데이터를 mno순으로 내림차순 정렬해서 리턴  
+```java
+	@Query("select m from Memo m order by m.mno desc")
+	public List<Memo> getListDesc();
+```  
 
+* 파라미터를 바인딩하고자 하는 경우에는 @Param 자료형 이름의 형태로 메서드의 매개변수로 만들고 JPQL을 작성할 때 #{이름} 또는 :이름 또는 ?인덱스의 형태로 만들면 됩니다.  
+
+### 1) mno값을 가지고 데이터를 조회해서 memoText를 수정하는 작업  
+* MemoRepository 인터페이스에 필요한 메서드 생성  
+	대소문자를 구분하므로 쿼리의 대소문자 주의  
+```java
+	// mno을 가지고 데이터를 찾아서 memoText를 수정하는 메서드
+	@Query("update Memo m set m.memoText = :memoText where m.mno = :mno")
+	//@Query에서 수행하는 문장이 select가 아닐 때 원본에 반영하도록 하기 위해서 설정
+	@Modifying
+	// 이 메서드 안에서 이루어지는 모든 작업은 하나의 트랜젝션으로 수행하도록 해주는 annotation
+	// Repository에 적용하지 않고 대부분은 Service나 Controller에 적용
+	@Transactional
+	int updateMemoText(@Param("mno")Long mno, @Param("memoText")String memoText);
+	
+	@Query("update Memo m set m.memoText =:#{#mmm.memoText} where m.mno =:#{#mmm.mno}")
+	@Modifying
+	@Transactional
+	int updateMemoText(@Param("mmm")Memo memo);
+```
+
+* Test 클래스에서 두 개의 메서드 호출  
+```java
+	@Test
+	public void testUpdateQuery() {
+		// 수정하는 메서드 호출
+		System.out.println(memoRepository.updateMemoText(11L, "반갑습니다."));
+		System.out.println(memoRepository.updateMemoText(Memo.builder().mno(12L).memoText("dkd안녕하세요").build()));
+	}
+```  
+
+### 2) 조회  
+* 조회를 할 때 Paging처리를 할 것이라면 countQuery라는 속성에 데이터 개수를 구하는 JPQL이 추가되어야 합니다.  
+
+* mno와 Pageable을 매개변수로 받아서 mno보다 큰 mno를 가진 데이터에 페이징을 적용해서 리턴받는 메서드를 MemoRepository에 생성  
+
+* +) 
+	사용자의 요청 하나당 서비스의 메서드는 1개인 것을 권장  
+	회원가입을 요청했는데 회원가입도 처리하고 다른 작업도 부수적으로 처리  
+
+	서비스1 - 회원가입  
+	서비스2 - 회원가입  
+	서비스3 - 다른 작업  
 ## +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
 데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
 이전에는 null을 구분하는 자료형이 없어서 직접 생성한 객체가 아닌 API가 생성해준 객체를 사용할 때는 null인지 확인하고 사용했는데 이러다보니 null을 확인하는 코드가 너무 많이 필요했습니다.  

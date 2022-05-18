@@ -147,11 +147,20 @@ public class MemoRepositoryTest {
 		}
 	}
 	*/
+	/*
 	// 삭제하는 작업이므로 트랜젝션을 설정해주어야 함 
 	@Test
 	@Commit
 	@Transactional
 	public void deleteByMno() {
 		memoRepository.deleteByMnoLessThan(10L);
+	}
+	*/
+	
+	@Test
+	public void testUpdateQuery() {
+		// 수정하는 메서드 호출
+		System.out.println(memoRepository.updateMemoText(11L, "반갑습니다."));
+		System.out.println(memoRepository.updateMemoText(Memo.builder().mno(12L).memoText("dkd안녕하세요").build()));
 	}
 } 
