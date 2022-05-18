@@ -269,7 +269,7 @@ public void testSelectOne() {
 ```  
 
 * 없는 데이터는 optional.empty라고만 나온다
-	<img src="./option.jpg">
+	<img src="./optional.jpg">
 
 * +) 최근 프로그래밍 언어의 데이터 타입에 대한 추세  
 	데이터의 자료형을 mutable(수정 가능한)과 immutable(수정 불가능한)의 형태로 구분하고 다시 null이 가능한 자료형과 그렇지 않은 자료형으로 구분합니다.  
