@@ -5,6 +5,16 @@
 <title>Thymeleaf</title>
 </head>
 <body>
-	<h1>Thymeleaf출력하기</h1>
+	<h1>Thymeleaf 출력하기</h1>
+	<h3>이름 : [[${name}]]</h3>
+	<h3>별명 : [[${person.nickname}]]</h3>
+	
+	<!-- num이 3의 배수인 경우는 name을 출력하고 그렇지 않은 경우네느 nickname을 출력 -->
+	<ul>
+		<li th:each ="vo, status : ${list}">
+			<p th:if="${vo.num %3 ==0}" th:text="${vo.name}"/>
+			<p th:unless="${vo.num%3==0}" th:text="${vo.nickname}"/>			
+		</li>
+	</ul>
 </body>
 </html>

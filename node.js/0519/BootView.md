@@ -215,3 +215,83 @@ th:each = "임시변수:${목록}
 ### 4) 데이터 출력 실습  
 * 기본패키지.domain에 PersonVO 생성
 * PageController의 요청 처리 메서드 수정  
+```java
+@GetMapping("/")
+	public String main(Model model) {
+		// Scala Data 생성
+		String name = "chocchic";
+		
+		// 개인 취향 차. new로 해도 됨
+		// 하나의 Instance 생성
+		PersonVO person = PersonVO.builder().num(1L).name(name).nickname("촉촉한초코칩").birthTime(LocalDateTime.now()).build();
+		// 여러개 데이터 생성
+		// 1부터 20까지의 정수 스트림을 생성해서 LongStream으로 변환한 후
+		// map(변환)ToObj(게겣로 변환 - 매개변수가 1개이고 1개의 객체를 리턴하는 람다를 매개변수로 사용)
+		// 람다의 매개변수는 스트림의 데이터가 순서대로 들어오고 리턴하는 객체들을 모아서 list로 리턴
+		List<PersonVO> list = IntStream.rangeClosed(1, 20).asLongStream().mapToObj(i -> {
+			PersonVO temp = PersonVO.builder().num(i).name(name+"_"+i).nickname("촉촉한초코칩_"+i).birthTime(LocalDateTime.now()).build();
+			return temp;
+		}).collect(Collectors.toList());
+		
+		// 생성한 데이터를 request 객체에 저장
+		model.addAttribute("name", name);
+		model.addAttribute("person", person);
+		model.addAttribute("list", list);
+		
+		// 여기서 리턴하는 문자열은 view의 이름입니다.
+		return "main";
+	}
+```
+* main.html을 수정  
+```html
+	<ul>
+ 		<li th:each="vo : ${list}">
+			객체 : [[${vo}]] <br/>
+			번호 : [[${vo.num}]] 
+			이름 : [[${vo.name}]]
+			별명 : [[${vo.nickname}]]
+			태어난날 : [[${vo.birthTime}]]
+		</li>
+	</ul>
+```
+* main.html을 수정  
+```html
+	<!-- 인덱스와 데이터 함께 출력 -->
+	<ul>
+		<li th:each="vo,state : ${list}">
+			[[${state.index}]] -- [[${vo.nickname}]]
+		</li>
+	</ul>
+```
+* main.html을 수정  
+```html
+	<!-- num이 3의 배수인 데이터만 출력 -->
+	<ul>
+		<li th:each ="vo, status : ${list}" th:if="${vo.num %3 ==0}">
+			[[${vo.nickname}]]		
+		</li>
+	</ul>
+```
+
+* main.html을 수정  
+```html
+	<!-- num이 3의 배수인 경우는 name을 출력하고 그렇지 않은 경우네느 nickname을 출력 -->
+	<ul>
+		<li th:each ="vo, status : ${list}">
+			<p th:if="${vo.num %3 ==0}" th:text="${vo.name}"/>
+			<p th:unless="${vo.num%3==0}" th:text="${vo.nickname}"/>			
+		</li>
+	</ul>
+```
+### 5) 자바스크립트에서 데이터를 사용
+```javascript
+<script th:inline="javascript">
+	let 변수명 = [[${데이터}]]
+```
+
+### 6) 링크 처리  
+* href 속성에 @{}를 이용해서 설정  
+
+### +) 포트 충돌이 계속 되는 경우
+	포트를 사용중인 프로세스를 확인하기 위해 cmd에서 netstat -ano 명령어로 확인할 수 있고, 
+	taskkill /pid 프로세스ID /F로 프로세스 강제 종료핧 수 있습니다.
