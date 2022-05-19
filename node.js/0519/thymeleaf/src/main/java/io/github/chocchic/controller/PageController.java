@@ -43,9 +43,11 @@ public class PageController {
 	*/
 	@GetMapping("/")
 	public String main(Model model) {
+		// Scala Data 생성
 		String name = "chocchic";
 		
 		// 개인 취향 차. new로 해도 됨
+		// 하나의 Instance 생성
 		PersonVO person = PersonVO.builder().num(1L).name(name).nickname("촉촉한초코칩").birthTime(LocalDateTime.now()).build();
 		// 여러개 데이터 생성
 		List<PersonVO> list = IntStream.rangeClosed(1, 20).asLongStream().mapToObj(i -> {
