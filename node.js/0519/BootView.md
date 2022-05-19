@@ -292,6 +292,58 @@ th:each = "임시변수:${목록}
 ### 6) 링크 처리  
 * href 속성에 @{}를 이용해서 설정  
 
+* main.html 수정
+```html
+
+```
+* +) 파라미터를 사용하는 이유는 서버에서 파라미터를 가지고 다른 작업을 하기 위해서인데, 예를 들어 상세보기는 하나의 데이터를 가져오기 위한 기본 키 값이 필요하다.  
+	ex) detail?num=1 : num값이 1이라는 것을 서버에서 읽어서 사용  
+	ex) detail/1 : path방식은 url의 마지막 부분을 읽어옴.  
+		```java
+		String url = "http://www.naver.com/detail/1";
+		String[] path = url.split("/");
+		path[path.length-1] // 1 -> Spring에서는 @Param이나 @PathVariable로 처리
+		```  
+
+### 7) 포맷 설정
+* 숫자의 경우는 #numbers를 이용해서 숫자의 포맷을 설정  
+* 날짜의 경우는 #temporals를 이용하는데 날짜는 아래 의존성을 이용해야 합니다.  
+```ini
+// https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-java8time
+implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
+```  
+
+* pageController에 요청 처리 메서드를 추가
+```java
+	// exformat 요청이 GET 방식으로 오면 
+	@GetMapping("/exformat")
+	public String exformat(Model model, RedirectAttributes rattr, HttpSession session, HttpServletRequest request) {
+		// 전송할 데이터를 생성 - Service의 메서드를 호출해서 생성하는 경우가 대부분
+		List<PersonVO> list = new ArrayList<>();
+		for(long i = 1; i<=10;i++) {
+			PersonVO person = PersonVO.builder().num(i).name("이름_"+i).nickname("별명_"+i).birthTime(LocalDateTime.now()).build();
+			list.add(person);
+		}
+		// 데이터를 저장
+		// model이나 request에 저자하면 포워딩하는 경우에는 데이터가 전달됩ㄴ디ㅏ.
+		// redirect하면 model이난 request에 저장된 데이터는 소멸됩니다.
+		
+		// request할 때도 데이터를 전달하고자 하는 경우에는 session이나 rattr을 이용
+		// session은 session에서 강제로 삭제하지 않는한 유지되지만 rattr은 한번만 유지됩니다.
+		
+		//model.addAttribute("list", list);
+		//request.setAttribute("list", list);
+		// 위 두개는 같은 의미
+		
+		// templates 디렉터리의 exformat.html 파일로 출력
+		return "exformat";
+	}
+```  
+
+* templates 디렉터리에 exformat.html을 생성하고 작성  
+
+* 프로젝트를 실행하고 브라우저에 http://localhost:포트번호/exformat을 입력하고 확인
+
 ### +) 포트 충돌이 계속 되는 경우
 	포트를 사용중인 프로세스를 확인하기 위해 cmd에서 netstat -ano 명령어로 확인할 수 있고, 
 	taskkill /pid 프로세스ID /F로 프로세스 강제 종료핧 수 있습니다.
