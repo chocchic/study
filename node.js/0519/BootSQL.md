@@ -158,7 +158,54 @@ public class MemoPageController {
 ```  
 
 ### 2) templates 디렉터리에 main.html 파일을 추가하고 작성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1>Memo Application</h1>
+	</th:block>
+</th:block>
+```  
 
 ### 3) application 실행  
 
 ### 4) 브라우저에서 localhost:포트번호를 입력하고 확인  
+
+### +) Template Method Pattern  
+인터페이스나 추상 클래스의 구현할 메서드의 원형을 만들고 이를 implements해서 메서드의 내용을 만들어서 사용하는 방식  
+
+인터페이스는 다른 개발자나 사용자와의 대화수단이 되고 클래스가 실제 내용을 구현할 본체가 되는 방식입니다.  
+
+클래스를 상속받을 때(Sub Classing)는 상속을 하나만 하면 Ex를 추가해서 상속받은 클래스라는 것을 표현하고 인터페이스를 구현할 때는 일반적으로 뒤에 Impl을 추가합니다.  
+
+## 5. 프로젝트 구조  
+### 1) 기본 구조  
+Thymeleaf Page <-> Controller(MemoPageController) <-> MemoServcie(Template Method Pattern 적용) <-> MemoRepository(영속성 작업)  
+
+### 2) 화면 구성  
+작업        URL             Method  수행할 기능             Redirect URL  
+목록보기    /memo/list      GET     목록보기 - 페이징,검색  
+삽입        /memo/register  GET     입력화면  
+            /memo/register  POST    실제 삽입               /memo/list  
+상세보기    /memo/read      GET     하나의 데이터 조회  
+수정        /memo/modify    GET     수정/삭제 화면  
+            /memo/modify    POST    실제 수정               /memo/read  
+삭제        /memo/remove    POST    실제 삭제               /memo/list  
+
+    삭제의 경우는 정말로 삭제를 할 것인지 아니면 삭제되었다고 표시만 했다가 출력할때 제외를 할 것인지에 대해서 고민  
+
+### 3) DTO와 Entity  
+* Entity : 데이터베이스와 연동하기 위한 클래스, 데이터베이스에 꼭 필요한 것들로만 구성되어야 합니다.  
+    이 클래스는 Repository에서만 사용해야 합니다.  
+
+* Entity는 사용자의 요청과 받느시 일치하지는 않는 문제가 발생하는데, 이런 경우에는 DTO 클래스를 별도로 만들어서 해결을 합니다.  
+    Repository에서 넘겨준 데이터를 가지고 가공을 해서 Controller에게 전달하거나 전달받고 Controller는 DTO를 View에게 전송해서 출력하거나 사용을 합니다.  
+    이렇게 Service에서 Controller로 데이터가 전달된다고 해서 이러한 클래스를 Data Transfer Object라고 합니다.  
+    안드로이드같은 곳에서 이러한 DTO 패턴으로 만들어진 클래스만 화면 사이에 전달이 됩니다.  
+    이 때 자바는 Serializable 인터페이스를 구현한 것을 DTO로 인식합니다.  
+
+    프로그램에서 만든 데이터는 근본적으로 Main Memory에 존재하는 데이터입니다.  
+    이 Main Memory의 데이터를 반영구적으로 저장하기 위해서 File에 기록을 하려면 Main Memory에서 File(Auxiliary Memory = 보조기억장치, HDD 또는 SSD)로 옮겨야 합니다.  
+    이 때 이동이 가능한 인스턴스는 Serializable 인터페이스가 구현된 인스턴스만 File에 기록이 가능합니다.  
+    이렇게 저장한 데이터는 반드시 Serializable 인터페이스가 구현된 인스턴스로 읽어야 합니다.
