@@ -97,4 +97,10 @@ public class PageController {
 		// templates 디렉터리의 exformat.html 파일로 출력
 		return "exformat";
 	}
+	
+	@GetMapping("/exlayout")
+	//리턴이 없으면 요청 URL이 view이름(exlayout)이 됩니다.
+	public void exlayout() {
+		
+	}
 }

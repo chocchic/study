@@ -5,6 +5,11 @@
 <title>포맷</title>
 </head>
 <body>
-	<p>[[${list}]]</p>
+	<ul>
+		<li th:each="vo : ${list}">
+			[[${#numbers.formatInteger(vo.num, 3)}]] : [[${#temporals.format(vo.birthTime, 'yyyy/MM/dd HH:mm:ss')}]]
+			
+		</li>
+	</ul>
 </body>
 </html>

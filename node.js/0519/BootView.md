@@ -312,6 +312,7 @@ th:each = "임시변수:${목록}
 // https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-java8time
 implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
 ```  
+* 참고 : https://www.baeldung.com/dates-in-thymeleaf  
 
 * pageController에 요청 처리 메서드를 추가
 ```java
@@ -343,7 +344,88 @@ implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
 * templates 디렉터리에 exformat.html을 생성하고 작성  
 
 * 프로젝트를 실행하고 브라우저에 http://localhost:포트번호/exformat을 입력하고 확인
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th ="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>포맷</title>
+</head>
+<body>
+	<ul>
+		<li th:each="vo : ${list}">
+			[[${#numbers.formatInteger(vo.num, 3)}]] : [[${#temporals.format(vo.birthTime, 'yyyy/MM/dd HH:mm:ss')}]]
+			
+		</li>
+	</ul>
+</body>
+</html>
+```  
 
 ### +) 포트 충돌이 계속 되는 경우
 	포트를 사용중인 프로세스를 확인하기 위해 cmd에서 netstat -ano 명령어로 확인할 수 있고, 
-	taskkill /pid 프로세스ID /F로 프로세스 강제 종료핧 수 있습니다.
+	taskkill /pid 프로세스ID /F로 프로세스 강제 종료핧 수 있습니다.  
+
+
+## 8. Layout 설정  
+* 비슷한 디자인을 사용하는 경우에는 하나의 레이아웃을 만들어두고 적용하면 편리합니다.  
+### 1) 방법  
+* jsp의 include처럼 특정 부분을 외부 혹은 내부에서 가져와서 포함시키는 형태  
+* 특정 부분을 파라미터로 전달해서 내용에 포함하는 형태  
+
+### 2) include 방식의 처리  
+* 특정한 부분을 다른 내용으로 변경할 수 있는 th:insert나 th:replace를 이용  
+* th:insert는 기존 내용의 바깥쪽 태그는 그대로 유지하면서 추가되는 방식  
+* th:replace는 기존의 내용을 완전히 대체하는 방식  
+
+### 3) include 실습  
+* PageController 클래스에 요청을 생성  
+```java
+```  
+
+* 공통된 레이아웃으로 사용할 파일들을 저장하기 위한 디렉터리를 templates 디렉터리에 생성 - fragments  
+
+* fragments 디렉터리 안에 공통으로 사용할 fragment1.html 파일을 생성하고 작성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th ="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div th:fragment="part1">
+		<h2>Part1</h2>
+	</div>
+	<div th:fragment="part2">
+		<h2>Part2</h2>
+	</div>
+	<div th:fragment="part3">
+		<h2>Part3</h2>
+	</div>
+</body>
+</html>
+```  
+
+* templates 디렉터리에 exlayout.html을 작성하고  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th ="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>레이아웃</title>
+</head>
+<body>
+	<h1>Layout1</h1>
+	<div th:replace="~{/fragments/fragment1 :: part1}"></div>
+	
+	<h1>Layout2</h1>
+	<div th:replace="~{/fragments/fragment1 :: part2}"></div>
+	
+	<h1>Layout3</h1>
+	<div th:replace="~{/fragments/fragment1 :: part3}"></div>
+</body>
+</html>
+```  
+
+* 브라우저에 localhost:port/exlayout을 입력하고 확인  
