@@ -423,7 +423,28 @@ public class MemoRepotest {
 }
 ```  
 
-### 5) MemoRepotest ㅡㅋㄹ래스에 데이터 삽입을 위한 테스트 메서드
+### 5) MemoRepotest 클래스에 데이터 삽입을 위한 테스트 메서드
 ```java
-
+@Test
+public void insertMemo() {
+    // 300개의 정수 모임을 생성하고 순회
+    IntStream.rangeClosed(1, 300).forEach(i ->{
+        // 데이터 생성
+        Memo memo = Memo.builder().title("title_"+i).content("content_"+i).writer("writer_"+i).build();
+        // 데이터 삽입
+        m.save(memo);
+    });
+    /*
+    select * from memo;
+    DB에서 위 구문으로 확인
+        */
+    
+}
 ```
+* 데이터가 한번에 300개씩 들어가기 때문에 DB에서 삽입된게 확인된다면 반드시 @Test를 주석처리하고 다른 코드 수행  
+
+* JPARepository를 extends(상속)하면 전체 데이터 가져오기(페이징, 정렬), 기본키를 이용해서 조회하기, 삽입, 삭제(기본키를 조건으로 해서 수정하는 경우), 수정(기본키를 조건으로 해서 수정하는 경우)은 구현할 필요가 없습니다.  
+
+* 기본키가 아닌 속성으로 조회하는데 일치하는 조건인 경우는 Repository에 메서드 이름을 findBy컬럼 이름 또는 컬럼이름연산자 형태로 만들고 필요한 매개변수를 갖는 메서드를 선언하면 됩니다.  
+
+### 6) 
