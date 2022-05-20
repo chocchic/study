@@ -457,3 +457,96 @@ public void insertMemo() {
 * 화면에 출력하고 클라이언트에서 넘겨준 파라미터를 사용하는 경우 이 데이터는 일시적으로 필요한 데이터입니다. 이러한 데이터를 Entity 클래스를 이용해서 관리하면 자원의 낭비가 발생할 수 있습니다. Service와 Controller와 View에서 사용하는 별도의 데이터 클래스가 필요  
 
 * 별도의 데이터 클래스(DTO)를 만들면 유사한 코드를 중복으로 개발하게 되고 Entity와 DTO 사이의 변환을 위한 메서드가 필요하게 됩니다.  
+
+### 1) dto 패키지에 memoDTO 클래스를 생성하고 작성
+```java
+// Controller와 Service 사이의 데이터 전달을 위한 클래스
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class MemoDTO {	
+	private Long gno;
+	private String title;
+	private String content;
+	private String writer;
+	private LocalDateTime regDate;
+	private LocalDateTime modDate;
+}
+```  
+
+### 2) 사용자의 요청을 처리하는 메서드이 원형을 갖는 Service 인터페이스 생성 - service.MemoService  
+```java
+// Controller와 Service 사이의 데이터 전달을 위한 클래스
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class MemoDTO {	
+	private Long gno;
+	private String title;
+	private String content;
+	private String writer;
+	private LocalDateTime regDate;
+	private LocalDateTime modDate;
+}
+```
+
+### 3) Service 인터페이스의 메서드를 구현한 ServiceImpl 클래스를 생성 - service.MemoServiceImpl  
+```java
+// Controller와 Service 사이의 데이터 전달을 위한 클래스
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class MemoDTO {	
+	private Long gno;
+	private String title;
+	private String content;
+	private String writer;
+	private LocalDateTime regDate;
+	private LocalDateTime modDate;
+}
+```  
+
+## 9. 데이터 삽입  
+### 1) MemoService 인터페이스에 데이터 삽입을 위한 메서드 선언  
+```java
+// 데이터 삽입을 위한 메서드 : 삽입된 메모의 gno값을 리턴
+	public Long insertMemo(MemoDTO dto);
+```  
+
+### 2) MemoServiceImpl 클래스에 데이터 삽입을 위한 메서드를 구현  
+```java
+	@Override
+	public Long insertMemo(MemoDTO dto) {
+		log.info("==데이터 삽입==");
+		log.info(dto);
+		
+		// DTO를 Entity로 변환
+		Memo memo = dtoToEntity(dto);
+		
+		// 데이터 저장하고 저장한 내용을 memo에 닫시 기록
+		m.save(memo);
+		
+		return memo.getGno();
+	}
+```  
+
+### 3) 데이터 삽입 테스트  
+* Service를 테스트하기 위한 테스트 클래스를 만들고 테스트 - src/test/MemoServiceTest
+```java
+@SpringBootTest
+public class MemoServiceTest {
+	@Autowired
+	private MemoService m;
+	
+	@Test
+	public void testInsert() {
+		MemoDTO dto = MemoDTO.builder().title("데이터삽입테스트1").content("insert success").writer("Service").build();
+		System.out.println(m.insertMemo(dto));
+		// 데이터베이스에 가서 select * from memo order by gno desc;로 확인
+	}
+}
+```  
+
