@@ -304,8 +304,126 @@ public class Memo extends BaseEntity{
 		this.content = content;
 	}
 }
-
 ```
 
+### 4) 애플리케이션을 실행해서 테이블이 만들어지는지 확인  
 
-### 4) 애플리케이션을 실행해서 테이블이 만들어지는지 확인
+## 7. Persistency 작업 (Querydsl 사용을 위해)  
+### 1) Memo Entity를 사용하기위한 Repository 클래스를 생성 - persistency.MemoRepository  
+
+### +) 
+```java
+    public List<String> method(){
+        List<String> result = new ArrayList<>();
+
+        // 처리내용 ...
+
+        return result;
+    }
+
+    public String method(){
+        String result = null;
+
+        // 처리내용 ...
+
+        return result;
+    }
+```
+    -> return 타입에 맞춰 메서드를 여럭개 만들어야 함. => Optional 사용  
+
+### 2) querydsl을 사용하기 위한 설정 - build.gradle에서 수행  
+```gradle
+plugins {
+   id 'org.springframework.boot' version '2.5.5'
+   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+   id 'java'
+   
+   id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+   
+}
+
+group = 'io.github.chocchic'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+   compileOnly {
+      extendsFrom annotationProcessor
+   }
+}
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+   implementation 'org.springframework.boot:spring-boot-starter-web'
+   compileOnly 'org.projectlombok:lombok'
+   developmentOnly 'org.springframework.boot:spring-boot-devtools'
+   runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
+   runtimeOnly 'mysql:mysql-connector-java'
+   annotationProcessor 'org.projectlombok:lombok'
+   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+   implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
+   
+   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+   
+   // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa'
+    implementation 'com.querydsl:querydsl-apt'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.1'
+}
+
+// querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets {
+    main.java.srcDir querydslDir
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+
+tasks.named('test') {
+   useJUnitPlatform()
+}
+
+```
+* boot 2.6.x 버전 이상 하려면 구글링해서 따라하기  
+### 3) MemoRepository에 QuerydslPredicateExecutor 인터페이스를 extends  
+```java
+public interface MemoRepository extends JpaRepository<Memo, Long>, QuerydslPredicateExecutor<Memo>{
+
+}
+```  
+
+### 4) src/test/java의 기본 패키지에 테스트용 클래스를 생성 - MemoRepotest  
+```java
+@SpringBootTest
+public class MemoRepotest {
+
+	@Autowired
+	private MemoRepository m;
+	
+}
+```  
+
+### 5) MemoRepotest ㅡㅋㄹ래스에 데이터 삽입을 위한 테스트 메서드
+```java
+
+```
