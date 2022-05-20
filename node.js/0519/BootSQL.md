@@ -208,4 +208,104 @@ Thymeleaf Page <-> Controller(MemoPageController) <-> MemoServcie(Template Metho
     프로그램에서 만든 데이터는 근본적으로 Main Memory에 존재하는 데이터입니다.  
     이 Main Memory의 데이터를 반영구적으로 저장하기 위해서 File에 기록을 하려면 Main Memory에서 File(Auxiliary Memory = 보조기억장치, HDD 또는 SSD)로 옮겨야 합니다.  
     이 때 이동이 가능한 인스턴스는 Serializable 인터페이스가 구현된 인스턴스만 File에 기록이 가능합니다.  
-    이렇게 저장한 데이터는 반드시 Serializable 인터페이스가 구현된 인스턴스로 읽어야 합니다.
+    이렇게 저장한 데이터는 반드시 Serializable 인터페이스가 구현된 인스턴스로 읽어야 합니다.  
+
+* Entity의 생성시간과 수정시간  
+    생성 시간과 수정 시간을 사용하고자 하는 경우 매번 현재 시간을 가져오는 것은 아주 많이 사용하는 공통된 로직입니다.  
+    정적인 로직을 매번 수행하는 것을 자원의 낭비입니다.  
+    JPA에서는 이를 Annotation으로 처리할 수 있도록 해주는데, Application의 Entry Point가 되는 클래스에 @EnableJpaAuditing이라는 어노테이션을 추가하고, Entity에 @CreatedData와 @LastModifiedDate를 추가한 속성을 만들면 됩니다.  
+
+* Entity를 테이블로 생성하지 않도록 하고자 하는 경우에는 @MappedSuperclass를 추가  
+
+## 6. 자동으로 처리되는 날짜 / 시간을 위한 작업  
+### 1) Entry Point(애플리케이션이 시작되는 지점 - main메서드가 소유한 클래스)  가 되는 클래스에 annotation추가  
+```java
+// JPA 관련된 작업을 감시
+@EnableJpaAuditing
+@SpringBootApplication
+public class BootIoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(BootIoApplication.class, args);
+	}
+
+}
+```  
+
+### +) Inheritance(상속 - SubClassing) : 하위 클래스가 상위 클래스의 모든 것을 물려받는 것  
+    Super Class <----- Sub Class  
+    상속을 구현하는 방법  
+        여러 클래스들을 구현하다가 공통된 부분이 있으면 상위 클래스를 만들어서 상속을 하는 구조를 만듭니다.  상위 클래스 만들고 하위 클래스를 생성하는 것은 경험이 많은 경우 가능  
+        자주 사용이 될만한 상위 클래스들을 미리 만들어서 제공하는 것을 Development Kit 또는 Framework라고 합니다.  
+
+### 2) 빼먹음
+```java
+// 공통된 속성을 가진 Entity
+
+// 테이블로 생성할 필요가 없음
+@MappedSuperclass
+// 데이터베이스 작업을 감시
+@EntityListeners(value= {AuditingEntityListener.class})
+@Getter
+//abstract : 인스턴스를 생성할 수 없도록 해주는 클래스로 상속을 통해서만 사용이 가능
+public class BaseEntity {
+	// 생성한 시간을 저장하는데 컬럼 이름은 regdate이고 수정할 수 없도록 생성  
+	@CreatedDate
+	@Column(name="regdate", updatable=false)
+	private LocalDateTime regDate;
+	
+	// 수정한 시간을 저장하는데 컬럼이름은 moddate이고 수정할 수 없도록 생성
+	@LastModifiedDate
+	@Column(name="moddate", updatable=false)
+	private LocalDateTime modDate;
+}
+```  
+
+### 3) 애플리케이션에서 사용할 Memo Entity 생성 - model.Memo
+* 
+```java
+@Entity
+@Table(name="memo")
+
+@Getter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Memo extends BaseEntity{
+	/*
+	// 시스템이 생성해주는 랜덤한 문자열
+	@Id
+	@GeneratedValue(generator = "system-uuid")
+	@GenericGenerator(name="system-uuid", strategy="uuid")
+	private String id;
+	*/
+	// gno 값을 데이터베이스의 auto_increment나 sequence를 이용해서 생성
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long gno;
+	
+	@Column(length=100, nullable=false)
+	private String title;
+	
+	@Column(length=1500, nullable=false)
+	private String content;
+	
+	@Column(length=100, nullable = false)
+	private String writer;
+	
+	// title을 변경해주는 메서드
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+	
+	// content를 변경해주는 메서드
+	public void changetContent(String content) {
+		this.content = content;
+	}
+}
+
+```
+
+
+### 4) 애플리케이션을 실행해서 테이블이 만들어지는지 확인
