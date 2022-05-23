@@ -26,4 +26,11 @@ public interface MemoService {
 	public Long insertMemo(MemoDTO dto);
 	// 목록보기를 위한 메서드
 	PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO);
+	// 상세보기를 위한 메서드
+	public MemoDTO read(Long gno);
+	// 수정을 처리하는 메서드
+	public void modify(MemoDTO dto);
+	// 삭제를 처리하는 메서드
+	public void remove(Long gno);
+	
 }

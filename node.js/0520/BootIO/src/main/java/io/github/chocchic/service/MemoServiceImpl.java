@@ -1,5 +1,6 @@
 package io.github.chocchic.service;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
@@ -48,5 +49,34 @@ public class MemoServiceImpl implements MemoService {
 		Function<Memo, MemoDTO> fn = (entity -> entityToDTO(entity));
 		// 결과 리턴
 		return new PageResponseDTO<MemoDTO, Memo>(result, fn);
+	}
+
+	@Override
+	public MemoDTO read(Long gno) {
+		// 기본키를 이용해서 데이터 찾아오기
+		Optional<Memo> memo = m.findById(gno);
+		return memo.isPresent()?entityToDTO(memo.get()):null;
+	}
+
+	@Override
+	public void modify(MemoDTO dto) {
+		// 데이터 찾아오기(그동안 지워졌을까봐)
+		Optional<Memo> result = m.findById(dto.getGno());
+		if(result.isPresent()){
+			//업데이트 하는 항목은 '제목', '내용'
+			Memo entity = result.get();
+			entity.changeTitle(dto.getTitle());
+			entity.changeContent(dto.getContent());
+			m.save(entity);
+		}
+	}
+
+	@Override
+	public void remove(Long gno) {
+		// 데이터 찾아오기(그동안 지워졌을까봐)
+		Optional<Memo> result = m.findById(gno);
+		if(result.isPresent()){
+			m.deleteById(gno);
+		}
 	}
 }

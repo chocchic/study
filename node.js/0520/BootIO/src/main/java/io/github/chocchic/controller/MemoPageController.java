@@ -3,6 +3,7 @@ package io.github.chocchic.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -52,6 +53,30 @@ public class MemoPageController {
 		//session.setAttribute("msg",gno+"로 저장완료!");
 		// 리다이렉트할 때 데이터를 전달
 		rAttr.addFlashAttribute("msg",gno+"로 저장완료!");
+		return "redirect:/memo/list";
+	}
+	
+	@GetMapping({"/memo/detail", "/memo/update"})
+	public void detail(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, Model model) {
+		MemoDTO memo = m.read(gno);
+		model.addAttribute("memo",memo);
+	}
+	
+	// 데이터 수정 처리
+	@PostMapping("/memo/update")
+	public String update(MemoDTO dto, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+		log.info("dto : "+ dto);
+		m.modify(dto);
+		// 상세보기로 이동할 때 필요한 gno값과 page값을 설정
+		rAttr.addAttribute("page",pr.getPage());
+		rAttr.addAttribute("gno",dto.getGno());
+		return "redirect:/memo/detail";
+	}
+	// 데이터 수정 처리
+	@PostMapping("/memo/delete")
+	public String delete(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+		m.remove(gno);
+		rAttr.addAttribute("page",pr.getPage());
 		return "redirect:/memo/list";
 	}
 }

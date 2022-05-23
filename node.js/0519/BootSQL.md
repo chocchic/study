@@ -856,3 +856,222 @@ public class MemoPageController {
 ```  
 
 ### 4) 애플리케이션을 실행하고 메모 작성을 해서 메시지가 출력되는지까지 확인  
+
+## 12. 상세보기
+* 처리 과정 : 목록이나 제목에서 글번호같은 것을 클릭하면 하나의 데이터를 찾아올 수 있는 기본키 값과 함께 서버에 요청하고 서버는 기본키값을 이용해서 데이터를 읽어와서 리턴  
+
+### 1) list.html파일에서 제목을 출력하는 부분을 수정  
+```html
+<td><a th:href="@{/memo/detail(gno=${dto.gno}, page=${result.page})}">[[${dto.title}]]</a></td>
+```  
+
+### 2) MemoService인터페이스에 상세보기 처리를 위한 메서드 선언
+```java
+	// 상세보기를 위한 메서드
+	public MemoDTO read(Long gno);
+```  
+
+### 3) MemoServiceImpl클래스에 상세보기 처리를 위한 메서드를 구현  
+```java
+	@Override
+	public MemoDTO read(Long gno) {
+		// 기본키를 이용해서 데이터 찾아오기
+		Optional<Memo> memo = m.findById(gno);
+		return memo.isPresent()?entityToDTO(memo.get()):null;
+	}
+```  
+
+### 4) MemoController클래스에 상세보기 요청을 처리하기 위한 메서드 작성  
+```java
+	@GetMapping("/memo/detail")
+	public void detail(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, Model model) {
+		MemoDTO memo = m.read(gno);
+		
+		model.addAttribute("memo",memo);
+	}
+```  
+
+### 5) 빼먹음
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+	<h1>Memo Detail</h1>
+		<div class="form-group">
+			<label>Gno</label>
+			<input type="text" class="form-control" name="gno" th:value="${memo.gno}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>title</label>
+			<input type="text" class="form-control" name="title" th:value="${memo.title}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>content</label>
+			<textarea rows="5" class="form-control" name="contnet" th:text="${memo.content}" readonly></textarea>
+		</div>
+		<div class="form-group">
+			<label >Writer</label>
+			<input type="text" class="form-control" name="writer" th:value="${memo.writer}" readonly/>
+		</div>
+		<div class="form-group">
+			<label >RegDate</label>
+			<input type="text" class="form-control" name="regDate" th:value="${#temporals.format(memo.regDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+		</div>
+		<div class="form-group">
+			<label >ModDate</label>
+			<input type="text" class="form-control" name="modDate" th:value="${#temporals.format(memo.modDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+		</div>
+		<a th:href="@{/memo/list(page=${requestDTO.page})}"><button type="button" class="btn btn-info">목록</button></a>
+	</th:block>
+</th:block>
+``` 
+
+## 13. 데이터 수정  
+* 상세보기에 수정 링크를 생성해서 수정 링크를 누르면 수정화면으로 이동하고 수정 후 수정 버튼을 누르면 수정되도록 작성  
+
+### 1) detail.html파일에 수정 링크를 생성  
+```html
+<a th:href="@{/memo/update(gno = ${memo.gno}, page=${requestDTO.page})}"><button type="button" class="btn btn-info">수정</button></a>
+```
+
+### 2) 상세보기에서 수정을 눌렀을 때 처리를 위한 메서드를 MemoPageController에 생성하는데 상세보기 처리 위에 url만 추가  
+```java
+@GetMapping({"/memo/detail", "/memo/update"})
+```
+
+### 3) update.html 만들기
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1>Memo Detail</h1>
+		<form>
+			<!--페이지 번호 -->
+			<input type="hidden" name="page" th:value="${requestDTO.page}">
+			<div class="form-group">
+				<label>Gno</label>
+				<input type="text" class="form-control" name="gno" th:value="${memo.gno}"  readonly/>
+			</div>
+			<div class="form-group">
+				<label>title</label>
+				<input type="text" class="form-control" name="title" th:value="${memo.title}"/>
+			</div>
+			<div class="form-group">
+				<label>content</label>
+				<textarea rows="5" class="form-control" name="contnet" th:text="${memo.content}"></textarea>
+			</div>
+			<div class="form-group">
+				<label >Writer</label>
+				<input type="text" class="form-control" name="writer" th:value="${memo.writer}" readonly/>
+			</div>
+			<div class="form-group">
+				<label >RegDate</label>
+				<input type="text" class="form-control" name="regDate" th:value="${#temporals.format(memo.regDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+			</div>
+			<div class="form-group">
+				<label >ModDate</label>
+				<input type="text" class="form-control" name="modDate" th:value="${#temporals.format(memo.modDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+			</div>
+			<button type="button" class="btn btn-primary modifyBtn">수정</button>
+			<button type="button" class="btn btn-info listBtn">목록</button>
+			<button type="button" class="btn btn-danger removeBtn">삭제</button>
+		</form>
+		<script th:inline="javascript">
+			var actionForm = $("form"); //form 태그 객체
+
+			//삭제 버튼을 눌렀을 때
+			$(".removeBtn").click(function(){
+				actionForm.attr("action", "/memo/remove").attr("method","post").submit();
+			})
+			
+			// 수정 버튼을 눌렀을 때
+			$(".modifyBtn").click(function() {
+				if(!confirm("수정하시겠습니까?")){
+					return ;
+				}
+				actionForm.attr("action", "/memo/update").attr("method","post").submit();
+			});
+			
+			// 목록버튼을 눌렀을 때
+			$(".listBtn").click(function() {
+				var page = $("input[name='page']");
+				actionForm.empty(); //form 태그의 모든 내용을 지우고
+				actionForm.append(page);
+				actionForm.attr("action", "/memo/list").attr("method","get").submit();
+			});
+			</script>
+	</th:block>
+</th:block>
+
+```
+### 4) MemoService 인터페이스에 수정을 처리하는 메서드를 추가
+```java
+// 수정을 처리하는 메서드
+	public void modify(MemoDTO dto);
+```
+
+### 5) MemoServiceImpl 클래스에 수정을 처리하는 메서드 구현  
+```java
+@Override
+	public void modify(MemoDTO dto) {
+		// 데이터 찾아오기(그동안 지워졌을까봐)
+		Optional<Memo> result = m.findById(dto.getGno());
+		if(result.isPresent()){
+			//업데이트 하는 항목은 '제목', '내용'
+			Memo entity = result.get();
+			entity.changeTitle(dto.getTitle());
+			entity.changeContent(dto.getContent());
+			m.save(entity);
+		}
+	}
+```
+
+### 6) MemoController 클래스에 수정 요청을 처리하기 위한 메서드 구현
+```java
+	// 데이터 수정 처리
+	@PostMapping("/memo/update")
+	public String update(MemoDTO dto, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+		log.info("dto : "+ dto);
+		m.modify(dto);
+		rAttr.addAttribute("page",pr.getPage());
+		rAttr.addAttribute("gno",dto.getGno());
+		return "redirect:/memo/detail";
+	}
+```
+
+## 17. 데이터 삭제  
+* 삭제는 기본키를 받아서 삭제하던지 아니면 DTO를 받아서 처리  
+### 1) MemoService 인터페이스에 삭제를 위한 메서드 선언  
+```java
+	// 삭제를 처리하는 메서드
+	public void remove(Long gno);
+```  
+
+### 2) MemoServiceImpl 클래스에 삭제를 위한 메서드 구현  
+```java
+	@Override
+	public void remove(Long gno) {
+		// 데이터 찾아오기(그동안 지워졌을까봐)
+		Optional<Memo> result = m.findById(gno);
+		if(result.isPresent()){
+			m.deleteById(gno);
+		}
+	}
+```  
+
+### 3) MemoPageController클래스에 삭제 요청을 처리하기 위한 메서드를 작성  
+```java
+	// 데이터 삭제 처리
+	@PostMapping("/memo/delete")
+	public String delete(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+		m.remove(gno);
+		rAttr.addAttribute("page",pr.getPage());
+		return "redirect:/memo/list";
+	}
+```  
+
+### 4) detail.html파일에 삭제 요청을 위한 링크 추가
+```html
+```

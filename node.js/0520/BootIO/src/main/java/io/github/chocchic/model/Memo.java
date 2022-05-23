@@ -51,7 +51,7 @@ public class Memo extends BaseEntity{
 	}
 	
 	// content를 변경해주는 메서드
-	public void changetContent(String content) {
+	public void changeContent(String content) {
 		this.content = content;
 	}
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1>Memo Detail</h1>
+		<form>
+			<!--페이지 번호 -->
+			<input type="hidden" name="page" th:value="${requestDTO.page}">
+			<div class="form-group">
+				<label>Gno</label>
+				<input type="text" class="form-control" name="gno" th:value="${memo.gno}"  readonly/>
+			</div>
+			<div class="form-group">
+				<label>title</label>
+				<input type="text" class="form-control" name="title" th:value="${memo.title}"/>
+			</div>
+			<div class="form-group">
+				<label>content</label>
+				<textarea rows="5" class="form-control" name="content" th:text="${memo.content}"></textarea>
+			</div>
+			<div class="form-group">
+				<label >Writer</label>
+				<input type="text" class="form-control" name="writer" th:value="${memo.writer}" readonly/>
+			</div>
+			<div class="form-group">
+				<label >RegDate</label>
+				<input type="text" class="form-control" th:value="${#temporals.format(memo.regDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+			</div>
+			<div class="form-group">
+				<label >ModDate</label>
+				<input type="text" class="form-control" th:value="${#temporals.format(memo.modDate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+			</div>
+			<button type="button" class="btn btn-primary modifyBtn">수정</button>
+			<button type="button" class="btn btn-info listBtn">목록</button>
+			<button type="button" class="btn btn-danger removeBtn">삭제</button>
+		</form>
+		<script th:inline="javascript">
+			var actionForm = $("form"); //form 태그 객체
+
+			//삭제 버튼을 눌렀을 때
+			$(".removeBtn").click(function(){
+				actionForm.attr("action", "/memo/remove").attr("method","post").submit();
+			})
+			
+			// 수정 버튼을 눌렀을 때
+			$(".modifyBtn").click(function() {
+				if(!confirm("수정하시겠습니까?")){
+					return ;
+				}
+				actionForm.attr("action", "/memo/update").attr("method","post").submit();
+			});
+			
+			// 목록버튼을 눌렀을 때
+			$(".listBtn").click(function() {
+				var page = $("input[name='page']");
+				actionForm.empty(); //form 태그의 모든 내용을 지우고
+				actionForm.append(page);
+				actionForm.attr("action", "/memo/list").attr("method","get").submit();
+			});
+			</script>
+	</th:block>
+</th:block>

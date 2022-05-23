@@ -7,12 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//Controller와 Service 사이의 데이터 전달을 위한 클래스
+//Controller 와 Service 사이의 데이터 전달을 위한 클래스
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MemoDTO {	
+public class MemoDTO {
 	private Long gno;
 	private String title;
 	private String content;
@@ -20,4 +20,3 @@ public class MemoDTO {
 	private LocalDateTime regDate;
 	private LocalDateTime modDate;
 }
-

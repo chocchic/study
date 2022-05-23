@@ -21,14 +21,14 @@ import lombok.Getter;
 @Getter
 //abstract : 인스턴스를 생성할 수 없도록 해주는 클래스로 상속을 통해서만 사용이 가능
 public class BaseEntity {
-	// 생성한 시간을 저장하는데 컬럼 이름은 regdate이고 수정할 수 없도록 생성  
+	//생성한 시간을 저장하는데 컬럼 이름은 regdate 이고 수정할 수 없도록 생성
 	@CreatedDate
 	@Column(name="regdate", updatable=false)
 	private LocalDateTime regDate;
 	
-	// 수정한 시간을 저장하는데 컬럼이름은 moddate이고 수정할 수 없도록 생성
+	//수정한 시간을 저장하는데 컬럼 이름은 moddate 이고 수정할 수 없도록 생성
 	@LastModifiedDate
-	@Column(name="moddate", updatable=false)
+	@Column(name="moddate", updatable=true)
 	private LocalDateTime modDate;
 	
 }

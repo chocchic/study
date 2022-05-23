@@ -23,7 +23,7 @@
 			<tbody>
 				<tr th:each="dto:${result.dtoList}">
 					<th scope="row">[[${dto.gno}]]</th>
-					<td>[[${dto.title}]]</td>
+					<td><a th:href="@{/memo/detail(gno=${dto.gno}, page=${result.page})}">[[${dto.title}]]</a></td>
 					<td>[[${dto.writer}]]</td>
 					<td>[[${#temporals.format(dto.regDate, 'yyyy/MM/dd hh:mm:ss')}]]</td>
 				</tr>
