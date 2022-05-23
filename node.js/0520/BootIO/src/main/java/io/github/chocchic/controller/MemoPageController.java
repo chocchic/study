@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import io.github.chocchic.dto.MemoDTO;
 import io.github.chocchic.dto.PageRequestDTO;
@@ -41,13 +42,16 @@ public class MemoPageController {
 	
 	// 데이터 삽입 처리
 	@PostMapping("/memo/register")
-	public String register(MemoDTO dto, Model model) {
+	public String register(MemoDTO dto, RedirectAttributes rAttr) {
 		// 여기가 제데로 출력이 안되면 요청 URL과 View이름을 확인하고 form의 경우라면 입력요소의 name을 확인
 		log.info("데이터 삽입 요청 : ", dto);
-		
 		// 삽입
 		Long gno = m.insertMemo(dto);
-		
-		return "redirect:/memo/list:";
+		//model에 msg 저장 -> 세션도 모델도 redirect되면 남아있지 않음
+		//model.addAttribute("msg",gno+"로 저장완료!");
+		//session.setAttribute("msg",gno+"로 저장완료!");
+		// 리다이렉트할 때 데이터를 전달
+		rAttr.addFlashAttribute("msg",gno+"로 저장완료!");
+		return "redirect:/memo/list";
 	}
 }

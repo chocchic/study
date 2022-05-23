@@ -733,7 +733,7 @@ public class MemoPageController {
 }
 ```
 
-### 9) templates 디렉터리 안에 
+### 9) templates 디렉터리 안에 memo 디렉터리를 생성하고 그 안에 list.html 파일을 생성하여 작성
 ```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -794,4 +794,65 @@ public class MemoPageController {
     forward : URL을 변경하지 않고 View파일을 출력, 새로고침을 하게되면 이전 요청이 다시 발생합니다.  
     redirect : URL을 변경, 새로고침을 하면 현재 요청이 다시 발생합니다.  
 
-### 1) 
+### 1) MemoPageController에 삽입 처리를 위한 메서드를 생성  
+```java
+    // 삽입화면으로 이동하는 요청을 처리
+	@GetMapping("/memo/register")
+	public void register() {
+		log.info("데이터 삽입화면으로 이동");
+	}
+	
+	// 데이터 삽입 처리
+	@PostMapping("/memo/register")
+	public String register(MemoDTO dto, Model model) {
+		// 여기가 제데로 출력이 안되면 요청 URL과 View이름을 확인하고 form의 경우라면 입력요소의 name을 확인
+		log.info("데이터 삽입 요청 : ", dto);
+		
+		// 삽입
+		Long gno = m.insertMemo(dto);
+
+		//model에 msg 저장 -> 세션도 모델도 redirect되면 남아있지 않음, 밑의 두 코드 작동 X
+		//model.addAttribute("msg",gno+"로 저장완료!");
+		//session.setAttribute("msg",gno+"로 저장완료!");
+
+		// 리다이렉트할 때 데이터를 전달
+		rAttr.addFlashAttribute("msg",gno+"로 저장완료!");
+		return "redirect:/memo/list";
+	}
+```  
+
+### 2) templates/memo 디렉터리 안에 register.html 파일을 만들고 데이터 입력화면을 생성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1 class="mt4">메모 등록</h1>
+		
+		<form th:action="@{/memo/register}" th:method="post">
+			<div class ="form-group">
+				<label>title</label>
+				<input type="text" class="form-control" name="title" placeholder="Enter title..."/>
+				<label>content</label>
+				<textarea class="form-control" rows="5" name="content"></textarea>
+				<label>writer</label>
+				<input type="text" class="form-control" name="writer" placeholder="Enter writer..."/>
+			</div>
+		</form>
+	</th:block>
+</th:block>
+```
+
+### 3) list.html파일에 데이터 삽입 요청을 생성  
+```html
+    <span>
+        <a th:href="@{/memo/register}">
+        <button type="button" class="btn btn-outline-primary">방명록 작성
+        </button>
+        </a>
+    </span>
+
+    <div th:if="${msg!=null}" th:text="${msg}"></div>
+```  
+
+### 4) 애플리케이션을 실행하고 메모 작성을 해서 메시지가 출력되는지까지 확인  

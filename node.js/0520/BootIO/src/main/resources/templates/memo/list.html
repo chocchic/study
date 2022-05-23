@@ -2,16 +2,24 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
 	<th:block th:fragment="content">
-		<h1>Memo Application</h1>
+        <h1 class="mt-4">Memo Application
+        	<span>
+				<a th:href="@{/memo/register}">
+				<button type="button" class="btn btn-outline-primary">방명록 작성
+				</button>
+				</a>
+			</span>
+        </h1>
+        <div th:if="${msg!=null}" th:text="${msg}"></div>
 		<table class ="table table-striped">
-			<thread>
+			<thead>
 				<tr>
 					<th scope="col">#</th>
 					<th scope="col">title</th>
 					<th scope="col">writer</th>
 					<th scope="col">Date</th>
 				</tr>
-			</thread>
+			</thead>
 			<tbody>
 				<tr th:each="dto:${result.dtoList}">
 					<th scope="row">[[${dto.gno}]]</th>
@@ -24,9 +32,8 @@
 		
 		<ul class ="pagination h-100 justify-content">
 			<li class="page-item" th:if="${result.prev}">
-				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}" tableindex="-1">prev</a>
+				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}">prev</a>
 			</li>
-			
 			<li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page:${result.pageList}">
 			<!--/* <li class="page-item" th:classappend="${result.page == page?'active':''}" th:each="page:${result.pageList}"> */-->
 				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
