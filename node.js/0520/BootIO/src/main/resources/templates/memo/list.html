@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1>Memo Application</h1>
+		<table class ="table table-striped">
+			<thread>
+				<tr>
+					<th scope="col">#</th>
+					<th scope="col">title</th>
+					<th scope="col">writer</th>
+					<th scope="col">Date</th>
+				</tr>
+			</thread>
+			<tbody>
+				<tr th:each="dto:${result.dtoList}">
+					<th scope="row">[[${dto.gno}]]</th>
+					<td>[[${dto.title}]]</td>
+					<td>[[${dto.writer}]]</td>
+					<td>[[${#temporals.format(dto.regDate, 'yyyy/MM/dd hh:mm:ss')}]]</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<ul class ="pagination h-100 justify-content">
+			<li class="page-item" th:if="${result.prev}">
+				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}" tableindex="-1">prev</a>
+			</li>
+			<li th:class="'page-item'+${result.page==page?'active':''}" th:each="page:${result.pageList}">
+				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
+			</li>
+			<li class="page-item" th:if="${result.next}">
+				<a class="page-link" th:href="@{/memo/list(page=${result.end+1})}">next</a>
+			</li>
+		</ul>
+	</th:block>
+</th:block>

@@ -657,3 +657,118 @@ PageResponseDTO<MemoDTO, Memo>getList(PageRequestDTO requestDTO);
     (int)(Math.ceil(5/(double)10)) * 10 = 1 * 10 = 10  
 
 * 시작하는 페이지 번호 = 끝나는 페이지 번호 - (페이지 번호 출력 개수 - 1);  
+
+* Page ~ 빼먹음 - PageRespnseDTO에 추가
+```java
+// Page 객체와 함수를 적용해서 List로 변환해주는 메서드
+	public PageResponseDTO(Page<EN> result, Function<EN, DTO> fn) {
+		// 출력할 데이터 목록 생성
+		dtoList = result.stream().map(fn).collect(Collectors.toList());
+		// 페이지 번호 목록 생성
+		totalPage = result.getTotalPages();
+		makePageList(result.getPageable());
+	}
+	
+	// 전체 페이지 개수
+	private int totalPage;
+	
+	// 현재 페이지 번호
+	private int page;
+	
+	// 출력할 페이지 번호 개수
+	private int size;
+	
+	// 이전 페이지 목록 여부
+	private boolean prev;
+	// 다음 페이지 목록 여부
+	private boolean next;
+	
+	// 시작하는 페이지 번호
+	private int start;
+	// 끝나는 페이지 번호
+	private int end;
+	
+	// 출력할 페이지 번호 등록
+	private List<Integer> pageList;
+	
+	// 출력핧 페이지 번호를 계산하는 메서드
+	private void makePageList(Pageable pageable) {
+		this.page = pageable.getPageNumber() + 1;
+		this.size = pageable.getPageSize();
+		
+		int tempEnd = (int)(Math.ceil(page/ (double)size)) * 10;
+		start = tempEnd - 9;
+		prev = start > 1;
+		end = totalPage > tempEnd ? tempEnd : totalPage;
+		next = totalPage > tempEnd;
+		pageList = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
+	}
+```  
+
+### 7) 테스트 클래스에서 메서드를 생성해서 테스트
+
+### 8) 빼먹음
+```java
+@Controller
+// 로그 기록을 편리하게 할 수 있도록 해주는 어노테이션
+@Log4j2
+// 인스턴스 변수의 주입을 생성자에서 자동으로 처리하도록 해주는 어노테이션
+@RequiredArgsConstructor
+public class MemoPageController {
+	private final MemoService m;
+	
+	// 요청이 오면 templates 디렉터리에 있는 main.html을 출력
+	@GetMapping("/")
+	public String main() {
+		// redirect할 때는 View의 이름을 적는 것이 아니고 요청을 적어야합니다.
+		return "redirect:/memo/list";
+	}
+	
+	// 목록보기 요청을 처리
+	@GetMapping("/memo/list")
+	public void list(PageRequestDTO pr, Model model) {
+		log.info("목록보기");
+		model.addAttribute("result", m.getList(pr));
+	}
+}
+```
+
+### 9) templates 디렉터리 안에 
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+		<h1>Memo Application</h1>
+		<table class ="table table-striped">
+			<thread>
+				<tr>
+					<th scope="col">#</th>
+					<th scope="col">title</th>
+					<th scope="col">writer</th>
+					<th scope="col">Date</th>
+				</tr>
+			</thread>
+			<tbody>
+				<tr th:each="dto:${result.dtoList}">
+					<th scope="row">[[${dto.gno}]]</th>
+					<td>[[${dto.title}]]</td>
+					<td>[[${dto.writer}]]</td>
+					<td>[[${#temporals.format(dto.regDate, 'yyyy/MM/dd hh:mm:ss')}]]</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<ul class ="pagination h-100 justify-content">
+			<li class="page-item" th:if="${result.prev}">
+				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}" tableindex="-1">prev</a>
+			</li>
+			<li th:class="'page-item'+${result.page==page?'active':''}" th:each="page:${result.pageList}">
+				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
+			</li>
+			<li class="page-item" th:if="${result.next}">
+				<a class="page-link" th:href="@{/memo/list(page=${result.end+1})}">next</a>
+			</li>
+		</ul>
+	</th:block>
+```
