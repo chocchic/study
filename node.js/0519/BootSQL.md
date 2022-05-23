@@ -758,11 +758,14 @@ public class MemoPageController {
 				</tr>
 			</tbody>
 		</table>
-		
+		<!-- 부트스트랩은 모양을 만들 때 class 이름을 가지고 모양을 생성하는데 pagination은 페이지 번호를 만들기 위한 클래스-->
 		<ul class ="pagination h-100 justify-content">
+            <!-- 이전을 만들기 위한 부분 result.prev가 true라면 prev를 출력-->
 			<li class="page-item" th:if="${result.prev}">
+                <!--thymeleaf에서는 link를 설정할 때 @를 포함해서 만들고 여기에 파라미터를 만들 때는 (파라미터 이름 = 값)으로 만듭니다. @{/memo/list(page=${result.start-1})는 a href='/memo/list?page=값의 형태가 됩니다.-->
 				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}" tableindex="-1">prev</a>
 			</li>
+            <!--페이지 번호 리스트를 순회하면서 출력을 하는데 현재 페이지 번호와 출력하는 페이지 번호가 같으면 active클래스를 추가해서 활성화 시켜주고 링크는 해제합니다.-->
 			<li th:class="'page-item'+${result.page==page?'active':''}" th:each="page:${result.pageList}">
 				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
 			</li>
@@ -771,4 +774,24 @@ public class MemoPageController {
 			</li>
 		</ul>
 	</th:block>
-```
+```  
+* th:class 사용시 주의할 점  
+    class의 속성값을 string처럼 주므로 base 클래스 뒤에 공백 하나가 있어야함.  
+    th:class 대신 th:classappend사용 가능  
+        class="base" th:classappend="${condition ? 'condition-true' : 'condition-false'}"  
+
+* 페이지 번호 목록을 출력  
+    현재 페이지가 1이라면 1~10, 현재 페이지가 5라면 1~10, 현재 페이지가 11이라면 11~20
+    => 필요한 데이터 : 현재 페이지 번호, 전체 페이지 개수, 페이지 번호 출력 개수  
+    시작하는 번호 : 끝나는 번호 - (페이지 번호 출력 개수 -1)  
+    끝나는 번호 : 시작하는 번호 + (페이지 번호 출력 개수 -1)  
+    끝나는 번호는 전체 페이지 개수보다 클 수 없음  
+
+## 11. 데이터 삽입 처리  
+* 데이터 삽입 과정 : 데이터 삽입 요청을 하면 데이터를 입력할 수 있는 화면으로 이동하고 데이터 입력이 끝난 후 데이터 삽입 요청을 하면 데이터 삽입을 수행  
+* 단순한 화면 이동이나 데이터 출력은 GET방식으로 이루어지고, 나머지 작업은 대부분 POST(PUT, DELETE)방식으로 처리합니다.  
+* 삽입, 삭제, 수정 작업이 완료되면 웹의 경우 페이지 이동은 redirect를 이용합니다.  
+    forward : URL을 변경하지 않고 View파일을 출력, 새로고침을 하게되면 이전 요청이 다시 발생합니다.  
+    redirect : URL을 변경, 새로고침을 하면 현재 요청이 다시 발생합니다.  
+
+### 1) 

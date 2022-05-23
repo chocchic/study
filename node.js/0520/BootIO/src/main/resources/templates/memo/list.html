@@ -26,7 +26,9 @@
 			<li class="page-item" th:if="${result.prev}">
 				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}" tableindex="-1">prev</a>
 			</li>
-			<li th:class="'page-item'+${result.page==page?'active':''}" th:each="page:${result.pageList}">
+			
+			<li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page:${result.pageList}">
+			<!--/* <li class="page-item" th:classappend="${result.page == page?'active':''}" th:each="page:${result.pageList}"> */-->
 				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
 			</li>
 			<li class="page-item" th:if="${result.next}">

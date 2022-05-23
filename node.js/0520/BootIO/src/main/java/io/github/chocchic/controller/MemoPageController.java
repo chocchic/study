@@ -3,7 +3,9 @@ package io.github.chocchic.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import io.github.chocchic.dto.MemoDTO;
 import io.github.chocchic.dto.PageRequestDTO;
 import io.github.chocchic.service.MemoService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +31,23 @@ public class MemoPageController {
 	public void list(PageRequestDTO pr, Model model) {
 		log.info("목록보기");
 		model.addAttribute("result", m.getList(pr));
+	}
+	
+	// 삽입화면으로 이동하는 요청을 처리
+	@GetMapping("/memo/register")
+	public void register() {
+		log.info("데이터 삽입화면으로 이동");
+	}
+	
+	// 데이터 삽입 처리
+	@PostMapping("/memo/register")
+	public String register(MemoDTO dto, Model model) {
+		// 여기가 제데로 출력이 안되면 요청 URL과 View이름을 확인하고 form의 경우라면 입력요소의 name을 확인
+		log.info("데이터 삽입 요청 : ", dto);
+		
+		// 삽입
+		Long gno = m.insertMemo(dto);
+		
+		return "redirect:/memo/list:";
 	}
 }
