@@ -1,6 +1,8 @@
 package io.github.chocchic.service;
 
 import io.github.chocchic.dto.MemoDTO;
+import io.github.chocchic.dto.PageRequestDTO;
+import io.github.chocchic.dto.PageResponseDTO;
 import io.github.chocchic.model.Memo;
 
 public interface MemoService {
@@ -22,4 +24,6 @@ public interface MemoService {
 	
 	// 데이터 삽입을 위한 메서드 : 삽입된 메모의 gno값을 리턴
 	public Long insertMemo(MemoDTO dto);
+	// 목록보기를 위한 메서드
+	PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO);
 }

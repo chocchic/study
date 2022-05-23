@@ -570,3 +570,90 @@ public class MemoServiceTest {
     검색 항목과 키워드
 
 * 목록 보기를 하기위해서는 별도의 DTO클래스가 필요  
+
+### 1) 요청 관련 DTO : 페이징 적용 - PageRequestDTO  
+```java
+@Builder
+@Data
+@AllArgsConstructor
+public class PageRequestDTO {
+	// 페이지 번호
+	private int page;
+	// 한 페이지에 출력될 데이터 개수
+	private int size;
+	
+	// 생성자 - 인스턴스 변수를 초기화
+	public PageRequestDTO() {
+		this.page = 1;
+		this.size = 10;
+	}
+	
+	// Pageable(Spring Boot JPA에서 Page 단위 검색을 위한 클래스) 객체를 생성해주는 메서드
+	public Pageable getPageable(Sort sort) {
+		return PageRequest.of(page-1, size, sort);
+	}
+}
+```  
+
+### 2) 응답관련 DTO : Page 객체를 받아서 List로 변환해서 저장  
+```java
+// 재활용을 위해서 템플릿을 적용
+// DTO는 변환할 DTO클래스가 대입되고, EN은 Entity와 DTO사이의 변환을 수행해 줄 함수
+// Java에서는 Generic이라고 하고 객체 지향에서는 템플릿 프로그래밍이라고 합니다.
+// 알고리즘을 구현하거나 프레임워크를 만들 때 중요
+@Data
+public class PageResponseDTO <DTO, EN> {
+	// DTO의 List
+	private List<DTO> dtoList;
+	
+	// Page 객체와 함수를 적용해서 List로 변환해주는 메서드
+	public PageResponseDTO(Page<EN> result, Function<EN, DTO> fn) {
+		dtoList = result.stream().map(fn).collect(Collectors.toList());
+	}
+}
+```  
+
+### 3) Service 인터페이스에 목록보기를 위한 메서드를 선언  
+리턴타입 getList(매개변수) -> 리턴타입 getList(PageRequsetDTO) -> PageResponseDTO<MemoDTO, Memo>getList(PageRequsetDTO);  
+```java
+// 목록보기를 위한 메서드
+PageResponseDTO<MemoDTO, Memo>getList(PageRequestDTO requestDTO);
+```  
+
+### 4) ServiceImpl 클래스에 목록보기 메서드를 구현  
+```java
+@Override
+	public PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO) {
+		// 정렬조건을 적용해서 페이징 객체를 생성
+		Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
+		Page<Memo> result = m.findAll(pageable);
+		
+		// Entity를 DTO로 변환해주는 함수 설정
+		Function<Memo, MemoDTO> fn = (entity -> entityToDTO(entity));
+		// 결과 리턴
+		return new PageResponseDTO<MemoDTO, Memo>(result, fn);
+	}
+```  
+
+### 5) Test클래스에서 메서드 테스트  
+```java
+    // 목록 보기 테스트
+	@Test
+	public void testList() {
+		PageRequestDTO pr = PageRequestDTO.builder().page(1).size(10).build();
+		PageResponseDTO<MemoDTO, Memo> resultDto = m.getList(pr);
+		for(MemoDTO mm : resultDto.getDtoList()) {
+			System.out.println(mm);
+		}
+	}
+```  
+
+### 6) 페이징 처리시 필요한 요소  
+* 페이지 번호 목록을 화면에 출력하기 위해서는 시작하는 페이지 번호, 끝나는 페이지 번호 , 이전 페이지 여부, 다음 페이지 여부, 현재 페이지 번호가 필요  
+
+* 끝나는 페이지 번호 = (int)(Math.ceil(현재 페이지 번호 / (double)페이지 번호 출력 개수)) * 페이지 번호 출력 개수;  
+
+* 현재 페이지 번호가 5이고 페이지 번호 출력 개수가 10이라면?  
+    (int)(Math.ceil(5/(double)10)) * 10 = 1 * 10 = 10  
+
+* 시작하는 페이지 번호 = 끝나는 페이지 번호 - (페이지 번호 출력 개수 - 1);  

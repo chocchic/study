@@ -1,8 +1,15 @@
 package io.github.chocchic.service;
 
+import java.util.function.Function;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import io.github.chocchic.dto.MemoDTO;
+import io.github.chocchic.dto.PageRequestDTO;
+import io.github.chocchic.dto.PageResponseDTO;
 import io.github.chocchic.model.Memo;
 import io.github.chocchic.persistence.MemoRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +36,17 @@ public class MemoServiceImpl implements MemoService {
 		m.save(memo);
 		
 		return memo.getGno();
+	}
+
+	@Override
+	public PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO) {
+		// 정렬조건을 적용해서 페이징 객체를 생성
+		Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
+		Page<Memo> result = m.findAll(pageable);
+		
+		// Entity를 DTO로 변환해주는 함수 설정
+		Function<Memo, MemoDTO> fn = (entity -> entityToDTO(entity));
+		// 결과 리턴
+		return new PageResponseDTO<MemoDTO, Memo>(result, fn);
 	}
 }
