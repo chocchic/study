@@ -27,4 +27,9 @@ public class PageRequestDTO {
 	public Pageable getPageable(Sort sort) {
 		return PageRequest.of(page-1, size, sort);
 	}
+	
+	// 검색 항목을 저장할 변수
+	private String type;
+	// 검색 값을 저장할 변수
+	private String keyword;
 }

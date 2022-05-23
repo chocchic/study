@@ -33,4 +33,6 @@ public interface MemoService {
 	// 삭제를 처리하는 메서드
 	public void remove(Long gno);
 	
+	
+	
 }

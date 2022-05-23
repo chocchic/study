@@ -72,9 +72,15 @@ public class MemoPageController {
 		rAttr.addAttribute("gno",dto.getGno());
 		return "redirect:/memo/detail";
 	}
-	// 데이터 수정 처리
+	// 데이터 삭제 처리
 	@PostMapping("/memo/delete")
 	public String delete(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+		m.remove(gno);
+		rAttr.addAttribute("page",pr.getPage());
+		return "redirect:/memo/list";
+	}
+	@GetMapping("/memo/delete") // detail페이지에서 삭제 요청시 ,GET만 가능하므로 추가함
+	public String delete2(Long gno, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
 		m.remove(gno);
 		rAttr.addAttribute("page",pr.getPage());
 		return "redirect:/memo/list";

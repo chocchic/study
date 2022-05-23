@@ -39,7 +39,23 @@
 
 			//삭제 버튼을 눌렀을 때
 			$(".removeBtn").click(function(){
-				actionForm.attr("action", "/memo/remove").attr("method","post").submit();
+				if(!confirm("정말로 삭제하시겠습니까?")) return;
+				// 기존 방식
+				//actionForm.attr("action", "/memo/delete").attr("method","post").submit();
+				
+				// ajax 방식
+				var request = new XMLHttpRequest();
+				var url = '/memo/delete';
+				//var params='gno='+document.getElementById('gno').value();
+				var params='gno='+'[[${memo.gno}]]';
+				
+				request.open('POST', url, true);
+				request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+				request.send(params);
+				
+				request.addEventListener('load', ()=>{
+					location.href='/memo/list';
+				});
 			})
 			
 			// 수정 버튼을 눌렀을 때
