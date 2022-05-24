@@ -20,7 +20,7 @@ import lombok.Getter;
 @EntityListeners(value= {AuditingEntityListener.class})
 @Getter
 //abstract : 인스턴스를 생성할 수 없도록 해주는 클래스로 상속을 통해서만 사용이 가능
-public class BaseEntity {
+abstract class BaseEntity {
 	//생성한 시간을 저장하는데 컬럼 이름은 regdate 이고 수정할 수 없도록 생성
 	@CreatedDate
 	@Column(name="regdate", updatable=false)

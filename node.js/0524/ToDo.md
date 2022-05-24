@@ -45,6 +45,65 @@ public class ToDoBackEndApplication {
 }
 ```
 
+### 4) model 패키지에 데이터 삽입시간과 수정시간을 가진 BaseEntity를 생성
+```java
+// 데이터베이스 작업을 감시하도록 설정
+// Listener: 이벤트가 발생했을 때 처리하는 객체
+@EntityListeners(value= {AuditingEntityListener.class})
+
+// 테이블로 생성하지 않는 Entity를 생성하기 위한 설정
+@MappedSuperclass
+
+
+// 인스턴스를 만들 수 없는 클래스
+public class BaseEntity {
+	@CreatedDate
+	@Column(name = "regdate", updatable = false)
+	private LocalDateTime regDate;
+	
+	@CreatedDate
+	@Column(name = "regdate", updatable = true)
+	private LocalDateTime modDate;
+}
+```  
+
+### 5) model패키지에 데이터 저장을 위한 ToDo엔티티 클래스를 생성  
+```java
+@Builder // 생성자를 사용하지 않고 인스턴스를 생성하고 속성이름을 setter처럼 사용하기 위한 어노테이션
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name="todo")
+@Entity
+public class ToDoEntity extends BaseEntity{ // regDate와 modDate를 자동으로 상속
+	@Id
+	// 시스템이 랜덤하게 uuid로 기본키 값을 생성
+	@GeneratedValue(generator="system-uuid")
+	@GenericGenerator(name="systme-uuid", strategy="uuid")
+	private String id;
+	
+	@Column(length = 100, nullable = false)
+	private String userId;
+	
+	@Column(length = 500, nullable = false)
+	private String title;
+	
+	@Column(nullable = false)
+	private boolean done;	
+	
+}
+```
+
+### 6) 실행을 해서 테이블이 생성되는지 확인  
+
+### 7) persistence 패키지에 ToDoEntity 작업을 위한 ToDoRepository 인터페이스를 생성하고 메서드 선언  
+```java
+
+```  
+
+### 8) test 패키지에 ToDoRepository를 테스트할 수 있는 클래스를 생성하고 테스트
+* 사용자의 
+
 ### +) 그냥 하다보면 프로그래머들이 알아야하는 단어들  
 * Authentication(인증)  
 * Authorization(인가)  
