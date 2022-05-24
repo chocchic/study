@@ -6,6 +6,8 @@
 		<form>
 			<!--페이지 번호 -->
 			<input type="hidden" name="page" th:value="${requestDTO.page}">
+			<input type="hidden" name="type" th:value="${requestDTO.type}">
+			<input type="hidden" name="keyword" th:value="${requestDTO.keyword}">
 			<div class="form-group">
 				<label>Gno</label>
 				<input type="text" class="form-control" name="gno" th:value="${memo.gno}"  readonly/>
@@ -69,8 +71,12 @@
 			// 목록버튼을 눌렀을 때
 			$(".listBtn").click(function() {
 				var page = $("input[name='page']");
-				actionForm.empty(); //form 태그의 모든 내용을 지우고
+				var type = $("input[name='type']");
+				var keyword = $("input[name='keyword']");
+				actionForm.empty(); //form 태그의 내용을 가져온 후 모든 내용을 지우기			
 				actionForm.append(page);
+				actionForm.append(type);
+				actionForm.append(keyword);
 				actionForm.attr("action", "/memo/list").attr("method","get").submit();
 			});
 			</script>

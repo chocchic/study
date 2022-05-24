@@ -10,6 +10,28 @@
 				</a>
 			</span>
         </h1>
+        <form action="/memo/list" method="get" id="searchform">
+        	<div class="input_group">
+        		<input type="hidden" name="page" value="1"/>
+        		<div class="input-group-prepend">
+        			<select class="custon-select" name="type">
+        				<option th:selected="${requestDTO.type == null}">---</option>
+        				<option th:selected="${requestDTO.type == 't'}" value = "t">title</option>
+        				<option th:selected="${requestDTO.type == 'c'}" value = "c">content</option>
+        				<option th:selected="${requestDTO.type == 'w'}" value = "w">writer</option>
+        				<option th:selected="${requestDTO.type == 'tc'}" value = "tc">title + content</option>
+        				<option th:selected="${requestDTO.type == 'tw'}" value = "tw">title + writer</option>
+        				<option th:selected="${requestDTO.type == 'cw'}" value = "cw">content + writer</option>
+        				<option th:selected="${requestDTO.type == 'tcw'}" value = "tcw">all</option>
+        			</select>
+        			<input class="form-control" name="keyword" th:value="${requestDTO.keyword}"/>
+        		</div>
+        		<div class="input-group-append" id="button-addon4">
+        			<button type="button" class="btn btn-outline-primary btn-search">검색</button>
+        			<button type="button" class="btn btn-outline-secondary btn-clear">초기화</button>
+        		</div>
+        	</div>
+        </form>
         <div th:if="${msg!=null}" th:text="${msg}"></div>
 		<table class ="table table-striped">
 			<thead>
@@ -23,7 +45,7 @@
 			<tbody>
 				<tr th:each="dto:${result.dtoList}">
 					<th scope="row">[[${dto.gno}]]</th>
-					<td><a th:href="@{/memo/detail(gno=${dto.gno}, page=${result.page})}">[[${dto.title}]]</a></td>
+					<td><a th:href="@{/memo/detail(gno=${dto.gno}, page=${result.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">[[${dto.title}]]</a></td>
 					<td>[[${dto.writer}]]</td>
 					<td>[[${#temporals.format(dto.regDate, 'yyyy/MM/dd hh:mm:ss')}]]</td>
 				</tr>
@@ -32,15 +54,24 @@
 		
 		<ul class ="pagination h-100 justify-content">
 			<li class="page-item" th:if="${result.prev}">
-				<a class="page-link" th:href="@{/memo/list(page=${result.start-1})}">prev</a>
+				<a class="page-link" th:href="@{/memo/list(page=${result.start-1}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}" tableindex="-1">prev</a>
 			</li>
 			<li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page:${result.pageList}">
 			<!--/* <li class="page-item" th:classappend="${result.page == page?'active':''}" th:each="page:${result.pageList}"> */-->
-				<a class="page-link" th:href="@{/memo/list(page=${page})}">[[${page}]]</a>
+				<a class="page-link" th:href="@{/memo/list(page=${page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">[[${page}]]</a>
 			</li>
 			<li class="page-item" th:if="${result.next}">
-				<a class="page-link" th:href="@{/memo/list(page=${result.end+1})}">next</a>
+				<a class="page-link" th:href="@{/memo/list(page=${result.end+1}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">next</a>
 			</li>
 		</ul>
+		<script th:inline="javascript">
+			var searchForm = $("#searchform");
+			$('.btn-search').click(function(){
+				searchForm.submit();
+			});
+			$('.btn-clear').click(function(){
+				searchForm.empty().submit();
+			});
+		</script>
 	</th:block>
 </th:block>

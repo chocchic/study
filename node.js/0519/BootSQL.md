@@ -238,10 +238,9 @@ public class BootIoApplication {
         여러 클래스들을 구현하다가 공통된 부분이 있으면 상위 클래스를 만들어서 상속을 하는 구조를 만듭니다.  상위 클래스 만들고 하위 클래스를 생성하는 것은 경험이 많은 경우 가능  
         자주 사용이 될만한 상위 클래스들을 미리 만들어서 제공하는 것을 Development Kit 또는 Framework라고 합니다.  
 
-### 2) 빼먹음
+### 2) Entity 들이 공통으로 가져야 하는 속성을 가진 Entity 클래스 생성 - model.BaseEntity  
 ```java
 // 공통된 속성을 가진 Entity
-
 // 테이블로 생성할 필요가 없음
 @MappedSuperclass
 // 데이터베이스 작업을 감시
@@ -261,8 +260,7 @@ public class BaseEntity {
 }
 ```  
 
-### 3) 애플리케이션에서 사용할 Memo Entity 생성 - model.Memo
-* 
+### 3) 애플리케이션에서 사용할 Memo Entity 생성 - model.Memo  
 ```java
 @Entity
 @Table(name="memo")
@@ -658,7 +656,7 @@ PageResponseDTO<MemoDTO, Memo>getList(PageRequestDTO requestDTO);
 
 * 시작하는 페이지 번호 = 끝나는 페이지 번호 - (페이지 번호 출력 개수 - 1);  
 
-* Page ~ 빼먹음 - PageRespnseDTO에 추가
+* PageResponseDTO 클래스에 페이지 번호 출력을 위한 코드를 추가 - PageRespnseDTO에 추가
 ```java
 // Page 객체와 함수를 적용해서 List로 변환해주는 메서드
 	public PageResponseDTO(Page<EN> result, Function<EN, DTO> fn) {
@@ -705,9 +703,27 @@ PageResponseDTO<MemoDTO, Memo>getList(PageRequestDTO requestDTO);
 	}
 ```  
 
-### 7) 테스트 클래스에서 메서드를 생성해서 테스트
+### 7) 테스트 클래스에서 메서드를 생성해서 테스트  
+```java
+	//목록 보기 테스트 - 목록 과 페이지 번호 테스트
+	@Test
+	public void testPageList() {
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(21).size(10).build();
+		PageResponseDTO <MemoDTO, Memo> resultDTO = memoService.getList(pageRequestDTO);
+		for(MemoDTO memoDto : resultDTO.getDtoList()) {
+			System.out.println(memoDto);
+		}
+		//이전 과 다음 페이지 존재 여부
+		System.out.println("이전:" + resultDTO.isPrev());
+		System.out.println("다음:" + resultDTO.isNext());
+		//전체 페이지 개수
+		System.out.println("전체 페이지 개수:" + resultDTO.getTotalPage());
+		//페이지 번호 목록
+		System.out.println(resultDTO.getPageList());	
+	}
+```  
 
-### 8) 빼먹음
+### 8) MemoPageController 클래스를 수정해서 목록 보기를 구현  
 ```java
 @Controller
 // 로그 기록을 편리하게 할 수 있도록 해주는 어노테이션
@@ -731,9 +747,9 @@ public class MemoPageController {
 		model.addAttribute("result", m.getList(pr));
 	}
 }
-```
+```  
 
-### 9) templates 디렉터리 안에 memo 디렉터리를 생성하고 그 안에 list.html 파일을 생성하여 작성
+### 9) templates 디렉터리 안에 memo 디렉터리를 생성하고 그 안에 list.html 파일을 생성하여 작성  
 ```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -775,13 +791,14 @@ public class MemoPageController {
 		</ul>
 	</th:block>
 ```  
+
 * th:class 사용시 주의할 점  
     class의 속성값을 string처럼 주므로 base 클래스 뒤에 공백 하나가 있어야함.  
     th:class 대신 th:classappend사용 가능  
         class="base" th:classappend="${condition ? 'condition-true' : 'condition-false'}"  
 
 * 페이지 번호 목록을 출력  
-    현재 페이지가 1이라면 1~10, 현재 페이지가 5라면 1~10, 현재 페이지가 11이라면 11~20
+    현재 페이지가 1이라면 1~10, 현재 페이지가 5라면 1~10, 현재 페이지가 11이라면 11~20  
     => 필요한 데이터 : 현재 페이지 번호, 전체 페이지 개수, 페이지 번호 출력 개수  
     시작하는 번호 : 끝나는 번호 - (페이지 번호 출력 개수 -1)  
     끝나는 번호 : 시작하는 번호 + (페이지 번호 출력 개수 -1)  
@@ -841,7 +858,7 @@ public class MemoPageController {
 		</form>
 	</th:block>
 </th:block>
-```
+```  
 
 ### 3) list.html파일에 데이터 삽입 요청을 생성  
 ```html
@@ -891,7 +908,7 @@ public class MemoPageController {
 	}
 ```  
 
-### 5) 빼먹음
+### 5) templates/memo 디렉터리에 detail.html 파일을 생성하고 작성
 ```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -940,7 +957,7 @@ public class MemoPageController {
 @GetMapping({"/memo/detail", "/memo/update"})
 ```
 
-### 3) update.html 만들기
+### 3) templates/memo디렉터리에 update.html 파일을 만들어서 수정 화면을 생성
 ```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -1041,7 +1058,7 @@ public class MemoPageController {
 	}
 ```
 
-## 17. 데이터 삭제  
+## 14. 데이터 삭제  
 * 삭제는 기본키를 받아서 삭제하던지 아니면 DTO를 받아서 처리  
 ### 1) MemoService 인터페이스에 삭제를 위한 메서드 선언  
 ```java
@@ -1079,7 +1096,7 @@ public class MemoPageController {
 <!--script쪽의 $(".removeBtn")-->
 ```  
 
-## 18. 검색 조건 활용  
+## 15. 검색 조건 활용  
 * 어떤 종류의 검색 조건이 있는지 결정  
 	제목 - t 내용 - c 작성자 - w
 	제목 or 내용, 제목 or 작성자, 내용 or 작성자  
@@ -1132,4 +1149,143 @@ public class MemoPageController {
 		
 		return booleanBuilder;		
 	}
+```  
+### +) 옵션을 만들 때 고려사항  
+* or 조건을 만들 떄는 하나의 비트나 문자가 하나의 옵션을 나타내도록 생성하는 것이 좋습니다.  
+* 하나의 비트를 이용하는 방법  
+1	2	4	8	16  
+=> 결합을 할 때는 | 연산이나 + 연산으로 하면 됩니다.  
+
+### 3) MemoServiceImpl클래스의 목록을 조회하는 메서드를 수정  
+```java
+	@Override
+	public PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO) {
+		// 정렬조건을 적용해서 페이징 객체를 생성
+		Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
+		// 검색조건을 생성
+		BooleanBuilder booleanBuilder = getSearch(requestDTO);
+		// 검색조건을 적용해서 조회
+		Page<Memo> result = m.findAll(booleanBuilder, pageable);
+		
+		// Entity를 DTO로 변환해주는 함수 설정
+		Function<Memo, MemoDTO> fn = (entity -> entityToDTO(entity));
+		// 결과 리턴
+		return new PageResponseDTO<MemoDTO, Memo>(result, fn);
+	}
+```  
+
+### 4) MemoServiceTest클래스에서 생성한 메서드 테스트  
+```java
+	@Test
+	public void testListSearch() {
+		PageRequestDTO pr = PageRequestDTO.builder().page(1).size(10).type("t").keyword("개행").build();
+		PageResponseDTO<MemoDTO, Memo> result = m.getList(pr);
+		System.out.println(result.getDtoList());	
+	}
+```  
+
+### 5) list.html파일에 검색 폼 추가
+```html
+		<form action="/memo/list" method="get" id="searchform">
+        	<div class="input_group">
+        		<input type="hidden" name="page" value="1"/>
+        		<div class="input-group-prepend">
+        			<select class="custon-select" name="type">
+        				<option th:selected="${pageRequestDTO.type == null}">---</option>
+        				<option th:selected="${pageRequestDTO.type == 't'}" value = "t">title</option>
+        				<option th:selected="${pageRequestDTO.type == 'c'}" value = "c">content</option>
+        				<option th:selected="${pageRequestDTO.type == 'w'}" value = "w">writer</option>
+        				<option th:selected="${pageRequestDTO.type == 'tc'}" value = "tc">title + content</option>
+        				<option th:selected="${pageRequestDTO.type == 'tw'}" value = "tw">title + writer</option>
+        				<option th:selected="${pageRequestDTO.type == 'cw'}" value = "cw">content + writer</option>
+        				<option th:selected="${pageRequestDTO.type == 'tcw'}" value = "tcw">all</option>
+        			</select>
+        			<input class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}"/>
+        		</div>
+        		<div class="input-group-append" id="button-addon4">
+        			<button type="button" class="btn btn-outline-primary btn-search" id="searchBtn">검색</button>
+        			<button type="button" class="btn btn-outline-secondary btn-clear" id="clearBtn">초기화</button>
+        		</div>
+        	</div>
+        </form>
 ```
+### 6) list.html파일에 스크립트 코드 추가
+```html
+		<script th:inline="javascript">
+			var searchForm = $("#searchform");
+			$('.btn-search').click(function(){
+				searchForm.submit();
+			});
+			$('.btn-clear').click(function(){
+				searchForm.empty().submit();
+			});
+		</script>
+```  
+
+### 7) list.html파일에서 페이지링크 부분을 수정 - 페이지 번호를 눌렀을 때 검색 폼의 내용이 사라지는 현상을 제거  
+```html
+<ul class ="pagination h-100 justify-content">
+	<li class="page-item" th:if="${result.prev}">
+		<a class="page-link" th:href="@{/memo/list(page=${result.start-1}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">prev</a>
+	</li>
+	<li th:class=" 'page-item ' + ${result.page == page?'active':''} " th:each="page:${result.pageList}">
+	<!--/* <li class="page-item" th:classappend="${result.page == page?'active':''}" th:each="page:${result.pageList}"> */-->
+		<a class="page-link" th:href="@{/memo/list(page=${page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">[[${page}]]</a>
+	</li>
+	<li class="page-item" th:if="${result.next}">
+		<a class="page-link" th:href="@{/memo/list(page=${result.end+1}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}">next</a>
+	</li>
+</ul>
+```  
+
+### 8) list.html에서 상세보기 링크부분도 수정
+```html
+<td><a th:href="@{/memo/detail(gno=${dto.gno}, page=${result.page}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">[[${dto.title}]]</a></td>
+```  
+
+### 9) detail.html파일에서 수정과 목록보기 요청에도 동일한 파라미터 추가
+```html
+<a th:href="@{/memo/list(page=${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}"><button type="button" class="btn btn-info">목록</button></a>
+<a th:href="@{/memo/update(gno = ${memo.gno}, page=${requestDTO.page})}"><button type="button" class="btn btn-primary">수정</button></a>
+```  
+
+### 10) update.html파일에서 form에 type과 keyword를 같이 전송할 수 있도록 hidden을 추가  
+```html
+			<input type="hidden" name="type" th:value="${requestDTO.type}">
+			<input type="hidden" name="keyword" th:value="${requestDTO.keyword}">
+```  
+
+### 11) update.html파일에서 목록보기를 눌렀을 때를 처리하는 자바스크립트를 추가  
+```javascript
+	// 목록버튼을 눌렀을 때
+	$(".listBtn").click(function() {
+		var page = $("input[name='page']");
+		var type = $("input[name='type']");
+		var keyword = $("input[name='keyword']");
+		actionForm.empty(); //form 태그의 내용을 가져온 후 모든 내용을 지우기			
+		actionForm.append(page);
+		actionForm.append(type);
+		actionForm.append(keyword);
+		actionForm.attr("action", "/memo/list").attr("method","get").submit();
+	});
+```  
+
+### 12) MemoPagecontroller에서 수정을 처리하는 메서드 수정  
+```java
+// 데이터 수정 처리
+@PostMapping("/memo/update")
+public String update(MemoDTO dto, @ModelAttribute("requestDTO")PageRequestDTO pr, RedirectAttributes rAttr) {
+	log.info("dto : "+ dto);
+	m.modify(dto);
+	// 상세보기로 이동할 때 필요한 gno값과 page값을 설정
+	rAttr.addAttribute("gno",dto.getGno());
+	rAttr.addAttribute("page",pr.getPage());
+	rAttr.addAttribute("type",pr.getType());
+	rAttr.addAttribute("keyword",pr.getKeyword());
+	return "redirect:/memo/detail";
+}
+```  
+
+### +) ServerApplication과 Client Application이 하나의 프로젝트로 만들어지는 경우 유지보수가 어려워집니다.
+Client-Server Application을 기획할 때는 되도록이면 Client Application과 ServerApplication을 분리하는 것이 좋습니다.  
+Server Application은 표준화된 데이터를 전송할 수 있어야하고 Client Application은 이 데이터를 가져와서 원하는 형태로 가공해서 사용하면 됩니다.  

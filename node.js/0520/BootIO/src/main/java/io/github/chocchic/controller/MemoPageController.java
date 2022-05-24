@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import io.github.chocchic.dto.MemoDTO;
@@ -30,7 +31,7 @@ public class MemoPageController {
 	
 	// 목록보기 요청을 처리
 	@GetMapping("/memo/list")
-	public void list(PageRequestDTO pr, Model model) {
+	public void list( @ModelAttribute("requestDTO")PageRequestDTO pr, Model model) {
 		log.info("목록보기");
 		model.addAttribute("result", m.getList(pr));
 	}
@@ -68,8 +69,10 @@ public class MemoPageController {
 		log.info("dto : "+ dto);
 		m.modify(dto);
 		// 상세보기로 이동할 때 필요한 gno값과 page값을 설정
-		rAttr.addAttribute("page",pr.getPage());
 		rAttr.addAttribute("gno",dto.getGno());
+		rAttr.addAttribute("page",pr.getPage());
+		rAttr.addAttribute("type",pr.getType());
+		rAttr.addAttribute("keyword",pr.getKeyword());
 		return "redirect:/memo/detail";
 	}
 	// 데이터 삭제 처리
@@ -85,4 +88,7 @@ public class MemoPageController {
 		rAttr.addAttribute("page",pr.getPage());
 		return "redirect:/memo/list";
 	}
+	
+	// 검색 처리
+	
 }

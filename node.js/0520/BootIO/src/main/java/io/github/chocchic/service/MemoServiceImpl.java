@@ -84,7 +84,10 @@ public class MemoServiceImpl implements MemoService {
 	public PageResponseDTO<MemoDTO, Memo> getList(PageRequestDTO requestDTO) {
 		// 정렬조건을 적용해서 페이징 객체를 생성
 		Pageable pageable = requestDTO.getPageable(Sort.by("gno").descending());
-		Page<Memo> result = m.findAll(pageable);
+		// 검색조건을 생성
+		BooleanBuilder booleanBuilder = getSearch(requestDTO);
+		// 검색조건을 적용해서 조회
+		Page<Memo> result = m.findAll(booleanBuilder, pageable);
 		
 		// Entity를 DTO로 변환해주는 함수 설정
 		Function<Memo, MemoDTO> fn = (entity -> entityToDTO(entity));

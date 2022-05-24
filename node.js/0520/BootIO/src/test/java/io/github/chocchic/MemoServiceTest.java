@@ -49,4 +49,11 @@ public class MemoServiceTest {
 		// 페이지 번호 목록
 		System.out.println(resultDto.getPageList());
 	}
+	
+	@Test
+	public void testListSearch() {
+		PageRequestDTO pr = PageRequestDTO.builder().page(1).size(10).type("t").keyword("개행").build();
+		PageResponseDTO<MemoDTO, Memo> result = m.getList(pr);
+		System.out.println(result.getDtoList());	
+	}
 }

@@ -15,9 +15,13 @@ import org.springframework.data.domain.Sort;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
+import io.github.chocchic.dto.MemoDTO;
+import io.github.chocchic.dto.PageRequestDTO;
+import io.github.chocchic.dto.PageResponseDTO;
 import io.github.chocchic.model.Memo;
 import io.github.chocchic.model.QMemo;
 import io.github.chocchic.persistence.MemoRepository;
+import io.github.chocchic.service.MemoService;
 
 @SpringBootTest
 public class MemoRepotest {
@@ -51,7 +55,7 @@ public class MemoRepotest {
 			Memo memo = result.get();
 			System.out.println("변경 전 내용 : "+memo);
 			memo.changeTitle("Changed 제목");
-			memo.changetContent("Changed 내용");
+			memo.changeContent("Changed 내용");
 			m.save(memo);
 		}else {
 			System.out.println("데이터가 존재하지 않습니다.");
@@ -123,7 +127,7 @@ public class MemoRepotest {
 	}
 	
 	// title 또는 content에 1이 포함되어 있고 gno가 0보다 큰 데이터 조회
-	@Test
+	//@Test
 	public void testQuery2() {
 		Pageable pageable = PageRequest.of(0, 20, Sort.by("gno").ascending());
 		
