@@ -43,7 +43,12 @@ public class ToDoBackEndApplication {
 		SpringApplication.run(ToDoBackEndApplication.class, args);
 	}
 }
-```
+```  
+
+### +) 그냥 하다보면 프로그래머들이 알아야하는 단어들  
+* Authentication(인증)  
+* Authorization(인가)  
+* Audit(감사 - 감시)  
 
 ### 4) model 패키지에 데이터 삽입시간과 수정시간을 가진 BaseEntity를 생성
 ```java
@@ -104,8 +109,7 @@ public interface ToDoRepository extends JpaRepository<ToDoEntity, String>{
 }
 ```  
 
-### 8) test 패키지에 ToDoRepository를 테스트할 수 있는 클래스를 생성하고 테스트
-* 사용자의 
+### 8) test 패키지에 ToDoRepository를 테스트할 수 있는 클래스를 생성하고 테스트  
 ```java
 @SpringBootTest
 public class ToDoRepoTest {
@@ -308,10 +312,196 @@ public class ToDoServiceImpl implements ToDoService{
 
 ### 13) URL과 Service 매핑을 위한 ToDoController클래스를 생성하고 요청 처리 메서드를 작성  
 ```java
-
+//데이터를 리턴하기 위한 Controller를 만들기 위한 어노테이션
+@RestController
+//공통된 URL 작성 - localhost:포트번호/todo/
+@RequestMapping("todo")
+public class ToDoController {
+	@Autowired
+	private ToDoService toDoService;
+	
+	//데이터 삽입
+	@PostMapping
+	public ResponseEntity<?> createToDo(@RequestBody ToDoDTO dto){
+		try {
+			//회원 정보를 만들 수 없어서 임시로 회원 아이디 설정
+			String temporaryUserId = "temporary-user";
+			//DTO를 Entity로 변환
+			ToDoEntity entity = ToDoDTO.toEntity(dto);
+			entity.setId(null);
+			entity.setUserId(temporaryUserId);
+			//서비스의 삽입을 호출하고 결과를 저장
+			List<ToDoEntity> entities = toDoService.create(entity);
+			
+			//ToDoEntity의 List를 ToDoDTO의 List로 변환
+			//entities.stream() 는 List를 Stream으로 변환
+			
+			//map은 Stream의 모든 요소를 순서대로 매개변수로 대입된 함수를 적용해서 리턴한 값들을 가지고
+			//스트림을 만들어주는 메서드
+			//클래스이름::메서드 이름의 형태로 대입을 해야하는데 new는 생성자를 이용하겠다는 의미입니다.
+			
+			//collect는 Stream을 배열이나 List, Set, Map으로 변환해주는 메서드입니다.
+			//map으로 나온 결과를 List로 변환한 것 입니다.
+			
+			List<ToDoDTO> list = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
+			//응답 객체를 생성
+			ResponseDTO<ToDoDTO> response = ResponseDTO.<ToDoDTO>builder().data(list).build();
+			//정상 응답 객체를 만든 후 본문은 response로 설정
+			return ResponseEntity.ok().body(response);
+			
+		}catch(Exception e) {
+			//예외가 발생하면 에러 메시지를 리턴
+			String error = e.getMessage();
+			ResponseDTO<ToDoDTO> response = ResponseDTO.<ToDoDTO>builder().error(error).build();
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+	
+	//데이터 조회
+	@GetMapping
+	public ResponseEntity<?> retrieveToDoList(){
+		String temporaryUserId = "temporary-user";
+		List<ToDoEntity> entities = toDoService.retrieve(temporaryUserId);
+		//ToDoEntity의 List를 ToDoDTO의 List로 변환
+		List<ToDoDTO> list = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
+		//응답 객체를 생성
+		ResponseDTO<ToDoDTO> response = ResponseDTO.<ToDoDTO>builder().data(list).build();
+		//정상 응답 객체를 만든 후 본문은 response로 설정
+		return ResponseEntity.ok().body(response);
+		
+	}
+	
+	//데이터 수정
+	@PutMapping
+	public ResponseEntity<?> updateToDo(@RequestBody ToDoDTO dto){
+		String temporaryUserId = "temporary-user";
+		
+		ToDoEntity entity = ToDoDTO.toEntity(dto);
+		entity.setUserId(temporaryUserId);
+				
+		List<ToDoEntity> entities = toDoService.update(entity);
+		//ToDoEntity의 List를 ToDoDTO의 List로 변환
+		List<ToDoDTO> list = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
+		//응답 객체를 생성
+		ResponseDTO<ToDoDTO> response = ResponseDTO.<ToDoDTO>builder().data(list).build();
+		//정상 응답 객체를 만든 후 본문은 response로 설정
+		return ResponseEntity.ok().body(response);
+		
+	}
+	
+	//데이터 삭제
+	@DeleteMapping
+	public ResponseEntity<?> deleteToDo(@RequestBody ToDoDTO dto){
+		String temporaryUserId = "temporary-user";
+		
+		ToDoEntity entity = ToDoDTO.toEntity(dto);
+		entity.setUserId(temporaryUserId);
+				
+		List<ToDoEntity> entities = toDoService.delete(entity);
+		//ToDoEntity의 List를 ToDoDTO의 List로 변환
+		List<ToDoDTO> list = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
+		
+		//응답 객체를 생성
+		ResponseDTO<ToDoDTO> response = ResponseDTO.<ToDoDTO>builder().data(list).build();
+		//정상 응답 객체를 만든 후 본문은 response로 설정
+		return ResponseEntity.ok().body(response);
+		
+	}
+}
 ```
 
-### +) 그냥 하다보면 프로그래머들이 알아야하는 단어들  
-* Authentication(인증)  
-* Authorization(인가)  
-* Audit(감사 - 감시)  
+### 14)PostMan 프로그램을 이용해서 테스트  
+* 데이터 삽입 테스트: post를 선택하고 url은 http://localhost:포트번호/todo  
+	body에 체크하고 raw 와 json을 선택한 후 데이터를 입력  
+```json
+{
+    "title":"새로운 메모"
+}
+```
+* 데이터 조회 테스트: get을 선택하고 url은 http://localhost:포트번호/todo  
+
+* 데이터 수정 테스트: put를 선택하고 url은 http://localhost:포트번호/todo  
+	body에 체크하고 raw 와 json을 선택한 후 데이터를 입력  
+```json
+{
+    "id":"아이디 - 데이터베이스에서 확인해서 복사",
+    "title":"수정한 메모",
+    "done":true
+}
+```  
+
+* 데이터 삭제 테스트: delete를 선택하고 url은 http://localhost:포트번호/todo  
+	body에 체크하고 raw 와 json을 선택한 후 데이터를 입력  
+```json
+{
+    "id":"아이디 - 데이터베이스에서 확인해서 복사"
+}
+```  
+
+## 3.FrontEnd Application  
+### 1)SPA - Single Page Application  
+* 한 번 로딩하면 사용자가 임의로 새로 고침하지 않는 이상 페이지를 새로 로딩하지 않는 애플리케이션  
+* 웹에서는 React.js 나 Vue.js를 이용해서 구현하는 경우가 많습니다.  
+
+### 2)React.js를 사용하기 위한 개발 환경  
+* node.js를 설치  
+* IDE - vscode  
+
+### 3)react 프로젝트 생성  
+* 터미널에서 npx create-react-app 앱이름을 입력  
+* npx create-react-app todo-front-end  
+
+* 실행은 npm start  
+```shell
+cd todo-front-end
+npm start
+```  
+* 브라우저에서는 localhost:3000 으로 확인  
+
+### 4)vscode 에서 생성한 프로젝트 열기  
+* src 디렉토리의 App.js가 Entry Point  
+
+### 5)UI 개발을 편리하게 해주는 material-ui 패키지를 설치  
+* https://mui.com  
+* 설치  
+```shell
+npm install --save --legacy-peer-deps @material-ui/core
+npm install --save --legacy-peer-deps @material-ui/icons
+```
+
+### 6)src 디렉토리에 ToDo.js 파일을 추가하고 작성  
+```javascript
+import React from "react"
+
+class ToDo extends React.Component{
+    render(){
+        return(
+            <div className="ToDo">
+                <input type="checkbox" 
+                    id="todo0" name="todo0" value="todo0"/>
+                <label for="todo0">ToDo 컴포넌트 만들기</label>
+            </div>
+        )
+    }
+}
+
+export default ToDo;
+```  
+
+### 7)App.js 파일을 수정  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <ToDo/>
+    </div>
+  );
+}
+
+export default App;
+```  
