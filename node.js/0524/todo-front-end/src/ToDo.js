@@ -4,9 +4,12 @@ import{
     ListItem,
     ListItemText,
     InputBase,
-    Checkbox
+    Checkbox,
+    ListItemSecondaryAction,
+    IconButton
 }from "@material-ui/core";
 
+import DeleteOutlined  from "@material-ui/icons/DeleteForeverOutlined";
 class ToDo extends React.Component{
     constructor(props){
         super(props);
@@ -29,6 +32,11 @@ class ToDo extends React.Component{
                         fullWidth={true}
                         />
                 </ListItemText>
+                <ListItemSecondaryAction>
+                    <IconButton aria-label="Delete ToDo">
+                        <DeleteOutlined/>
+                    </IconButton>
+                </ListItemSecondaryAction>
             </ListItem>
         )
     }

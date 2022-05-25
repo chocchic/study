@@ -26,12 +26,21 @@ class App extends React.Component{
     // 원본 데이터 변경
     this.setState({items:thisItems});
   }
+
+  delete = (item)=>{
+    const thisItems = this.state.item;
+    const newItems = thisItems.filter((e)=>e.id !== item.id);
+    this.setState({items:newItems}, ()=>{
+      console.log("데이터 삭제");
+    });
+  }
+
   render(){
     var todoItems= this.state.items.length > 0 && (
       <Paper style={{margin:16}}>
         <List>
           {this.state.items.map((item)=>{
-            return <ToDo item = {item}/>
+            return <ToDo item = {item} key={item.id} delete={this.delete}/>
           })};
         </List>
       </Paper>
@@ -40,7 +49,7 @@ class App extends React.Component{
     return(
       <div className='App'>
         <Container maxWidth="md">
-          <AddToDo/>
+          <AddToDo add={this.add}/>
           <div className="ToDoList">{todoItems}</div>
         </Container>
       </div>

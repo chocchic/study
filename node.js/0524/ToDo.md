@@ -704,5 +704,175 @@ export default App;
 
 * AddToDo.js 파일을 수정 - 이벤트 처리  
 ```javascript
+import React from "react";
 
+import { TextField, Paper, Button, Grid } from "@material-ui/core";
+
+class AddToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:{title:""}};
+        this.add = props.add;
+    }
+
+    // Input의 내용이 변경될 때 호출될 함수
+    onInputChange = (e) =>{
+        // 입력한 내용을 title에 대체
+        const thisItem = this.state.item;
+        thisItem.title = e.target.value;
+        this.setState({item:thisItem});
+    }
+
+    // + 버튼을 눌렀을 때 호출될 함수
+    onButtonClick = () =>{
+        this.add(this.state.item);
+        this.setState({item:{title:""}});
+    }
+
+    // Enter키를 눌렀을 때 호출될 함수
+    enterKeyEventHandler = (e)=>{
+        if(e.key === "Enter"){
+            this.onButtonClick();
+        }
+    }
+
+    render(){
+        return(
+            <Paper style={{margin:16,padding:16}}>
+                <Grid container>
+                    <Grid xs={11} item style={{paddingRight:16}}>
+                        <TextField placeholder="텍스트를 입력하세요" fullWidth 
+                        onChange={this.onInputChange} value={this.state.item.title} 
+                        onKeyPress={this.enterKeyEventHandler}/>
+                    </Grid>
+                    <Grid xs={1} md={1} item>
+                        <Button fullWidth color="secondary" variant="outllined" 
+                        onClick={this.onButtonClick}>
+                            +
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Paper>
+        )
+    }
+}
+
+export default AddToDo;
+```
+
+* 브라우저에서 내용을 입력하고 Enter를 누르거나 +버튼을 눌러서 데이터가 삽입되는지 확인
+
+* 빼먹음
+```javascript
+import React from "react"
+
+import{
+    ListItem,
+    ListItemText,
+    InputBase,
+    Checkbox,
+    ListItemSecondaryAction,
+    IconButton
+}from "@material-ui/core";
+
+import DeleteOutlined  from "@material-ui/icons/DeleteForeverOutlined";
+class ToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:props.item};
+    }
+
+    render(){
+        const item = this.state.item;
+        return(
+            <ListItem>
+                <Checkbox checked={item.done}/>
+                <ListItemText>
+                    <InputBase
+                        inputProps={{"aria-label":"naked"}}
+                        type="text"
+                        id={item.id}
+                        name={item.name}
+                        value={item.title}
+                        multiline={true}
+                        fullWidth={true}
+                        />
+                </ListItemText>
+                <ListItemSecondaryAction>
+                    <IconButton aria-label="Delete ToDo">
+                        <DeleteOutlined/>
+                    </IconButton>
+                </ListItemSecondaryAction>
+            </ListItem>
+        )
+    }
+}
+
+export default ToDo;
+```  
+
+* 브라우저에서 데이터 오른쪽에 삭제 아이콘이 생겼는지 확인  
+
+* App.js파일에 삭제 아이콘을 눌렀을 때 호출될 함수를 작성하고 이를 ToDo에게 전달  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDO";
+
+import './App.css';
+import {Paper, List, Container} from "@material-ui/core";
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {items:[
+      {id:0, title:"Hello React", done:true},
+      {id:1, title:"Hello React2", done:false},
+      {id:2, title:"Hello React", done:true}]};
+  }
+  add = (item) =>{
+    // 데이터 배열 가져오기
+    const thisItems = this.state.items;
+    // 새로운 item의 id 설정
+    item.id = "ID-"+thisItems.length;
+    // done 설정
+    item.done = false;
+    // 배열에 추가
+    thisItems.push(item);
+    // 원본 데이터 변경
+    this.setState({items:thisItems});
+  }
+
+  delete = (item)=>{
+    const thisItems = this.state.item;
+    const newItems = thisItems.filter((e)=>e.id !== item.id);
+    this.setState({items:newItems}, ()=>{
+      console.log("데이터 삭제");
+    });
+  }
+
+  render(){
+    var todoItems= this.state.items.length > 0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item)=>{
+            return <ToDo item = {item} key={item.id} delete={this.delete}/>
+          })};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className='App'>
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
 ```
