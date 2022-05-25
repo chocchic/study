@@ -559,8 +559,37 @@ export default App;
 * 브라우저 화면에 변경된 내용이 적용되는지 확인  
 
 * App.js를 수정해서 배열을 출력  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import './App.css';
 
-* Todo.js에 빼먹음
+class App extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {items:[
+      {id:0, title:"aespa", done:true},
+      {id:1, title:"redvelvet", done:false}]};
+  }
+
+  render(){
+    var todoItems = this.state.items.map((item, idx) => (
+      <ToDo item={item} key={item.id} />
+    ));
+    
+    return(
+      <div className="App">
+        {todoItems}
+      </div>
+    );
+  }
+}
+
+export default App;
+```  
+
+* ToDo.js 파일을 수정 - UI 개선(material ui를 활용)
 ```javascript
 import React from "react"
 
@@ -746,7 +775,7 @@ class AddToDo extends React.Component{
                         onKeyPress={this.enterKeyEventHandler}/>
                     </Grid>
                     <Grid xs={1} md={1} item>
-                        <Button fullWidth color="secondary" variant="outllined" 
+                        <Button fullWidth color="secondary" variant="outlined" 
                         onClick={this.onButtonClick}>
                             +
                         </Button>
@@ -762,7 +791,8 @@ export default AddToDo;
 
 * 브라우저에서 내용을 입력하고 Enter를 누르거나 +버튼을 눌러서 데이터가 삽입되는지 확인
 
-* 빼먹음
+### 10)데이터 삭제 구현
+* ToDo.js 파일 수정
 ```javascript
 import React from "react"
 
@@ -1208,12 +1238,225 @@ export function call(api, method, request){
 
 * app.js파일의 내용 수정 - 삽입, 삭제, 조회기능 적용  
 ```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDo"
 
+import {Paper, List, Container, ThemeProvider} from "@material-ui/core"
+
+import './App.css';
+
+import {call} from './service/Api-Service'
+
+class App extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {items:[]};
+  }
+
+  //컴포넌트가 마운된 후 호출되는 함수
+  componentDidMount(){
+    call("/todo", "GET", null).then((response) => 
+      this.setState({items:response.data})
+      )
+  }
+
+  add = (item) => {
+    call("/todo", "POST", item).then((response) => 
+      this.setState({items:response.data}))
+  }
+
+  delete = (item) => {
+    call("/todo", "DELETE", item).then((response) => 
+      this.setState({items:response.data}))
+  }
+
+  render(){
+    var todoItems = this.state.items.length >0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item, idx) => (
+            <ToDo item={item} key={item.id} delete={this.delete} />
+          ))};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className="App">
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
 ```
 => 브라우저에서 데이터 삽입 및 삭제를 확인  
 
-* 수정을 구현하기 위해서 app.js를 수정
+* 수정을 구현하기 위해서 app.js를 수정  
 ```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDo"
+
+import {Paper, List, Container, ThemeProvider} from "@material-ui/core"
+
+import './App.css';
+
+import {call} from './service/Api-Service'
+
+class App extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {items:[]};
+  }
+
+  //컴포넌트가 마운된 후 호출되는 함수
+  componentDidMount(){
+    call("/todo", "GET", null).then((response) => 
+      this.setState({items:response.data})
+      )
+  }
+
+  add = (item) => {
+    call("/todo", "POST", item).then((response) => 
+      this.setState({items:response.data}))
+  }
+
+  delete = (item) => {
+    call("/todo", "DELETE", item).then((response) => 
+      this.setState({items:response.data}))
+  }
+
+  update = (item) => {
+    call("/todo", "PUT", item).then((response) => 
+      this.setState({items:response.data}))
+  }
+
+  render(){
+    var todoItems = this.state.items.length >0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item, idx) => (
+            <ToDo item={item} key={item.id} 
+            delete={this.delete} update={this.update}/>
+          ))};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className="App">
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
 ```
 
-* ToDo.js 수정  빼먹음
+* 데이터 수정을 위해서 ToDo.js 파일을 수정  
+```javascript
+import React from "react"
+
+import {
+    ListItem,
+    ListItemText,
+    InputBase,
+    Checkbox,
+    ListItemSecondaryAction,
+    IconButton
+}from "@material-ui/core";
+
+import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
+
+class ToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:props.item, readOnly:true};
+        this.delete = props.delete;
+        this.update = props.update;
+    }
+
+    //삭제 이벤트 처리를 위한 함수
+    deleteEventHandler = () => {
+        this.delete(this.state.item);
+    }
+
+    //readOnly 가 false 가 될 때 호출될 함수
+    offReadOnlyMode = () => {
+        console.log("이벤트:", this.state.readOnly);
+        this.setState({readOnly:false}, () => {
+            console.log("읽기 전용?", this.state.readOnly);
+        })
+    }
+
+    //Enter를 누르면 호출될 함수
+    enterKeyEventHandler = (e) => {
+        if(e.key === "Enter"){
+            this.setState({readOnly:true});
+            this.update(this.state.item);
+        }
+    }
+
+    //수정시 호출될 함수
+    editEventHandler = (e)=>{
+        const thisItem = this.state.item;
+        thisItem.title = e.target.value;
+        this.setState({item:thisItem});
+    }
+
+    //체크박스를 클릭했을 때 호출될 함수
+     checkboxEventHandler = (e) => {
+         const thisItem = this.state.item;
+         thisItem.done = !thisItem.done;
+         this.setState({item:thisItem});
+         this.update(this.state.item);
+     }
+   
+
+    render(){
+        const item = this.state.item;
+        return(
+           <ListItem>
+               <Checkbox checked={item.done} 
+                    onChange={this.checkboxEventHandler}/>
+               <ListItemText>
+                   <InputBase
+                    inputProps={{"aria-label":"naked", 
+                        readOnly:this.state.readOnly}}
+                    type="text"
+                    id={item.id}
+                    name={item.id}
+                    value={item.title}
+                    multiline={true}
+                    fullWidth={true}
+                    onClick={this.offReadOnlyMode}
+                    onChange={this.editEventHandler}
+                    onKeyPress={this.enterKeyEventHandler}
+                    />
+               </ListItemText>
+
+               <ListItemSecondaryAction>
+                   <IconButton aria-label="Delete ToDo" 
+                   onClick={this.deleteEventHandler}>
+                       <DeleteOutlined />
+                   </IconButton>
+               </ListItemSecondaryAction>
+           </ListItem>
+        )
+    }
+}
+
+export default ToDo;
+```
