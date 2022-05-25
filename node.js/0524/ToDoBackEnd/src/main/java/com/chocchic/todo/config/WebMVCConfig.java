@@ -14,6 +14,6 @@ public class WebMVCConfig implements WebMvcConfigurer{
 	public void addCorsMappings(CorsRegistry registry) {
 		// 현재 애플리케이션의 모든 경로에 대해서
 		registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("GET","POST","PUT","DELETE","PATCH","OPTIONS")
-		.allowedHeaders("").allowCredentials(true).maxAge(MAX_AGE_SECS);
+		.allowedHeaders("*").allowCredentials(true).maxAge(MAX_AGE_SECS);// http://localhost:3000/
 	}
 }

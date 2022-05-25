@@ -1146,4 +1146,74 @@ function exampleFunction(){
 exampleFunction()
 	.then((r)=>{/* 완료되었을 때 수행할 내용*/})
 	.catch((e)=>{/*실패했을때 수행할 내용*/});
+```  
+
+* fetch api
+```javascript
+// 파라미터가 없을 때 
+fetch("url").then(response =>{
+	// 성공했을 때 수행할 내용
+}).catch(e =>{
+	// 실패했을 때 수행할 내용
+})
+
+//파라미터 있을 때
+파라미터 이름 = {method:전송방식, headers:[헤더데이터], body:JSON.stringfy(데이터)};
+fetch("url", 파라미터 이름).then(response =>{
+	// 성공했을 때 수행할 내용
+}).catch(e =>{
+	// 실패했을 때 수행할 내용
+});
+```  
+
+### 3) Front-End Application 수정  
+* Back - End URL을 저장할 환경 설정 파일을 src 디렉터리에 추가 - src/app-config.js
+```javascript
+let backendHost;
+const hostname=window && window.location && window.location.hostname;
+
+if(hostname == 'localhost'){
+    backendHost = "http://localhost";
+}
+
+export const API_BASE_URL = `${backendHost}`
+```  
+
+* BackEnd에서 데이터를 가져우는 함수를 구현한 파일을 생성 - src/service/Api-Service.js
+```javascript
+import { API_BASE_URL } from "../app-config";
+
+export function call(api, method, request){
+    let options = {
+        headers:new Headers({
+            'Content-Type':"application/json"
+        }),
+        url:API_BASE_URL + api,
+        method:method
+    };
+
+    if(request){
+        options.body = JSON.stringify(request);
+    }
+
+    return fetch(options.url, options).then((response)=>
+        response.json().then((json)=>{
+            if(!response.ok){
+                return Promise.reject(json);
+            }
+            return json;
+        }))
+}
+```  
+
+* app.js파일의 내용 수정 - 삽입, 삭제, 조회기능 적용  
+```javascript
+
 ```
+=> 브라우저에서 데이터 삽입 및 삭제를 확인  
+
+* 수정을 구현하기 위해서 app.js를 수정
+```javascript
+```
+
+* ToDo.js 수정  빼먹음

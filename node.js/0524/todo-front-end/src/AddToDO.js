@@ -40,7 +40,7 @@ class AddToDo extends React.Component{
                         onKeyPress={this.enterKeyEventHandler}/>
                     </Grid>
                     <Grid xs={1} md={1} item>
-                        <Button fullWidth color="secondary" variant="outllined" 
+                        <Button fullWidth color="secondary" variant="outlined" 
                         onClick={this.onButtonClick}>
                             +
                         </Button>
