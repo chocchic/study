@@ -505,3 +505,204 @@ function App() {
 
 export default App;
 ```  
+
+### 8) 목록보기  
+* ToDo.js파일 수정  
+```javascript
+import React from "react"
+
+class ToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:props.item};
+    }
+
+    render(){
+        return(
+            <div className="ToDo">
+                <input type="checkbox" 
+                    id={this.state.item.id} name={this.state.item.id} value={this.state.item.done}/>
+                <label id={this.state.item.id}>{this.state.item.title}</label>
+            </div>
+        )
+    }
+}
+
+export default ToDo;
+```  
+
+* App.js파일을 수정
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import './App.css';
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {item:{id:0, title:"Hello React", done:true}};
+  }
+
+  render(){
+    return(
+      <div className='App'>
+        <ToDo item={this.state.item}/>
+      </div>
+    );
+  }
+}
+
+export default App;
+```  
+
+* 브라우저 화면에 변경된 내용이 적용되는지 확인  
+
+* App.js를 수정해서 배열을 출력  
+
+* Todo.js에 빼먹음
+```javascript
+import React from "react"
+
+import{
+    ListItem,
+    ListItemText,
+    InputBase,
+    Checkbox
+}from "@material-ui/core";
+
+class ToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:props.item};
+    }
+
+    render(){
+        const item = this.state.item;
+        return(
+            <ListItem>
+                <Checkbox checked={item.done}/>
+                <ListItemText>
+                    <InputBase
+                        inputProps={{"aria-label":"naked"}}
+                        type="text"
+                        id={item.id}
+                        name={item.name}
+                        value={item.title}
+                        multiline={true}
+                        fullWidth={true}
+                        />
+                </ListItemText>
+            </ListItem>
+        )
+    }
+}
+
+export default ToDo;
+```
+
+* App.js파일을 수정 - UI 개선 (material-ui 활용)  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDO";
+
+import './App.css';
+import {Paper, List, Container} from "@material-ui/core";
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {items:[
+      {id:0, title:"Hello React", done:true},
+      {id:1, title:"Hello React2", done:false},
+      {id:2, title:"Hello React", done:true}]};
+  }
+
+  render(){
+    var todoItems= this.state.items.length > 0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item)=>{
+            return <ToDo item = {item}/>
+          })};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className='App'>
+        <Container maxWidth="md">
+          <AddToDo/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
+```  
+
+* 브라우저에서 데이터 목록위에 추가화면이 출력되는지 확인  
+
+* App.js파일을 수정해서 데이터 추가 함수를 생성하고 AddToDo.js에게 함수를 넘겨줍니다.  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDO";
+
+import './App.css';
+import {Paper, List, Container} from "@material-ui/core";
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {items:[
+      {id:0, title:"Hello React", done:true},
+      {id:1, title:"Hello React2", done:false},
+      {id:2, title:"Hello React", done:true}]};
+  }
+  add = (item) =>{
+    // 데이터 배열 가져오기
+    const thisItems = this.state.items;
+    // 새로운 item의 id 설정
+    item.id = "ID-"+thisItems.length;
+    // done 설정
+    item.done = false;
+    // 배열에 추가
+    thisItems.push(item);
+    // 원본 데이터 변경
+    this.setState({items:thisItems});
+  }
+  render(){
+    var todoItems= this.state.items.length > 0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item)=>{
+            return <ToDo item = {item}/>
+          })};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className='App'>
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
+```  
+
+* AddToDo.js 파일을 수정 - 이벤트 처리  
+```javascript
+
+```

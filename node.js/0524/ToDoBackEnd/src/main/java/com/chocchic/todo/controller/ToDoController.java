@@ -19,15 +19,15 @@ import com.chocchic.todo.model.ToDoEntity;
 import com.chocchic.todo.service.ToDoService;
 
 import lombok.RequiredArgsConstructor;
-//@RequiredArgsConstructor 
+@RequiredArgsConstructor 
 //데이터를 리턴하기 위한 Controller를 만들기 위한 어노테이션
 @RestController
 //공통된 URL 작성 - localhost:포트번호/todo/
 @RequestMapping("todo")
 public class ToDoController {
-//	private ToDoService service; // 대신 Autowired
-	@Autowired
-	private ToDoService toDoService;
+	private ToDoService toDoService; // 대신 Autowired
+	//@Autowired
+	//private ToDoService toDoService;
 	
 	//데이터 삽입
 	@PostMapping
