@@ -875,4 +875,147 @@ class App extends React.Component{
 }
 
 export default App;
+```  
+
+* ToDo.js에 구현
+```javascript
+import React from "react"
+
+import{
+    ListItem,
+    ListItemText,
+    InputBase,
+    Checkbox,
+    ListItemSecondaryAction,
+    IconButton
+}from "@material-ui/core";
+
+import DeleteOutlined  from "@material-ui/icons/DeleteForeverOutlined";
+class ToDo extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {item:props.item};
+        this.delete = props.delete;
+    }
+    // 삭제 이벤트 처리를 위한 함수
+    /*
+    함수 만드는 방법
+    1.
+    function 이름(매개변수){
+        내용
+    }
+
+    2. 
+    var 또는 let,const 이름 = function(매개변수){
+        내용
+    }
+    3. 에로우 함수 : 메모리 효율때문에 많이 사용
+    (매개변수) => {
+        내용
+    }
+
+    javascript에서 변수 만들 때 
+    var 변수이름 = 값; 해도 되지만
+    변수이름 = 값; 해도 됨. 대신 이 경우는 global됨
+    */
+    deleteEventHandler = ()=>{
+        this.delete(this.state.item);
+    }
+    render(){
+        const item = this.state.item;
+        return(
+            <ListItem>
+                <Checkbox checked={item.done}/>
+                <ListItemText>
+                    <InputBase
+                        inputProps={{"aria-label":"naked"}}
+                        type="text"
+                        id={item.id}
+                        name={item.name}
+                        value={item.title}
+                        multiline={true}
+                        fullWidth={true}
+                        />
+                </ListItemText>
+                <ListItemSecondaryAction>
+                    <IconButton aria-label="Delete ToDo" onClick={this.deleteEventHandler}>
+                        <DeleteOutlined/>
+                    </IconButton>
+                </ListItemSecondaryAction>
+            </ListItem>
+        )
+    }
+}
+
+export default ToDo;
+```  
+=> 브라우저에서 데이터가 삭제되는지 확인  
+
+* App.js에서 직접 생성한 데이터 삭제  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDO";
+
+import './App.css';
+import {Paper, List, Container} from "@material-ui/core";
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {items:[]};
+  }
+  add = (item) =>{
+    // 데이터 배열 가져오기
+    const thisItems = this.state.items;
+    // 새로운 item의 id 설정
+    item.id = "ID-"+thisItems.length;
+    // done 설정
+    item.done = false;
+    // 배열에 추가
+    thisItems.push(item);
+    // 원본 데이터 변경
+    this.setState({items:thisItems});
+  }
+
+  delete = (item)=>{
+    const thisItems = this.state.items;
+    const newItems = thisItems.filter((e)=>e.id !== item.id);
+    this.setState({items:newItems}, ()=>{
+      console.log("데이터 삭제");
+    });
+  }
+
+  render(){
+    var todoItems= this.state.items.length > 0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item)=>{
+            return <ToDo item = {item} key={item.id} delete={this.delete}/>
+          })};
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className='App'>
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
 ```
+
+### 11) ToDo 수정  
+* 요구사항  
+	ToDo 컴포넌트 readonly 플래그를 이요해서 이 플래그가 true면 수정이 불가능하고 false인 경우 수정이 가능하도록 설정  
+	사용자가 아이템의 title을 클릭하면 input field가 수정할 수 있는 상태인 readonly가 false인 상태로 변경되도록 할 것  
+	사용자가 Enter를 누르면 readonly가 true인 상태로 변환  
+	체크를 클릭하면 item.done의 값을 토글  
+	

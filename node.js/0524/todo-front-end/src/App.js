@@ -9,10 +9,7 @@ import {Paper, List, Container} from "@material-ui/core";
 class App extends React.Component{
   constructor(props){
       super(props);
-      this.state = {items:[
-      {id:0, title:"Hello React", done:true},
-      {id:1, title:"Hello React2", done:false},
-      {id:2, title:"Hello React", done:true}]};
+      this.state = {items:[]};
   }
   add = (item) =>{
     // 데이터 배열 가져오기
@@ -28,7 +25,7 @@ class App extends React.Component{
   }
 
   delete = (item)=>{
-    const thisItems = this.state.item;
+    const thisItems = this.state.items;
     const newItems = thisItems.filter((e)=>e.id !== item.id);
     this.setState({items:newItems}, ()=>{
       console.log("데이터 삭제");
@@ -41,7 +38,7 @@ class App extends React.Component{
         <List>
           {this.state.items.map((item)=>{
             return <ToDo item = {item} key={item.id} delete={this.delete}/>
-          })};
+          })}
         </List>
       </Paper>
     )
