@@ -11,6 +11,26 @@ class App extends React.Component{
       super(props);
       this.state = {items:[]};
   }
+
+  // 컴포넌트가 마운트된 후 호출되는 함수
+  componentDidMount(){
+    const requestoptions={
+      method:'GET',
+      headers:{'Content-Type':'application/json'}
+    };
+
+    fetch('http://localhost/todo', requestoptions).then((response)=>response.json())
+    .then((response)=>{
+      this.setState({
+        items:response.data
+      });
+    },(error)=>{
+      this.setState({
+        error
+      });
+    })
+  }
+
   add = (item) =>{
     // 데이터 배열 가져오기
     const thisItems = this.state.items;
@@ -37,8 +57,9 @@ class App extends React.Component{
       <Paper style={{margin:16}}>
         <List>
           {this.state.items.map((item)=>{
-            return <ToDo item = {item} key={item.id} delete={this.delete}/>
-          })}
+              return <ToDo item = {item} key={item.id} delete={this.delete}/>
+            })
+          }
         </List>
       </Paper>
     )

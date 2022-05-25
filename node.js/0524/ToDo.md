@@ -1018,4 +1018,132 @@ export default App;
 	사용자가 아이템의 title을 클릭하면 input field가 수정할 수 있는 상태인 readonly가 false인 상태로 변경되도록 할 것  
 	사용자가 Enter를 누르면 readonly가 true인 상태로 변환  
 	체크를 클릭하면 item.done의 값을 토글  
-	
+
+
+## 4. 서비스 통합  
+### 1) CORS(Cross-Origin Resource Sharing)  
+* 웹 서비스를 만들면 리소스를 제공하는 곳의 도메인(포트번호까지)과 요청하는 곳의 도메인이 같아야만 요청을 허락합니다.  
+
+* FrontEnd의 App.js파일의 컴포넌트에 데이터를 요청하는 코드를 추가  
+```javascript
+import logo from './logo.svg';
+import React from "react";
+import ToDo from "./ToDo";
+import AddToDo from "./AddToDO";
+
+import './App.css';
+import {Paper, List, Container} from "@material-ui/core";
+
+class App extends React.Component{
+  constructor(props){
+      super(props);
+      this.state = {items:[]};
+  }
+
+  // 컴포넌트가 마운트된 후 호출되는 함수
+  componentDidMount(){
+    const requestoptions={
+      method:'GET',
+      headers:{'Content-Type':'application/json'}
+    };
+
+    fetch('http://localhost/todo', requestoptions).then((response)=>response.json())
+    .then((response)=>{
+      this.setState({
+        items:response.data
+      });
+    },(error)=>{
+      this.setState({
+        error
+      });
+    })
+  }
+
+  add = (item) =>{
+    // 데이터 배열 가져오기
+    const thisItems = this.state.items;
+    // 새로운 item의 id 설정
+    item.id = "ID-"+thisItems.length;
+    // done 설정
+    item.done = false;
+    // 배열에 추가
+    thisItems.push(item);
+    // 원본 데이터 변경
+    this.setState({items:thisItems});
+  }
+
+  delete = (item)=>{
+    const thisItems = this.state.items;
+    const newItems = thisItems.filter((e)=>e.id !== item.id);
+    this.setState({items:newItems}, ()=>{
+      console.log("데이터 삭제");
+    });
+  }
+
+  render(){
+    var todoItems= this.state.items.length > 0 && (
+      <Paper style={{margin:16}}>
+        <List>
+          {this.state.items.map((item)=>{
+              return <ToDo item = {item} key={item.id} delete={this.delete}/>
+            })
+          }
+        </List>
+      </Paper>
+    )
+
+    return(
+      <div className='App'>
+        <Container maxWidth="md">
+          <AddToDo add={this.add}/>
+          <div className="ToDoList">{todoItems}</div>
+        </Container>
+      </div>
+    );
+  }
+}
+
+export default App;
+```  
+
+* 브라우저의 검사 창을 확인 - 에러발생  
+
+* Spring에서는 환경 설정 클래스를 추가해서 해결 - 기본패키지.config.WebMVCconfig  
+```java
+```  
+=> 브라우저에서 새로고침을 하게되면 에러가 없어집니다.  
+
+
+### 2) 자바스크립트로 데이터 요청  
+* ajax : 콜백을 이용하는 방법  
+```javascript
+var oReq = new XMLHttpReqeust();
+oReq.open("GET", "http://localhost/todo");
+oReq.send();
+oReq.addEventListener("load", (e)=>{
+	// 내부처리
+})
+```  
+
+* ajax : Promise를 이용하는 방법  
+```javascript
+function exampleFunction(){
+	return new Promise((resolve, reject)=>{
+		var oReq = new XMLHttpRequest();
+		oReq.open("GET", "http://localhost/todo");
+		oReq.onload= function(){
+			// 성공했을 때 수행 내용
+		}
+		oReq.onerror= function(){
+			// 에러가 발생했을 때 수행 내용
+		}
+		oReq.onsend= function(){
+			// 아직 도착하지 않았을 때 수행 내용
+		}
+	})
+}
+
+exampleFunction()
+	.then((r)=>{/* 완료되었을 때 수행할 내용*/})
+	.catch((e)=>{/*실패했을때 수행할 내용*/});
+```

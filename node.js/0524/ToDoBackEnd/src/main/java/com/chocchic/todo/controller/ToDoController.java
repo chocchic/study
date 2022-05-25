@@ -1,6 +1,7 @@
 package com.chocchic.todo.controller;
 
 import java.util.List;
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,14 @@ import com.chocchic.todo.model.ToDoEntity;
 import com.chocchic.todo.service.ToDoService;
 
 import lombok.RequiredArgsConstructor;
-@RequiredArgsConstructor 
+
 //데이터를 리턴하기 위한 Controller를 만들기 위한 어노테이션
 @RestController
 //공통된 URL 작성 - localhost:포트번호/todo/
 @RequestMapping("todo")
 public class ToDoController {
-	private ToDoService toDoService; // 대신 Autowired
-	//@Autowired
-	//private ToDoService toDoService;
+	@Autowired
+	private ToDoService toDoService;
 	
 	//데이터 삽입
 	@PostMapping

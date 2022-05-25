@@ -3,14 +3,17 @@ package com.chocchic.todo.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.chocchic.todo.model.ToDoEntity;
 import com.chocchic.todo.persistence.ToDoRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
 @Slf4j
+@Service // Autowired 쓰려면 해야함
+@RequiredArgsConstructor
 public class ToDoServiceImpl implements ToDoService{
 	
 	private final ToDoRepository todoRepository;
