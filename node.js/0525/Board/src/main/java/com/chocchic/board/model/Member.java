@@ -1,5 +1,6 @@
 package com.chocchic.board.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -19,7 +20,10 @@ import lombok.ToString;
 @ToString
 public class Member extends BaseEntity{
 	@Id
+	//@Column(name="email")
 	private String email;
+	//@Column(name="password")
 	private String password;
+	//@Column(name="name")
 	private String name;
 }
