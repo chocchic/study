@@ -10,6 +10,10 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.chocchic.board.model.Board;
 import com.chocchic.board.model.Member;
@@ -46,18 +50,18 @@ public class RepoTest {
 	@Autowired
 	private ReplyRepository r;
 	
-	@Test
+	//@Test
 	public void insertReplys() {
 		IntStream.rangeClosed(0,99).forEach(i ->{
 			// 0부터 99사이의 정수를 랜덤하게 생성해서 Board객체를 생성
-			long bno = (long)(Math.random()*100);
+			long bno = (long)(Math.random()*100)+2;
 			Board board = Board.builder().bno(bno).build();
-			Reply reply = Reply.builder().content("댓글..."+i).board(board).build();
+			Reply reply = Reply.builder().content("댓글..."+i).board(board).replyer("촉촉한초코칩"+i).build();
 			r.save(reply);
 		});
 	}
 	
-	// 하나의 board데이터를 조회하는 메서드
+	// 하나의 board데이터를 조회하는 메서드 : bno 2부터 시작
 	//@Test
 	//@Transactional
 	public void readBoard() {
@@ -84,11 +88,30 @@ public class RepoTest {
 		System.out.println((Object[])result);
 	}
 	
+	
 	//@Test
 	public void testGetBoardWithReply() {
 		List<Object[]> result = b.getBoardWithReply(40L);
 		for(Object[] ar : result) {
 			System.out.println(Arrays.toString(ar));
 		}
+	}
+	
+	//@Test
+	public void testWithReplyCount() {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+		Page<Object[]> result = b.getBoardWithReplyCount(pageable);
+		
+		result.get().forEach(row ->{
+			Object[] ar = (Object[])row;
+			System.out.println(Arrays.toString(ar));
+		});
+	}
+	
+	@Test
+	public void testByBno() {
+		Object result = b.getBoardByBno(40L);
+		Object[] ar = (Object[])result;
+		System.out.println(Arrays.toString(ar));
 	}
 }

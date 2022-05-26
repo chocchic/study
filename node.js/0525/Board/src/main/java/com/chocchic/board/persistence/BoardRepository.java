@@ -23,6 +23,13 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 	List<Object[]> getBoardWithReply(@Param("bno") Long bno); 
 
 	// 목록보기를 위한 메서드  
-	@Query(value="select b, w, count(r) from Board b left join b.member w left join Reply r On r.board = b group by b", countQuery="select count(b) from Board b")
+	@Query(value="select b, w, count(r) "+
+	"from Board b left join b.member w left join Reply r On r.board = b group by b", 
+			countQuery="select count(b) from Board b")
 	Page<Object[]> getBoardWithReplyCount(Pageable pageable);
+	
+	// 게시글 번호를 가지고 데이터를 찾아오는 메서드 
+	@Query(value="select b, w, count(r) "+
+	"from Board b left join b.member w left join Reply r On r.board = b where b.bno = :bno")
+	Object getBoardByBno(@Param("bno") Long bno);
 }

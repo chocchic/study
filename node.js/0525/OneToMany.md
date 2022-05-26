@@ -36,6 +36,7 @@ N:M -> @ManyToMany
 ## 2. Board 애플리케이션 생성  
 ### 1) 프로젝트 생성  
 * 의존성 : Spring Boot Devtools, Lombok, Spring Web, Thymeleaf, Spring Data JPA, MySQL  
+* boot 2.7.0버전  
 
 ### 2) build.gradle 파일에 시간 처리 관련 의존성을 추가  
 ```gradle
@@ -413,16 +414,118 @@ public class Board extends BaseEntity{
 * Board테이블과 Reply테이블은 연관관계가 있으면 Reply테이블에 board라는 속성으로 관계가 설정되어 있습니다.  
 	Board에서 바라볼 때는 1:N의 관계입니다.  
 ```java
+// 하나의 글 번호를 가지고 게시글과 댓글을 모두 가져오는 메서드
+	// 하나의 게시글에 여러 개의 댓글이 있으므로 리턴 타입은 List<Object[]>
+	// 결과는 게시글, 댓글 + 게시글, 댓글의 형태로 리턴됩니다.
+	@Query("select b,r from Board b left join Reply r on r.board = b where b.bno=:bno")
+	List<Object[]> getBoardWithReply(@Param("bno") Long bno);
 ```  
 
 ### 4) RepoTest 클래스에서 앞에서 만든 메서드 테스트  
+```java
+	//@Test
+	public void testGetBoardWithReply() {
+		List<Object[]> result = b.getBoardWithReply(40L);
+		for(Object[] ar : result) {
+			System.out.println(Arrays.toString(ar));
+		}
+	}
+```
+
+### +) JPA MySQL 관련 오류  
+계속 board_bno라는 애를 reply에서 참조를 제대로 못하고 있다는 오류가 났는데, 그냥 테이블자체 잘못 올라갔던 것이라 drop하고 다시 올렸더니 고쳐졌다  
 
 ## 9. 목록보기 구현  
 ### 1) 필요한 데이터  
-Board : 게시물 번호  
+Board : 게시물 번호, 제목, 작성시간  
+Member : 회원의 이름, 이메일  
+Reply : 댓글의 수  
+페이징도 구현  
+### 2) BoardRepository 인터페이스에 메서드를 선언
+```java
+	// 목록보기를 위한 메서드  
+	@Query(value="select b, w, count(r) "+
+	"from Board b left join b.member w left join Reply r On r.board = b group by b", 
+			countQuery="select count(b) from Board b")
+	Page<Object[]> getBoardWithReplyCount(Pageable pageable);
+```  
 
+### 3) RepoTest에서 테스트
+```java
+	@Test
+	public void testWithReplyCount() {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+		Page<Object[]> result = b.getBoardWithReplyCount(pageable);
+		
+		result.get().forEach(row ->{
+			Object[] ar = (Object[])row;
+			System.out.println(Arrays.toString(ar));
+		});
+	}
+```  
+-> 결과에서 0번 요소가 Board이고 1번 요소가 Member 2번 요소가 댓글의 개수  
 
+### 4) BoardRepository인터페이스에 게시글 번호를 가지고 동일한 데ㅔ이터를 가져오는 메서드를 선언  
+```java
+// 게시글 번호를 가지고 데이터를 찾아오는 메서드 
+	@Query(value="select b, w, count(r) "+
+	"from Board b left join b.member w left join Reply r On r.board = b where b.bno = :bno")
+	Object getBoardByBno(@Param("bno") Long bno);
+```  
 
+### 5) RepositoryTest 클래스에서 메서드 테스트  
+```java
+	@Test
+	public void testByBno() {
+		Object result = b.getBoardByBno(40L);
+		Object[] ar = (Object[])result;
+		System.out.println(Arrays.toString(ar));
+	}
+```  
+
+### 6) BoardEntity에 해당하는 Board DTO클래스 생성  
+```java
+@Data
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BoardDTO {
+	private Long bno;
+	private String title;
+	private String content;
+	private LocalDateTime regdate;
+	private LocalDateTime moddate;
+	
+	// 작성자 정보
+	private String memberEmail;
+	private String memberName;
+	
+	// 댓굴의 개수
+	private int replyCount;
+}
+```  
+
+### 7) Board Entity의 요청을 처리할 메서드의 원형을 소유할 BoardService인터페이스를 생성하고 DTO와 Entity사이의 변환을 수행해주는 메서드를 생성 - service.BoardService  
+```java
+public interface BoardService {
+	// DTO를 Entity로 변환하는 메서드
+	default Board dtoToEntity(BoardDTO dto) {
+		Member member = Member.builder().email(dto.getMemberEmail()).build();
+		Board board = Board.builder().bno(dto.getBno()).title(dto.getTitle()).content(dto.getContent()).member(member).build();
+		
+		return board;
+	}
+	
+	// Entity를 DTO로 변환해주는 메서드
+	default BoardDTO entitytoDTO(Board board, Member member, Long replyCount) {
+		BoardDTO boardDTO = BoardDTO.builder().bno(board.getBno()).title(board.getTitle()).content(board.getContent())
+				.regdate(board.getRegDate()).moddate(board.getModDate()).memberEmail(member.getEmail())
+				.memberName(member.getName()).replyCount(replyCount.intValue()).build();
+		return boardDTO;		
+	}
+}
+```  
 
 # Build tool  
 소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  

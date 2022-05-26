@@ -3,12 +3,10 @@ show databases;
 desc tbl_member;
 desc board;
 desc reply;
-drop table tbl_member;
-drop table board;
-drop table reply;
 commit;
 -- 데이터 100개 들어갔는지 확인
 select * from tbl_member;
+select count(*)from tbl_member;
 select * from board;
 select * from reply;
 
