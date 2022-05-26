@@ -169,3 +169,71 @@ public class Reply extends BaseEntity{
 
 ### 4) fetch  
 * 관련있는 Entity를 가져오는 시점을 설정하는 것인데 Eagar(바로 가져오기)와 Lazy(지연)가 있음  
+
+## 5. ManyToOne 어노테이션  
+* Board테이블과 Member테이블은 Board쪽에서 바라보면 N:1의 관계입니다.  
+	객체지향에서 이런 관계를 표현하고자 할 때는 Board쪽에 Member를 참조할 수 있는 속성을 하나 추가하거나 Mebmer쪽에 Board를 포함할 수 있는 List나 배열같은 속성을 추가합니다.  
+* 관계형 데이터베이스에서는 Member테이블의 기본키를 Board테이블에 외래키로 설정합니다.  
+* Spring JPA에서는 속성 위에 @OneToMany나 @ManyToOne을 이용해서 설정을 합니다.  
+
+### 1) Board Entity에 Member Entity를 참조할 수 있는 속성을 추가  
+```java
+	// Member Entity를 N:1관계로 참조
+	@ManyToOne
+	private Member member;
+```  
+
+### 2) ReplyEntity에 BoardEntity를 참조할 수 있는 속성을 추가  
+```java
+	@ManyToOne
+	private Board board;
+```  
+
+### 3) 프로젝트 실행
+### 4) 데이터베이스 확인  
+```sql
+desc tbl_member;
+desc board;
+desc reply;
+```
+* board테이블에는 member_기본키 컬럼이 추가되어 있고 reply테이블에는 board_기본키 컬럼이 추가되어 있어야 합니다.  
+
+## 6. Repository 생성  
+### 1) Member Entity를 위한 Repository 인터페이스 생성 - persistence.MemberRepository  
+```java
+public interface MemberRepository extends JpaRepository<Member, String> {
+	
+}
+```  
+
+### 2) Board Entity를 위한 Repository 인터페이스 생성 - persistence.BoardRepository  
+```java
+public interface BoardRepository extends JpaRepository<Board, String> {
+
+}
+```  
+
+### 3) Reply Entity를 위한 Repository 인터페이스 생성 - persistence.ReplyRepository  
+```java
+public interface ReplyRepository extends JpaRepository<Reply, String> {
+	
+}
+```  
+## 7. Repository Test  
+### 1) Repository의 작업을 Test하기 위한 클래스를 src/test/java디렉터리의 패키지에 생성 - RepoTest
+```java
+@SpringBootTest
+public class RepoTest {
+
+}
+```  
+
+### 2) Member테이블에 100개의 데이터 삽입  
+```java
+
+```  
+
+# Build tool  
+소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  
+
+* gradle(build.gradle에 설정), maven(pom.xml파일에 설정), jenkins(현업과 클라우드 환경에서 가장 많이 사용되는 build tool) : 설정 파일을 수정하면 rebuild를 해주는 것이 좋습니다. 의존성 설정을 수정한 경우에는 반드시 rebuild를 해주는 것이 좋습니다. 외부 라이브러리의 의존성을 설정해서 코드를 작성할 떄는 에러가 없었는데 실행을하면 ClassNotFoundExceptioon이 발생하는 경우가 있는데 이 경우가 대부분 rebuild를 하지 않아서 그렇습니디.  
