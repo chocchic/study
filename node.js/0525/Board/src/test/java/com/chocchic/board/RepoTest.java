@@ -108,7 +108,7 @@ public class RepoTest {
 		});
 	}
 	
-	@Test
+	//@Test
 	public void testByBno() {
 		Object result = b.getBoardByBno(40L);
 		Object[] ar = (Object[])result;

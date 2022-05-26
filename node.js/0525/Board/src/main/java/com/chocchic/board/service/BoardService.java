@@ -20,4 +20,10 @@ public interface BoardService {
 				.memberName(member.getName()).replyCount(replyCount.intValue()).build();
 		return boardDTO;		
 	}
+	
+	// 게시물 등록을 위한 메서드
+	Long register(BoardDTO dto);
+	
+	// 목록보기 메서드
+	PageResultDTO <BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 }

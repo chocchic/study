@@ -435,7 +435,7 @@ public class Board extends BaseEntity{
 ### +) JPA MySQL 관련 오류  
 계속 board_bno라는 애를 reply에서 참조를 제대로 못하고 있다는 오류가 났는데, 그냥 테이블자체 잘못 올라갔던 것이라 drop하고 다시 올렸더니 고쳐졌다  
 
-## 9. 목록보기 구현  
+## 9. 목록보기에 필요한 Repository 구현  
 ### 1) 필요한 데이터  
 Board : 게시물 번호, 제목, 작성시간  
 Member : 회원의 이름, 이메일  
@@ -483,7 +483,8 @@ Reply : 댓글의 수
 	}
 ```  
 
-### 6) BoardEntity에 해당하는 Board DTO클래스 생성  
+## 10. CRUD작업을 위한 준비
+### 1) BoardEntity에 해당하는 Board DTO클래스 생성  
 ```java
 @Data
 @ToString
@@ -506,7 +507,7 @@ public class BoardDTO {
 }
 ```  
 
-### 7) Board Entity의 요청을 처리할 메서드의 원형을 소유할 BoardService인터페이스를 생성하고 DTO와 Entity사이의 변환을 수행해주는 메서드를 생성 - service.BoardService  
+### 2) Board Entity의 요청을 처리할 메서드의 원형을 소유할 BoardService인터페이스를 생성하고 DTO와 Entity사이의 변환을 수행해주는 메서드를 생성 - service.BoardService  
 ```java
 public interface BoardService {
 	// DTO를 Entity로 변환하는 메서드
@@ -525,6 +526,130 @@ public interface BoardService {
 		return boardDTO;		
 	}
 }
+```  
+
+### 3) 사용자의 요청을 처리할 메서드를 구현하기위한 BoardServiceImpl 클래스를 생성 - service.BoardServiceImpl  
+```java
+@Service
+@RequiredArgsConstructor
+@Log4j2
+public class BoardServiceImpl implements BoardService{
+	private final BoardRepository boardRepostiory;
+}
+```
+## 11. 게시물 등록
+### 1) BoardService 인터페이스에 메서드를 선언
+```java
+	// 게시물 등록을 위한 메서드
+	Long register(BoardDTO dto);
+```  
+
+### 2) BoardServiceImpl에 메서드 구현  
+```java
+	@Override
+	public Long register(BoardDTO dto) {
+		log.info(dto);
+		Board board = dtoToEntity(dto);
+		boardRepostiory.save(board);
+		return board.getBno();
+	}
+```  
+
+### 3) Service 계층 테스트를 위한 클래스를 생성하고 작성한 메서드 테스트 - src/test/java의 ServiceTest  
+```java
+@SpringBootTest
+public class ServiceTest {
+	@Autowired
+	private BoardService b;
+	
+	@Test
+	public void testRegister() {
+		BoardDTO dto = BoardDTO.builder().title("test").content("test content").memberEmail("choc1@aa.com").build();
+		Long bno = b.register(dto);
+		System.out.println("test reg : "+bno);
+	}
+}
+```  
+-> 없는 member의 email을 사용하면 오류  
+
+## 12. 게시물 목록 보기  
+### 1) 목록보기 요청을 위한 DTO클래스를 생성 - dto.PageRequestDTO  
+```java
+@Builder
+@AllArgsConstructor
+@Data
+public class PageRequestDTO {
+	// 현재페이지 번호
+	private int page;
+	// 페이지당 출력할 데이터 개수
+	private int size;
+	// 검색 항목
+	private String type;
+	// 검색할 데이터
+	private String keyword;
+	
+	// 생성자
+	public PageRequestDTO() {
+		this.page = 1;
+		this.size = 10;
+	}
+	
+	public Pageable getPageable(Sort sort) {
+		return PageRequest.of(page-1, size, size);
+	}
+}
+```
+### 2) 목록보기 응답을 위한 DTO클래스를 생성 - dto.PageResultDTO  
+```java
+@Data
+public class PageResultDTO<DTO, EN> {
+	//DTO리스트
+	private List<DTO> dtoList;
+	
+	// 전체 페이지 개수
+	private int totalPage;
+	
+	// 현재 페이지 번호
+	private int page;
+	
+	// 출력할 페이지 번호 개수
+	private int size;
+	
+	// 시작하는 페이지번호와 끝나는 페이지번호
+	private int start, end;
+	
+	// 이전 페이지와 다음페이지 존재여부
+	private boolean prev,next;
+	
+	// 페이지번호 목록
+	private List<Integer> pageList;
+	
+	// 페이지 번호목록을 만들어주는 메서드
+	private void makePageList(Pageable pageable) {
+		this.page = pageable.getPageNumber();
+		this.size = pageable.getPageSize();
+		
+		int tempEnd = (int)(Math.ceil(page/10.0)) * 10;
+		start = tempEnd - 9;
+		prev = start > 1;
+		
+		end = totalPage > tempEnd ? tempEnd:totalPage;
+		next= totalPage> tempEnd;
+		pageList = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
+	}
+	
+	public PageResultDTO(Page <EN> result, Function<EN, DTO> fn) {
+		dtoList = result.stream().map(fn).collect(Collectors.toList());
+		totalPage = result.getTotalPages();
+		makePageList(result.getPageable());		
+	}
+}
+```  
+
+### 3) BoardService 인터페이스에 목록보기 메서드 선언  
+```java
+	// 목록보기 메서드
+	PageResultDTO<BoardDTO, Object[]> <BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 ```  
 
 # Build tool  
