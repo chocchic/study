@@ -31,4 +31,10 @@ public interface BoardService {
 	
 	// 상세보기 메서드
 	BoardDTO getBoard(Long bno);
+	
+	// 게시글 삭제 메서드
+	void removeWithReplies(Long bno);
+	
+	// 게시글 수정 메서드
+	void modifyBoard(BoardDTO boardDTO);
 }

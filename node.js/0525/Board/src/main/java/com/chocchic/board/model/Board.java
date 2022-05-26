@@ -27,6 +27,15 @@ public class Board extends BaseEntity{
 	private String title;
 	private String content;
 	
+	// title을 수정하는 메서드
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+	
+	// content을 수정하는 메서드
+	public void changeContent(String content) {
+		this.content = content;
+	}
 	// Member Entity를 N:1관계로 참조
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Member member;

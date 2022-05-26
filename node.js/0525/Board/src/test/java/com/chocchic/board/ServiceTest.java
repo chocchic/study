@@ -30,9 +30,20 @@ public class ServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testBoard() {
 		BoardDTO dto = b.getBoard(40L);
 		System.out.println("test board : " + dto);
+	}
+	
+	//@Test
+	public void testDelete() {
+		b.removeWithReplies(2L);
+	}
+	
+	@Test
+	public void testModifyBoard() {
+		BoardDTO boardDTO = BoardDTO.builder().bno(3L).title("제목을 수정").content("내용을 수정").build();
+		b.modifyBoard(boardDTO);
 	}
 }

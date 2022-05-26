@@ -3,6 +3,8 @@ package com.chocchic.board.service;
 import java.util.Optional;
 import java.util.function.Function;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import com.chocchic.board.dto.PageResultDTO;
 import com.chocchic.board.model.Board;
 import com.chocchic.board.model.Member;
 import com.chocchic.board.persistence.BoardRepository;
+import com.chocchic.board.persistence.ReplyRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -53,5 +56,30 @@ public class BoardServiceImpl implements BoardService{
 		Object[] ar = (Object[]) result;
 		
 		return entitytoDTO((Board)ar[0], (Member)ar[1], (Long)ar[2]);
+	}
+
+	private final ReplyRepository replyRepo;
+	
+	// 이 메서드 안의 작업은 하나의 트랜젝션으로 처리해달라고 요청
+	@Transactional
+	@Override
+	public void removeWithReplies(Long bno) {
+		// 댓글 삭제
+		replyRepo.deleteByBno(bno);
+		// 게시글 삭제
+		boardRepostiory.deleteById(bno);
+	}
+	
+	@Transactional
+	@Override
+	public void modifyBoard(BoardDTO boardDTO) {
+		// 데이터의 존재 여부를 확인
+		Optional<Board> board = boardRepostiory.findById(boardDTO.getBno());
+		if(board.isPresent()) {
+			board.get().changeTitle(boardDTO.getTitle());
+			board.get().changeContent(boardDTO.getContent());
+			
+			boardRepostiory.save(board.get());
+		}
 	}
 }

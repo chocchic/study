@@ -716,8 +716,104 @@ public class PageResultDTO<DTO, EN> {
 * 삭제를 할 때는 실제 삭제할 것인지 아니면 삭제되었다는 표시를 할 것인지를 고민해야 합니다.  
 * Board테이블에서 게시글을 지울 때 Reply테이블에서 게시글에 해당하는 데이터도 삭제  
 
-### 1) ReplyRepository 인터페이스에 게시글 번호로  삭제하는 메서드를 생성  
+### 1) ReplyRepository 인터페이스에 게시글 번호로 삭제하는 메서드를 생성  
+```java
+public interface ReplyRepository extends JpaRepository<Reply, Long> {
+	// 게시글 번호를 이용해서 삭제하는 메서드 
+	@Modifying
+	@Query("delete from Reply r where r.board.bno = :bno")
+	public void deleteByBno(@Param("bno") Long bno);
+}
+```  
 
+### 2) BoardService에 게시글을 삭제하는 메서드를 선언  
+```java
+	// 게시글 삭제 메서드
+	void removeWithReplies(Long bno);
+```
+
+### 3) BoardServiceImpl클래스에 게시글을 삭제하는 메서드를 구현  
+```java
+	private final ReplyRepository replyRepo;
+
+	// 이 메서드 안의 작업은 하나의 트랜젝션으로 처리해달라고 요청
+	@Transactional
+	@Override
+	public void removeWithReplies(Long bno) {
+		// 댓글 삭제
+		replyRepo.deleteByBno(bno);
+		// 게시글 삭제
+		boardRepostiory.deleteById(bno);
+	}
+```  
+-> @Transactional 생략시 오류나므로 조심할 것  
+
+### 4) ServiceTest 클래스에 테스트 코드를 작성하고 테스트  
+```java
+	@Test
+	public void testDelete() {
+		Long bno = 2L;
+		b.removeWithReplies(bno);
+	}
+```  
+### +) 
+```java
+Scanner sc = new Scanner(System.in);
+while(true){
+	try{
+		String x = sc.nextLine();
+		int n = sc.nextInt();
+	}catch(Exception e){
+		continue;
+	}	
+}
+```  
+
+## 15. 데이터 수정  
+* Board Entity에 getter는 있으나 Setter는 없으므로 수정이 안됨  
+### 1) Board Entity에 title과 content를 수정할 수 있는 메서드를 추가  
+```java
+// title을 수정하는 메서드
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+	
+	// content을 수정하는 메서드
+	public void changeContent(String content) {
+		this.content = content;
+	}
+```
+
+### 2) BoardService인터페이스에 게시글 수정을 위한 메서드를 선언  
+```java
+	// 게시글 수정 메서드
+	void modifyBoard(BoardDTO boardDTO);
+```  
+
+### 3) BoardServiceImpl클래스에 게시글 수정을 위한 메서드 생성  
+```java
+	@Transactional
+	@Override
+	public void modifyBoard(BoardDTO boardDTO) {
+		// 데이터의 존재 여부를 확인
+		Optional<Board> board = boardRepostiory.findById(boardDTO.getBno());
+		if(board.isPresent()) {
+			board.get().changeTitle(boardDTO.getTitle());
+			board.get().changeContent(boardDTO.getContent());
+			
+			boardRepostiory.save(board.get());
+		}
+	}
+```
+
+### 4) ServiceTest 클래스에 테스트 코드를 작성하고 테스트  
+```java
+	@Test
+	public void testModifyBoard() {
+		BoardDTO boardDTO = BoardDTO.builder().bno(3L).title("제목을 수정").content("내용을 수정").build();
+		b.modifyBoard(boardDTO);
+	}
+```  
 
 # Build tool  
 소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  
