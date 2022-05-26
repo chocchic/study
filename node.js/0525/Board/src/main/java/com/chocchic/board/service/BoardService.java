@@ -1,6 +1,8 @@
 package com.chocchic.board.service;
 
 import com.chocchic.board.BoardDTO;
+import com.chocchic.board.dto.PageRequestDTO;
+import com.chocchic.board.dto.PageResultDTO;
 import com.chocchic.board.model.Board;
 import com.chocchic.board.model.Member;
 
@@ -25,5 +27,8 @@ public interface BoardService {
 	Long register(BoardDTO dto);
 	
 	// 목록보기 메서드
-	PageResultDTO <BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+	PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+	
+	// 상세보기 메서드
+	BoardDTO getBoard(Long bno);
 }

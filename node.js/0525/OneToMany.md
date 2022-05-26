@@ -652,6 +652,73 @@ public class PageResultDTO<DTO, EN> {
 	PageResultDTO<BoardDTO, Object[]> <BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 ```  
 
+### 4) BoardServiceImpl 클래스에 목록보기 메서드 구현  
+```java
+	@Override
+	public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+		log.info(pageRequestDTO);
+		
+		// Entity를 DTO로 변환해주는 함수 생성
+		// Repository의 메서드의 결과가 Object[]인데 이 배열의 요소를 가지고 BoardDTO를 생성해서 출력해야 함
+		Function<Object[], BoardDTO> fn = (en -> entitytoDTO((Board)en[0], (Member)en[1], (Long)en[2]));
+		
+		// 데이터를 조회 - bno의 내림차순 적용
+		// 상황에 따라서는 regdate나 moddate로 정렬하는 경우도 있음
+		Page<Object[]> result = boardRepostiory.getBoardWithReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
+			
+		return new PageResultDTO<>(result, fn);
+	}
+```  
+
+### 5) ServiceTest클래스에 앞에서 만든 메서드를 테스트하는 코드를 추가하고 확인  
+```java
+	@Test
+	public void testList() {
+		PageRequestDTO pageRequestDTO = new PageRequestDTO();
+		PageResultDTO<BoardDTO, Object[]> result = b.getList(pageRequestDTO);
+		
+		for(BoardDTO boardDTO : result.getDtoList()) {
+			System.out.println(boardDTO);
+		}
+	}
+```
+
+## 13. 게시물 상세보기  
+### 1) BoardService 인터페이스에서 상세보기(하나의 데이터를 자세히 확인하는 작업)를 위한 메서드를 선언  
+```java
+	// 상세보기 메서드
+	BoardDTO getBoard(Long bno);
+```
+
+### 2) BoardServiceImpl에서 상세보기를 위한 메서드 구현  
+```java
+	@Override
+	public BoardDTO getBoard(Long bno) {
+		// bno를 이용해서 하나의 데이터 가져오기
+		// Board, Member, Long - 댓글 개수
+		Object result = boardRepostiory.getBoardByBno(bno);
+		Object[] ar = (Object[]) result;
+		
+		return entitytoDTO((Board)ar[0], (Member)ar[1], (Long)ar[2]);
+	}
+```  
+
+### 3) ServiceTest 클래스에 상세보기를 확인하는 메서드를 생성하고 확인  
+```java
+	@Test
+	public void testBoard() {
+		BoardDTO dto = b.getBoard(40L);
+		System.out.println("test board : " + dto);
+	}
+```  
+
+## 14. 게시물 삭제  
+* 삭제를 할 때는 실제 삭제할 것인지 아니면 삭제되었다는 표시를 할 것인지를 고민해야 합니다.  
+* Board테이블에서 게시글을 지울 때 Reply테이블에서 게시글에 해당하는 데이터도 삭제  
+
+### 1) ReplyRepository 인터페이스에 게시글 번호로  삭제하는 메서드를 생성  
+
+
 # Build tool  
 소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  
 
