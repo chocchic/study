@@ -117,6 +117,6 @@ public class RepoTest {
 	
 	@Test
 	public void testSearch() {
-		System.out.println("testSearch :"+b.search());
+		b.search();
 	}
 }

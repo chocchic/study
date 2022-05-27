@@ -1253,7 +1253,7 @@ compileQuerydsl {
 
 * 제대로 빌드되었다면 프로젝트에 build/generated/querydsl 디렉터리가 생성됩니다.  
 
-### 2) persistence패키지에 검색을 위한 SearchBoardRepostiory인터페이스를 생성  
+### 2) persistence패키지에 검색을 위한 SearchBoardRepostiory인터페이스를 생성 - BoardRepository의 기능을 확장하기 위해서 만든 인터페이스  
 ```java
 public interface SearchBoardRepository {
 	
@@ -1309,3 +1309,111 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 ```  
 
 ### 8) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  
+
+### +) Java에서 Database 사용  
+* 순수 JDBC Code 이용
+	Connection  
+	Statement, PreparedStatement, CallableStatement  
+	ResultSet  
+	클래스들을 이용해서 작성  
+	중복된 코드를 만들 가능성이 높아지고 자바 코드 안에 SQL을 문자열의 형태로 작성하기 때문에 에러 가능성이 높아지고가독성이 떨어지고 유지보수가 힘듬.  
+
+* Framework 이용  
+	중복된 작업을 자동화해주고 SQL과 자바코드를 분리시키는 구조를 만들어서 데이터베이스 작업의 효율성을 높여줍니다.  
+
+	SQL Mapper Framework : SQL과 자바코드를 분리하고 파라미터 매핑이나 결과 매핑을 자동으로 해주는 프레임워크로 MyBatis가 대표적  
+		데이터베이스가 변경되면 SQL을 수정해야합니다.  
+		데이터베이스의 변경이 자바 코드의 변경을 가져오는 경우가 발생할 수 있습니다.  
+	
+	ORM : 프로그래밍언어의 객체와 데이터베이스의 행을 매핑시켜서 SQL없이도 데이터베이스 작업이 가능하도록 해주는 프레임워크
+		원리는 데이터베이스에 연결할 떄 데이터베이스의 내용을 메모리로 가져와서 가져온 복사본을 사용합니다. 이 복사본을 가져오는 작업은 자바코드를 이용하지 않고 설정을 이용합니다. 복사본을 작업하면 프레임워크가 적절한 순간에 데이터베이스와 동기화를 해줍니다.  
+		ORM의 대표적인 방식이 Java에서는 JPA인터페이스를 이용하는 Hibernate입니다.  
+
+	- JPA를 이용하는 방식
+		+ Entity의 Repository인터페이스만 이용하는 방법 : 전체 또는 페이지 단위로 조회하거나 기본키를 가지고 수행하는 CRUD작업만 가능  
+		+ 이름으로 메서드를 만들어서 이용하는 방법 : 간단한 조건을 이름으로 설정해서 작업을 수행할 수 있습니다 
+			ex) findByEmail(String email)  
+========= 위의 두가지는 하나의 Entity로만 결과를 만들 수 잇습니다. =========   
+
+		+ JPQL로 쿼리를 생성해서 이용하는 방법 : JPQL 문법으로 쿼리를 작성해서 작업을 수행  
+			@Query("쿼리")로 작성해서 사용하는 방식  
+	여기까지 모든 방법들은 정적인 쿼리를 만드는 것입니다. 정적인 쿼리는 조건에 해당하는 값은 바꿀 수 있지만, 테이블 이름이나 컬럼 이름등은 실행 중에 변경이 불가능합니다.  
+	select ? from ? where ? = ? ; 
+
+	- 실행중에 쿼리를 변경하고자 하는 경우에 사용할 수 있는 Querydsl을 제공합니다.  
+		검색항목을 여러 개 두고 그 중에서 하나의 항목을 선택해서 조회를 하고자 합니다.  
+
+### +)
+* 어떤 클래스를 상속받았을 떄 에러가 발생하는 경우  
+	- 이 클래스가 private이나 default class인지 확인 : 다른 패키지에서 사용이 안되기 때문  
+	- 이 클래스가 추상 클래스인지 확인 : 추상 메서드를 재정의하지 않아서 에러  
+	- final class 인지 확인 : final클래스는 상속이 안됩니다.  
+	- default 메서드를 생성하지 않았을 때  
+
+### 9) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  
+```java
+@Override
+	public Board search() {
+		log.info("search...");
+		/*
+		// 데이터 하나만 뽑아오는 경우
+		QBoard board = QBoard.board;
+		
+		JPQLQuery<Board> jpqlQuery = from(board);
+		// bno가 40인 데이터 조회를 위한 메서드 호출
+		jpqlQuery.select(board).where(board.bno.eq(40L));
+		
+		// 실행
+		List<Board> result = jpqlQuery.fetch();
+		
+		log.info("result : " + result);
+		return result.get(0);
+		*/
+		
+		/*
+		// 쿼리를 수행할 수 있는 Querydsl객체 중 join하고자 하는 Entity를 가져옵니다.
+		QBoard board = QBoard.board;
+		QReply reply = QReply.reply;
+		QMember member = QMember.member;
+		
+		// 관계에서 부모에 해당하는 Entity를 기준으로 쿼리 객체 JPQLQuery를 생성
+		JPQLQuery <Board> jpqlQuery = from(board);
+		
+		// 관계설정에 사용한 속성을 가지고 조인
+		// SQL로 보면 : select * from board b, member m where b.email = m.email; 
+		jpqlQuery.leftJoin(member).on(board.member.eq(member)); // member와 join
+		jpqlQuery.leftJoin(reply).on(reply.board.eq(board)); // reply와 join
+		
+		// 필요한 데이터를 조회하는 구문을 추가
+		// 조인한 데이터를 board별로 묶어서 board와 회원의 email 그리고 댓글의 개수 조회
+		jpqlQuery.select(board, member.email, reply.count()).groupBy(board);
+		
+		// 결과 가져오기
+		List<Board> result = jpqlQuery.fetch();
+		
+		System.out.println(result);
+		*/
+		
+		// 결과를 Tuple로 받기
+		QBoard board = QBoard.board;
+		QReply reply = QReply.reply;
+		QMember member = QMember.member;
+		
+		// Tuple은 관계형 데이터베이스에서는 하나의 행을 지칭하는 용어
+		// 프로그래밍에서는 일반적으로 여러 종류의 데이터가 묶여서 하나의 데이터를 나타내는 것
+		// Map과 다른 점은 Map은 key로 세부 데이터를 접근하지만 Tuple은 인덱스로 접근이 가능하고, 대부분의 경우 Tuple은 수정이 불가능
+		JPQLQuery<Board> jpqlquery = from(board);
+		jpqlquery.leftJoin(member).on(board.member.eq(member)); // member와 join
+		jpqlquery.leftJoin(reply).on(reply.board.eq(board)); // reply와 join
+		
+		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email,reply.count());
+		tuple.groupBy(board);
+		
+		// 결과 가져오기
+		List<Tuple> result = tuple.fetch();
+		
+		System.out.println(result);
+		
+		return null;
+	}
+```  
