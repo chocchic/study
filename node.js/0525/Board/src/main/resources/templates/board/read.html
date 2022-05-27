@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+	<th:block th:fragment="content">
+	<h1>Board Detail</h1>
+		<div class="form-group">
+			<label>Gno</label>
+			<input type="text" class="form-control" name="gno" th:value="${dto.bno}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>title</label>
+			<input type="text" class="form-control" name="title" th:value="${dto.title}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>content</label>
+			<textarea rows="5" class="form-control" name="contnet" th:text="${dto.content}" readonly></textarea>
+		</div>
+		<div class="form-group">
+			<label >Writer</label>
+			<input type="text" class="form-control" name="writer" th:value="${dto.memberName}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>작성일</label>
+			<input type="text" class="form-control" name="regdate" th:value="${#temporals.format(dto.regdate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+		</div>
+		<div class="form-group">
+			<label>최종 수정일</label>
+			<input type="text" class="form-control" name="moddate" th:value="${#temporals.format(dto.moddate, 'yyyy/MM/dd HH:mm:ss')}" readonly/>
+		</div>
+		<a th:href="@{/dto/list(page=${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}"><button type="button" class="btn btn-info">목록</button></a>
+		<a th:href="@{/dto/update(bno = ${dto.bno}, page=${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}"><button type="button" class="btn btn-primary">수정</button></a>
+		<a th:href="@{/dto/delete(bno = ${dto.bno})}"><button type="button" class="btn btn-danger">삭제</button></a>
+	</th:block>
+</th:block>

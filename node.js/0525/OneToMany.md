@@ -853,7 +853,7 @@ public class BoardController {
 	}
 ```
 
-* templates 디렉터리에 board디렉터리를 생성하고 list.html파일을 생성하고 작성  
+* templates/board디렉터리에 board디렉터리를 생성하고 list.html파일을 생성하고 작성  
 ```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
@@ -966,3 +966,83 @@ public class BoardController {
     });
 </script>
 ```
+
+### 4) 게시물 작성
+* BoardController 클래스에 게시물 등록을 위한 메서드를 생성  
+```java
+	// 게시물 작성을 처리할 메서드
+	@GetMapping("/board/register")
+	public void register() {
+		log.info("게시물 등록으로 이동");
+	}
+	
+	@PostMapping("/board/register")
+	public String register(BoardDTO dto, RedirectAttributes rAttr) {
+		log.info("게시물 처리중"+dto);
+		// 게시물 등록
+		Long bno = boardService.register(dto);
+		// View에 데이터 전달
+		rAttr.addFlashAttribute("msg",bno+" insert");
+		return "redirect:/board/list";
+	}
+```
+* templates 디렉터리에 register.html파일을 생성하고 작성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content} )}">
+  <th:block th:fragment="content">
+    <h1 class="mt-4">게시물 작성</h1>
+
+    <form th:action="@{/board/register}" th:method="post">
+      <div class="form-group">
+        <label>제목</label>
+        <input type="text" class="form-control" name="title" placeholder="Enter Title">
+      </div>
+      <div class="form-group">
+        <label>내용</label>
+        <textarea class="form-control" rows="5" name="content"></textarea>
+      </div>
+      <div class="form-group">
+        <label>작성자 이메일</label>
+        <input type="email" class="form-control" name="memberEmail" placeholder="작성자 이메일">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </th:block>
+</th:block>
+```  
+
+## 5. 게시물 상세보기  
+### 1) BoardController 클래스에 게시물 상세보기를 위한 메서드를 생성  
+```java
+	// 상세보기 처리를 위한 메서드
+	@GetMapping("/board/read")
+	// @ModelAttribute("이름")는 파라미터를 받아서이름으로 다음 요청에게 넘겨주는 역항르 수행
+	public void read(@ModelAttribute("requestDTO")PageRequestDTO pageRequestDTO, Model model, Long bno) {
+		log.info("상세보기 처리중.." + bno);
+		BoardDTO boardDTO = boardService.getBoard(bno);
+		model.addAttribute("dto",boardDTO);
+	}
+```  
+
+### 2) templates/board디렉터리에 read.html파일을 생성하고 작성  
+```html
+
+```  
+
+## 6. 게시물 수정 및 삭제  
+### 1) BoardController에서 게시물 상세보기 요청을 처리하는 부분의 URL을 수정  
+```java
+	// 상세보기 처리를 위한 메서드
+	@GetMapping({"/board/read", "/board/modify"})
+	// @ModelAttribute("이름")는 파라미터를 받아서이름으로 다음 요청에게 넘겨주는 역항르 수행
+	public void read(@ModelAttribute("requestDTO")PageRequestDTO pageRequestDTO, Model model, Long bno) {
+		log.info("상세보기 처리중.." + bno);
+		BoardDTO boardDTO = boardService.getBoard(bno);
+		model.addAttribute("dto",boardDTO);
+	}
+```
+-> 상세보기와 수정을 위한 화면으로 이동하는 것은 하나의 데이터를 찾아오는 것은 동일하고 출력할 때 읽기전용으로 만들 것이냐 아니면 편집이 가능하도록 할 것이냐의 차이입니다.  
+
