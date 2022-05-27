@@ -1252,3 +1252,60 @@ compileQuerydsl {
 * build tasks 윈도우를 열어서 build에서 build와 jar를 클릭  
 
 * 제대로 빌드되었다면 프로젝트에 build/generated/querydsl 디렉터리가 생성됩니다.  
+
+### 2) persistence패키지에 검색을 위한 SearchBoardRepostiory인터페이스를 생성  
+```java
+public interface SearchBoardRepository {
+	
+}
+```
+### 3) persistence패키지에 검색을 위한 SearchBoardRepostiory인터페이스를 implements하고 Querydsl을 사용할 수 있는 클래스를 생성  - SearchBoardRepositoryImpl
+```java
+public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport implements SearchBoardRepository {
+
+	public SearchBoardRepositoryImpl() {
+		super(Board.class);
+	}
+
+}
+```  
+
+### 4) SearchBoardRepository인터페이스에 메서드 선언  
+```java
+	Board search();
+```  
+
+### 5) SearchBoardRepositoryImpl클래스에 메서드 구현  
+```java
+@Override
+	public Board search() {
+		log.info("search...");
+		
+		QBoard board = QBoard.board;
+		
+		JPQLQuery<Board> jpqlQuery = from(board);
+		// bno가 40인 데이터 조회를 위한 메서드 호출
+		jpqlQuery.select(board).where(board.bno.eq(40L));
+		
+		// 실행
+		List<Board> result = jpqlQuery.fetch();
+		
+		log.info("result : " + result);
+		return result.get(0);
+	}
+```  
+
+### 6) BoardRepository 인터페이스에 SearchBoardRepository를 extends  
+```java
+public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoardRepository {
+```  
+
+### 7) RepositoryTest 클래스에 테스트 메서드를 생성하고 확인  
+```java
+	@Test
+	public void testSearch() {
+		System.out.println("testSearch :"+b.search());
+	}
+```  
+
+### 8) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  

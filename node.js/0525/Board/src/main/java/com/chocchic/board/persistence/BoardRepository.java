@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.chocchic.board.model.Board;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoardRepository {
 	// Board테이블에서 데이터를 가져올 때 Member 정보도 같이 가져오는 메서드
 	// 하나의 게시글에 회원정보가 1개밖에 없으므로 리턴 타입은 Object
 	@Query("select b, w from Board b left join b.member w where b.bno = :bno")

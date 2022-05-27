@@ -114,4 +114,9 @@ public class RepoTest {
 		Object[] ar = (Object[])result;
 		System.out.println(Arrays.toString(ar));
 	}
+	
+	@Test
+	public void testSearch() {
+		System.out.println("testSearch :"+b.search());
+	}
 }
