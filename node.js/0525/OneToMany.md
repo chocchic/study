@@ -177,6 +177,11 @@ public class Reply extends BaseEntity{
 * 관계형 데이터베이스에서는 Member테이블의 기본키를 Board테이블에 외래키로 설정합니다.  
 * Spring JPA에서는 속성 위에 @OneToMany나 @ManyToOne을 이용해서 설정을 합니다.  
 
+### +) Build tool  
+소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  
+
+* gradle(build.gradle에 설정), maven(pom.xml파일에 설정), jenkins(현업과 클라우드 환경에서 가장 많이 사용되는 build tool) : 설정 파일을 수정하면 rebuild를 해주는 것이 좋습니다. 의존성 설정을 수정한 경우에는 반드시 rebuild를 해주는 것이 좋습니다. 외부 라이브러리의 의존성을 설정해서 코드를 작성할 떄는 에러가 없었는데 실행을하면 ClassNotFoundExceptioon이 발생하는 경우가 있는데 이 경우가 대부분 rebuild를 하지 않아서 그렇습니디.  
+
 ### 1) Board Entity에 Member Entity를 참조할 수 있는 속성을 추가  
 ```java
 	// Member Entity를 N:1관계로 참조
@@ -815,7 +820,149 @@ while(true){
 	}
 ```  
 
-# Build tool  
-소스코드 -> 컴파일 작업(문법적인 오류가 있는지 확인)을 수행하게 되고 이 작업을 하고나면 자바의 경우는 중간 코드인 class 파일이 생성됩니다. -> build를 수행하는데 결과로는 실행 가능한 코드가 만들어집니다. -> Run(실행)  
 
-* gradle(build.gradle에 설정), maven(pom.xml파일에 설정), jenkins(현업과 클라우드 환경에서 가장 많이 사용되는 build tool) : 설정 파일을 수정하면 rebuild를 해주는 것이 좋습니다. 의존성 설정을 수정한 경우에는 반드시 rebuild를 해주는 것이 좋습니다. 외부 라이브러리의 의존성을 설정해서 코드를 작성할 떄는 에러가 없었는데 실행을하면 ClassNotFoundExceptioon이 발생하는 경우가 있는데 이 경우가 대부분 rebuild를 하지 않아서 그렇습니디.  
+
+## 16. Controller와 Veiw 계층  
+### 1) 공통된 디자인 적용을위한 설정 - bootstrap의 simple sidebar 디자인 적용  
+* 공통된 디자인을 적용하기 위한 css 파일이나 js파일은 static 디렉터리에 위치시켜야합니다.  
+* 이전에 사용했던 assets, css, js 디렉터리를 src/main/resources디렉터리 안의 static 디렉터리에 복사  
+* 이전에 공통된 메뉴를 위해 만들었던 basic.html파일을 src/main/resources디렉터리안의 template 디렉터리에 layout 디렉터리를 만들고 복사  
+
+### 2) Controller역할을 수행할 BoardController 클래스를 생성 
+```java
+@Controller
+@Log4j2
+@RequiredArgsConstructor
+public class BoardController {
+	private final BoardService boardService;
+	
+	
+}
+```  
+
+### 3) 목록보기 처리  
+* 목록보기 요청을 처리할 메서드를 BoardController 클래스에 생성  
+```java
+	// 목록보기 요청을 처리할 메서드
+	@GetMapping({"/","/board/list"})
+	public String list(PageRequestDTO pageRequestDTO, Model model) {
+		log.info("목록보기 요청"+pageRequestDTO);
+		model.addAttribute("result",boardService.getList(pageRequestDTO));
+		
+		return "/board/list";
+	}
+```
+
+* templates 디렉터리에 board디렉터리를 생성하고 list.html파일을 생성하고 작성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content} )}">
+   <th:block th:fragment="content">
+      <h1 class="mt-4">
+         Board List Page 
+         <span><a th:href="@{/board/register}">
+         	<button type="button" class="btn btn-outline-primary">REGISTER</button>
+         </a></span>
+      </h1>
+      <form action="/board/list" method="get" id="searchForm">
+         <div class="input-group">
+            <input type="hidden" name="page" value="1">
+            <div class="input-group-prepend">
+               <select class="custom-select" name="type">
+                  <option th:selected="${pageRequestDTO.type == null}">-------</option>
+                  <option value="t" th:selected="${pageRequestDTO.type =='t'}">제목</option>
+                  <option value="c" th:selected="${pageRequestDTO.type =='c'}">내용</option>
+                  <option value="w" th:selected="${pageRequestDTO.type =='w'}">작성자</option>
+                  <option value="tc" th:selected="${pageRequestDTO.type =='tc'}">제목+내용</option>
+                  <option value="tcw" th:selected="${pageRequestDTO.type =='tcw'}">ALL</option>
+               </select>
+            </div>
+            <input class="form-control" name="keyword"
+               th:value="${pageRequestDTO.keyword}">
+            <div class="input-group-append" id="button-addon4">
+               <button class="btn btn-outline-secondary btn-search" type="button">Search</button>
+               <button class="btn btn-outline-secondary btn-clear" type="button">Clear</button>
+            </div>
+         </div>
+      </form>
+      <table class="table table-striped">
+         <thead>
+            <tr>
+               <th scope="col">#</th>
+               <th scope="col">Title</th>
+               <th scope="col">Writer</th>
+               <th scope="col">Regdate</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr th:each="dto : ${result.dtoList}">
+               <th scope="row">[[${dto.bno}]]</th>
+               <td><a th:href="@{/board/read(bno = ${dto.bno},
+                    page= ${result.page},
+                    type=${pageRequestDTO.type} ,
+                    keyword = ${pageRequestDTO.keyword})}">[[${dto.title}]]--------[<b th:text="${dto.replyCount}"></b>]
+               </a></td>
+               <td>[[${dto.memberName}]] <small>[[${dto.memberEmail}]]</small>
+               </td>
+               <td>[[${#temporals.format(dto.regdate, 'yyyy/MM/dd')}]]</td>
+            </tr>
+         </tbody>
+      </table>
+      <ul class="pagination h-100 justify-content-center align-items-center">
+         <li class="page-item " th:if="${result.prev}"><a
+            class="page-link"
+            th:href="@{/board/list(page= ${result.start-1},
+                    type=${pageRequestDTO.type} ,
+                    keyword = ${pageRequestDTO.keyword} ) }"
+            tabindex="-1">Previous</a></li>
+         <li th:class=" 'page-item ' + ${result.page == page?'active':''} "
+            th:each="page: ${result.pageList}"><a class="page-link"
+            th:href="@{/board/list(page = ${page} ,
+                   type=${pageRequestDTO.type} ,
+                   keyword = ${pageRequestDTO.keyword}  )}">
+               [[${page}]] </a></li>
+         <li class="page-item" th:if="${result.next}"><a
+            class="page-link"
+            th:href="@{/board/list(page= ${result.end + 1} ,
+                    type=${pageRequestDTO.type} ,
+                    keyword = ${pageRequestDTO.keyword} )}">Next</a>
+         </li>
+      </ul>
+      <div class="modal" tabindex="-1" role="dialog">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title">Modal title</h5>
+                  <button type="button" class="close" data-dismiss="modal"
+                     aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                  <p>[[${msg}]]</p>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary"
+                     data-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+<script th:inline="javascript">
+    var msg = [[${msg}]];
+    console.log(msg);
+
+    if(msg){
+      $(".modal").modal();
+    }
+    var searchForm = $("#searchForm");
+    $('.btn-search').click(function(e){
+      searchForm.submit();
+    });
+
+    $('.btn-clear').click(function(e){
+      searchForm.empty().submit();
+    });
+</script>
+```
