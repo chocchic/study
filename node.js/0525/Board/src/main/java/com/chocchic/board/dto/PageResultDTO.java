@@ -35,10 +35,10 @@ public class PageResultDTO<DTO, EN> {
 	
 	// 페이지 번호목록을 만들어주는 메서드
 	private void makePageList(Pageable pageable) {
-		this.page = pageable.getPageNumber();
+		this.page = pageable.getPageNumber() + 1;
 		this.size = pageable.getPageSize();
 		
-		int tempEnd = (int)(Math.ceil(page/10.0)) * 10;
+		int tempEnd = (int)(Math.ceil(page/10.0))*10;
 		start = tempEnd - 9;
 		prev = start > 1;
 		

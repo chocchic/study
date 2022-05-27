@@ -631,7 +631,7 @@ public class PageResultDTO<DTO, EN> {
 	
 	// 페이지 번호목록을 만들어주는 메서드
 	private void makePageList(Pageable pageable) {
-		this.page = pageable.getPageNumber();
+		this.page = pageable.getPageNumber() + 1;
 		this.size = pageable.getPageSize();
 		
 		int tempEnd = (int)(Math.ceil(page/10.0)) * 10;
@@ -1014,8 +1014,8 @@ public class BoardController {
 </th:block>
 ```  
 
-## 5. 게시물 상세보기  
-### 1) BoardController 클래스에 게시물 상세보기를 위한 메서드를 생성  
+### 5) 게시물 상세보기  
+* 1) BoardController 클래스에 게시물 상세보기를 위한 메서드를 생성  
 ```java
 	// 상세보기 처리를 위한 메서드
 	@GetMapping("/board/read")
@@ -1027,15 +1027,15 @@ public class BoardController {
 	}
 ```  
 
-### 2) templates/board디렉터리에 read.html파일을 생성하고 작성  
+* 2) templates/board디렉터리에 read.html파일을 생성하고 작성  
 ```html
 
 ```  
 
-## 6. 게시물 수정 및 삭제  
+### 6) 게시물 수정 및 삭제  
 ### 1) BoardController에서 게시물 상세보기 요청을 처리하는 부분의 URL을 수정  
 ```java
-	// 상세보기 처리를 위한 메서드
+	// 상세보기와 수정보기 처리를 위한 메서드
 	@GetMapping({"/board/read", "/board/modify"})
 	// @ModelAttribute("이름")는 파라미터를 받아서이름으로 다음 요청에게 넘겨주는 역항르 수행
 	public void read(@ModelAttribute("requestDTO")PageRequestDTO pageRequestDTO, Model model, Long bno) {
@@ -1046,3 +1046,209 @@ public class BoardController {
 ```
 -> 상세보기와 수정을 위한 화면으로 이동하는 것은 하나의 데이터를 찾아오는 것은 동일하고 출력할 때 읽기전용으로 만들 것이냐 아니면 편집이 가능하도록 할 것이냐의 차이입니다.  
 
+### 2) BoardController에서 수정과 삭제를 처리할 메서드
+```java
+	// 수정을 처리할 메서드
+	@PostMapping("/board/modify")
+	// 수정은 이전에 보고있던 목록보기로 돌아갈 수있어야하기 때문에 목록 보기에 필요한 데이터가 필요합니다.
+	public String modify(BoardDTO dto, @ModelAttribute("requestDTO")PageRequestDTO pageRequestDTO, RedirectAttributes rAttr) {
+		boardService.modifyBoard(dto);
+		
+		rAttr.addAttribute("page", pageRequestDTO.getPage());
+		rAttr.addAttribute("type", pageRequestDTO.getType());
+		rAttr.addAttribute("keyword", pageRequestDTO.getKeyword());
+		rAttr.addAttribute("bno", dto.getBno());
+		
+		return "redirect:/board/read";
+	}
+
+		// 수정을 처리할 메서드
+	@PostMapping("/board/modify")
+	// 수정은 이전에 보고있던 목록보기로 돌아갈 수있어야하기 때문에 목록 보기에 필요한 데이터가 필요합니다.
+	public String modify(BoardDTO dto, @ModelAttribute("requestDTO")PageRequestDTO pageRequestDTO, RedirectAttributes rAttr) {
+		boardService.modifyBoard(dto);
+		
+		rAttr.addAttribute("page", pageRequestDTO.getPage());
+		rAttr.addAttribute("type", pageRequestDTO.getType());
+		rAttr.addAttribute("keyword", pageRequestDTO.getKeyword());
+		rAttr.addAttribute("bno", dto.getBno());
+		
+		return "redirect:/board/read";
+	}
+```  
+
+### 3) templates/board디렉터리에 modify.html 작성  
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content} )}">
+   <th:block th:fragment="content">
+      <h1 class="mt-4">Board Modify Page</h1>
+      <form action="/board/modify" method="post">
+
+         <!--페이지 번호  -->
+         <input type="hidden" name="page" th:value="${requestDTO.page}">
+         <input type="hidden" name="type" th:value="${requestDTO.type}">
+         <input type="hidden" name="keyword" th:value="${requestDTO.keyword}">
+
+         <div class="form-group">
+            <label>Bno</label> <input type="text" class="form-control"
+               name="bno" th:value="${dto.bno}" readonly>
+         </div>
+
+         <div class="form-group">
+            <label>Title</label> <input type="text" class="form-control"
+               name="title" th:value="${dto.title}">
+         </div>
+         <div class="form-group">
+            <label>Content</label>
+            <textarea class="form-control" rows="5" name="content">[[${dto.content}]]</textarea>
+         </div>
+         <div class="form-group">
+            <label>Writer</label> <input type="text" class="form-control"
+               name="member" th:value="${dto.memberEmail}" readonly>
+         </div>
+         <div class="form-group">
+            <label>RegDate</label> <input type="text" class="form-control"
+               th:value="${#temporals.format(dto.regdate, 'yyyy/MM/dd HH:mm:ss')}"
+               readonly>
+         </div>
+         <div class="form-group">
+            <label>ModDate</label> <input type="text" class="form-control"
+               th:value="${#temporals.format(dto.moddate, 'yyyy/MM/dd HH:mm:ss')}"
+               readonly>
+         </div>
+      </form>
+
+      <button type="button" class="btn btn-primary modifyBtn">수정</button>
+      <button type="button" class="btn btn-info listBtn">목록</button>
+      <button type="button" class="btn btn-danger removeBtn">삭제</button>
+
+      <script th:inline="javascript">
+      var actionForm = $("form"); //form 태그 객체
+
+      $(".removeBtn").click(function(){
+             if(!confirm("삭제하시겠습니까?")){
+          return ;
+        }        
+           actionForm
+                .attr("action", "/board/remove")
+                .attr("method","post");
+
+        actionForm.submit();
+      });
+
+      $(".modifyBtn").click(function() {
+        if(!confirm("수정하시겠습니까?")){
+          return ;
+        }
+        actionForm
+                .attr("action", "/board/modify")
+                .attr("method","post")
+                .submit();
+      });
+      
+      $(".listBtn").click(function() {
+        //var pageInfo = $("input[name='page']");
+        var page = $("input[name='page']");
+        var type = $("input[name='type']");
+        var keyword = $("input[name='keyword']");
+
+        actionForm.empty(); //form 태그의 모든 내용을 지우고
+
+        actionForm.append(page);
+        actionForm.append(type);
+        actionForm.append(keyword);
+        
+        actionForm
+                .attr("action", "/board/list")
+                .attr("method","get");
+
+        actionForm.submit();
+      })
+    </script>
+
+   </th:block>
+</th:block>
+```  
+
+## 17. 동적인 쿼리 작업  
+* 검색항목이 고정이 아니고 변하는 쿼리 - Spring JPA에서는 querydsl을 이용해서 처리 가능  
+
+### 1) querydsl사용 설정
+* querydsl을 사용하기 위해서 build.gradle을 수정 : group, version, sourceCompatibility, tasks.named("test")는 그대로, implements에는 jpa  
+```gradle
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+group = 'com.chocchic.board'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	// https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-java8time
+	implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time'
+	
+	//querydsl 추가
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+```  
+
+* build.gradle을 수정 후 프로젝트를 선택하고 마우스 오른쪽을 누른후 gradle - refresh gradle project를 수행  
+
+* build tasks 윈도우를 열어서 build에서 build와 jar를 클릭  
+
+* 제대로 빌드되었다면 프로젝트에 build/generated/querydsl 디렉터리가 생성됩니다.  
