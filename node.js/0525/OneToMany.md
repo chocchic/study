@@ -1366,7 +1366,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 	* 이 클래스가 private이나 default class인지 확인 : 다른 패키지에서 사용이 안되기 때문  
 	* 이 클래스가 추상 클래스인지 확인 : 추상 메서드를 재정의하지 않아서 에러  
 	* final class 인지 확인 : final클래스는 상속이 안됩니다.  
-	* default 메서드를 생성하지 않았을 때  
+	* default constructor가 없는 경우  
 
 ### 9) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  
 ```java
@@ -1424,7 +1424,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 		jpqlquery.leftJoin(member).on(board.member.eq(member)); // member와 join
 		jpqlquery.leftJoin(reply).on(reply.board.eq(board)); // reply와 join
 		
-		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email,reply.count());
+		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email, reply.count());
 		tuple.groupBy(board);
 		
 		// 결과 가져오기
@@ -1455,7 +1455,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 		jpqlquery.leftJoin(member).on(board.member.eq(member)); 
 		jpqlquery.leftJoin(reply).on(reply.board.eq(board));
 		
-		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email,reply.count());
+		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member, reply.count());
 
 		// 동적인ㅇ 쿼리 수행을 위한 객체 생성
 		BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -1520,3 +1520,45 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 		System.out.println("result : " + result);
 	}	
 ```  
+
+### 13) BoardServiceImpl클래스의 getList메서드 수정  
+```java
+	@Override
+	public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+		log.info(pageRequestDTO);
+		
+		// Entity를 DTO로 변환해주는 함수 생성
+		// Repository의 메서드의 결과가 Object[]인데 이 배열의 요소를 가지고 BoardDTO를 생성해서 출력해야 함
+		Function<Object[], BoardDTO> fn = (en -> entitytoDTO((Board)en[0], (Member)en[1], (Long)en[2]));
+		
+		// 데이터를 조회 - bno의 내림차순 적용
+		// 상황에 따라서는 regdate나 moddate로 정렬하는 경우도 있음
+		/*
+		Page<Object[]> result = boardRepostiory.getBoardWithReplyCount(pageRequestDTO.getPageable(Sort.by("bno").descending()));
+		*/
+		Page<Object[]> result = boardRepostiory.searchPage(pageRequestDTO.getType(),pageRequestDTO.getKeyword(), pageRequestDTO.getPageable(Sort.by("bno").descending()));
+		return new PageResultDTO<>(result, fn);
+	}
+```  
+
+### +) 검색 타입 지정
+	우리는 갯수가 적어서 영어 알파벳으로 해도 괜찮지만 쿠팡같은 거대한 쇼핑몰의 경우 알파벳으로만 하는 것이 힘들다
+	그래서 숫자로 하는데,  shift연산자로 한다.
+  	1 << 0
+	1 << 1  
+
+	1, 2, 3, 4, 5 ...
+	1, 2, 4, 8, 16 ... 
+
+	int i = 1; 이라고 지정하면 컴퓨터 입장에서는 2진수로 변환한다. -> 00000000 00000000 00000000 00000001  
+	1 << 1 : 1을 왼쪽으로 한번 밀기 -> 0000000 0000000 00000000 00000010 : 2 (맨 앞에 0은 부호이므로 밀리지 않음)
+	1 << 2 : 1을 왼쪽으로 두번 밀기 -> 0000000 0000000 00000000 00000100 : 4  
+
+	같이 쓸 수 있는 옵션인지 못 쓰는 애들인지 사람이 기억해야 한다.  
+
+	shift만 누르면 0000000 0000000 00000000 00000100 -> 4  
+	control만 누르면 0000000 0000000 00000000 00001000 -> 8  
+	shift와 control을 같이 0000000 0000000 00000000 00001100 -> 12  
+	alt만 누르면  0000000 0000000 00000000 00100000 -> 16  
+
+	shift 누른 것 확인 : 오른쪽으로 2번 밀기 % 2 == 1  	

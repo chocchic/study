@@ -105,7 +105,8 @@ public class SearchBoardRepositoryImpl extends QuerydslRepositorySupport impleme
 		jpqlquery.leftJoin(member).on(board.member.eq(member)); 
 		jpqlquery.leftJoin(reply).on(reply.board.eq(board));
 		
-		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email,reply.count());
+		// 검색 결과를 만들어주는 부분
+		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member,reply.count());
 
 		// 동적인ㅇ 쿼리 수행을 위한 객체 생성
 		BooleanBuilder booleanBuilder = new BooleanBuilder();

@@ -120,7 +120,7 @@ public class RepoTest {
 		b.search();
 	}
 	
-	@Test
+	//@Test
 	public void testSearchPage() {
 		Pageable p = PageRequest.of(0,10,Sort.by("bno").descending().and(Sort.by("title").ascending()));
 		Page<Object[]> result = b.searchPage("tcw", "9", p);
