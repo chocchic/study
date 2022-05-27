@@ -115,8 +115,15 @@ public class RepoTest {
 		System.out.println(Arrays.toString(ar));
 	}
 	
-	@Test
+	//@Test
 	public void testSearch() {
 		b.search();
+	}
+	
+	@Test
+	public void testSearchPage() {
+		Pageable p = PageRequest.of(0,10,Sort.by("bno").descending().and(Sort.by("title").ascending()));
+		Page<Object[]> result = b.searchPage("tcw", "9", p);
+		System.out.println("result : " + result);
 	}
 }

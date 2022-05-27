@@ -1309,6 +1309,25 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 ```  
 
 ### 8) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  
+```java
+	@Override
+	public Board search() {
+		log.info("search...");
+
+		// 데이터 하나만 뽑아오는 경우
+		QBoard board = QBoard.board;
+		
+		JPQLQuery<Board> jpqlQuery = from(board);
+		// bno가 40인 데이터 조회를 위한 메서드 호출
+		jpqlQuery.select(board).where(board.bno.eq(40L));
+		
+		// 실행
+		List<Board> result = jpqlQuery.fetch();
+		
+		log.info("result : " + result);
+		return result.get(0);
+	}
+```  
 
 ### +) Java에서 Database 사용  
 * 순수 JDBC Code 이용
@@ -1343,12 +1362,11 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 	- 실행중에 쿼리를 변경하고자 하는 경우에 사용할 수 있는 Querydsl을 제공합니다.  
 		검색항목을 여러 개 두고 그 중에서 하나의 항목을 선택해서 조회를 하고자 합니다.  
 
-### +)
-* 어떤 클래스를 상속받았을 떄 에러가 발생하는 경우  
-	- 이 클래스가 private이나 default class인지 확인 : 다른 패키지에서 사용이 안되기 때문  
-	- 이 클래스가 추상 클래스인지 확인 : 추상 메서드를 재정의하지 않아서 에러  
-	- final class 인지 확인 : final클래스는 상속이 안됩니다.  
-	- default 메서드를 생성하지 않았을 때  
+### +) 어떤 클래스를 상속받았을 떄 에러가 발생하는 경우  
+	* 이 클래스가 private이나 default class인지 확인 : 다른 패키지에서 사용이 안되기 때문  
+	* 이 클래스가 추상 클래스인지 확인 : 추상 메서드를 재정의하지 않아서 에러  
+	* final class 인지 확인 : final클래스는 상속이 안됩니다.  
+	* default 메서드를 생성하지 않았을 때  
 
 ### 9) SearchBoardRepositoryImpl클래스의 search메서드를 수정하고 테스트  
 ```java
@@ -1416,4 +1434,89 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 		
 		return null;
 	}
+```  
+
+### 10) SearchBoardRepository인터페이스에 검색기능을 위한 메서드를 선언
+```java
+	// 검색을 위한 메서드
+	// 3개의 항목을 묶어서 하나의 클래스로 표현해도 됩니다.
+	Page<Object[]> searchPage(String type, String keyword, Pageable pageable);
+```  
+
+### 11) SearchBoardRepositoryImpl클래스에 검색기능을 위한 메서드를 구현  
+```java
+@Override
+	public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
+		QBoard board = QBoard.board;
+		QReply reply = QReply.reply;
+		QMember member = QMember.member;
+		
+		JPQLQuery<Board> jpqlquery = from(board);
+		jpqlquery.leftJoin(member).on(board.member.eq(member)); 
+		jpqlquery.leftJoin(reply).on(reply.board.eq(board));
+		
+		JPQLQuery<Tuple> tuple = jpqlquery.select(board, member.email,reply.count());
+
+		// 동적인ㅇ 쿼리 수행을 위한 객체 생성
+		BooleanBuilder booleanBuilder = new BooleanBuilder();
+		// bno가 0보다 큰 데이터를 추출
+		BooleanExpression expression = board.bno.gt(0L);
+		
+		// type이 검색 항목
+		if(type !=null) {
+			String[] typeArr = type.split("");
+			BooleanBuilder conditionBuilder = new BooleanBuilder();
+			for(String t : typeArr) {
+				switch(t) {
+					case "t":
+						conditionBuilder.or(board.title.contains(keyword));
+						break;
+					case "c":
+						conditionBuilder.or(board.content.contains(keyword));
+						break;
+					case "w":
+						conditionBuilder.or(board.member.name.contains(keyword));
+						break;
+				}
+			}
+			booleanBuilder.and(conditionBuilder);
+		}
+		// 조건 적용
+		tuple.where(booleanBuilder);
+		
+		// 데이터 정렬 - 하나의 조건으로만 정렬
+		// tuple.orderBy(board.bno.desc());
+		// 정렬 조건 가져오기
+		Sort sort = pageable.getSort();
+		sort.stream().forEach(order ->{
+			Order direction = order.isAscending()?Order.ASC:Order.DESC;
+			String prop = order.getProperty();
+			
+			PathBuilder orderByExpression = new PathBuilder(Board.class, "board");
+			tuple.orderBy(new OrderSpecifier(direction, orderByExpression.get(prop)));
+		});
+		
+		// 그룹화
+		tuple.groupBy(board);
+		
+		// 페이징 처리
+		tuple.offset(pageable.getOffset());
+		tuple.limit(pageable.getPageSize());
+		
+		// 결과를 가져오기
+		List<Tuple> result = tuple.fetch();
+		
+		// 결과를 리턴
+		return new PageImpl<Object[]>(result.stream().map(t->t.toArray()).collect(Collectors.toList()), pageable, tuple.fetchCount());
+	}
+```  
+
+### 12) RepositoryTest클래스에서 만든 메서드 테스트  
+```java
+	@Test
+	public void testSearchPage() {
+		Pageable p = PageRequest.of(0,10,Sort.by("bno").descending().and(Sort.by("title").ascending()));
+		Page<Object[]> result = b.searchPage("tcw", "9", p);
+		System.out.println("result : " + result);
+	}	
 ```  
