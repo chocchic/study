@@ -45,7 +45,7 @@ public class ServiceTest {
 		b.removeWithReplies(2L);
 	}
 	
-	@Test
+	//@Test
 	public void testModifyBoard() {
 		BoardDTO boardDTO = BoardDTO.builder().bno(3L).title("제목을 수정").content("내용을 수정").build();
 		b.modifyBoard(boardDTO);
@@ -55,8 +55,9 @@ public class ServiceTest {
 	private ReplyService r;
 	
 	// 댓글 목록 가져오기 테스트
+	@Test
 	public void testGetList() {
-		Long bno = 7L;
+		Long bno = 33L;
 		List<ReplyDTO> replyDTOList= r.getList(bno);
 		replyDTOList.forEach(replyDTO -> System.out.println(replyDTO));
 	}

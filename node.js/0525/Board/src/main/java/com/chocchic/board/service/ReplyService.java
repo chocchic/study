@@ -23,13 +23,13 @@ public interface ReplyService {
 	// ReplyDTO 객체를 Reply 객체로 변환하는 메서드
 	default Reply dtoToEntity(ReplyDTO replyDTO) {
 		Board board = Board.builder().bno(replyDTO.getBno()).build();
-		Reply reply = Reply.builder().rno(replyDTO.getRno()).text(replyDTO.getText()).replyer(replyDTO.getReplyer()).board(board).build();
+		Reply reply = Reply.builder().rno(replyDTO.getRno()).content(replyDTO.getText()).replyer(replyDTO.getReplyer()).board(board).build();
 		return reply;
 	}
 	
 	// Reply Entity를 ReplyDTO 객체로 변환하는 메서드
 	default ReplyDTO entityToDTO(Reply reply) {
-		ReplyDTO dto = ReplyDTO.builder().rno(reply.getRno()).text(reply.getText()).regdate(reply.getRegDate()).moddate(reply.getModDate()).build();
+		ReplyDTO dto = ReplyDTO.builder().rno(reply.getRno()).replyer(reply.getReplyer()).text(reply.getContent()).regdate(reply.getRegdate()).moddate(reply.getModdate()).build();
 		return dto;
 	}
 }

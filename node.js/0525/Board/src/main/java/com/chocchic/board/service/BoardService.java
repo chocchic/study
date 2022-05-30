@@ -18,7 +18,7 @@ public interface BoardService {
 	// Entity를 DTO로 변환해주는 메서드
 	default BoardDTO entitytoDTO(Board board, Member member, Long replyCount) {
 		BoardDTO boardDTO = BoardDTO.builder().bno(board.getBno()).title(board.getTitle()).content(board.getContent())
-				.regdate(board.getRegDate()).moddate(board.getModDate()).memberEmail(member.getEmail())
+				.regdate(board.getRegdate()).moddate(board.getModdate()).memberEmail(member.getEmail())
 				.memberName(member.getName()).replyCount(replyCount.intValue()).build();
 		return boardDTO;		
 	}

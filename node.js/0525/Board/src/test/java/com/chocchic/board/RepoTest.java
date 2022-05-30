@@ -56,7 +56,7 @@ public class RepoTest {
 			// 0부터 99사이의 정수를 랜덤하게 생성해서 Board객체를 생성
 			long bno = (long)(Math.random()*100)+2;
 			Board board = Board.builder().bno(bno).build();
-			Reply reply = Reply.builder().text("댓글..."+i).board(board).replyer("촉촉한초코칩"+i).build();
+			Reply reply = Reply.builder().content("댓글..."+i).board(board).replyer("촉촉한초코칩"+i).build();
 			r.save(reply);
 		});
 	}

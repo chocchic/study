@@ -22,9 +22,9 @@ import lombok.Getter;
 abstract class BaseEntity {
 	@CreatedDate
 	@Column(name = "regdate", updatable = false)
-	private LocalDateTime regDate;
+	private LocalDateTime regdate;
 	
 	@LastModifiedDate
 	@Column(name = "moddate")
-	private LocalDateTime modDate;
+	private LocalDateTime moddate;
 }

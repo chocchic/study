@@ -30,5 +30,79 @@
 		<a th:href="@{/board/list(page=${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}"><button type="button" class="btn btn-info">목록</button></a>
 		<a th:href="@{/board/modify(bno = ${dto.bno}, page=${requestDTO.page}, type=${requestDTO.type}, keyword=${requestDTO.keyword})}"><button type="button" class="btn btn-primary">수정</button></a>
 		<a th:href="@{/board/remove(bno = ${dto.bno})}"><button type="button" class="btn btn-danger">삭제</button></a>
+		<div>
+			<div class="mt-4">
+				<h5><span class="badge badge-secondary replyCount"> 댓글	[[${dto.replyCount}]]</span> </h5>
+			</div>
+			<div class="list-group replyList">
+			</div>
+		</div>
+	<div class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span> </button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					<input class="form-control" type="text" name="replyText" placeholder="댓글 작성...">
+					</div>
+					<div class="form-group">
+						<input class="form-control" type="text" name="replyer" placeholder="작성자..." >
+						<input type="hidden" name="rno"/>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger replyRemove">삭제</button>
+					<button type="button" class="btn btn-warning replyModify">수정</button>
+					<button type="button" class="btn btn-primary replySave">추가</button>
+					<button type="button" class="btn btn-outline-secondary replyClose" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+<script th:inline="javascript">
+	$(document).ready(function() {
+		// 게시글 번호를 bno에 저장
+		var bno = [[${dto.bno}]];
+		
+		// 댓굴의 개수를 클릭했을 때 처리
+		$(".replyCount").click(function () {
+			loadJSONData();
+		});
+		//댓글이 추가될 영역
+		var listGroup = $(".replyList");
+		//날짜 처리를 위한 함수
+		function formatTime(str){
+			var date = new Date(str);
+			return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+		}
+		//특정한 게시글의 댓글을 처리하는 함수
+		function loadJSONData() {
+			// ajax의 get 방식으로 요청을 전송
+			$.getJSON('/replies/board/'+bno, function(arr){
+				console.log(arr);
+				var str = "";
+				// 댓글 수 출력
+				$('.replyCount').html("댓글 수 " + arr.length);
+				// 댓글을 순회하면서 댓글 출력 내용을 생성
+				$.each(arr, function(idx, reply) {
+					console.log(reply);
+					str += '<div class="card-body" data-rno="' + reply.rno + '"><b>' + 
+					reply.rno + '</b>';
+					str += '<h5 class="card-title">' + reply.text + '</h5>';
+					str += '<h6 class="card-subtitle mb-2 text-muted">' + reply.replyer + 
+					'</h6>';
+					str += '<p class="card-text">' + formatTime(reply.regdate) + '</p>';
+					str += '</div>';
+				})
+				// 댓글 출력
+				listGroup.html(str);
+			});
+		}
+	});
+</script>
 	</th:block>
 </th:block>

@@ -1662,7 +1662,7 @@ public interface ReplyService {
 	
 	// Reply Entity를 ReplyDTO 객체로 변환하는 메서드
 	default ReplyDTO entityToDTO(Reply reply) {
-		ReplyDTO dto = ReplyDTO.builder().rno(reply.getRno()).text(reply.getText()).regdate(reply.getRegDate()).moddate(reply.getModDate()).build();
+		ReplyDTO dto = ReplyDTO.builder().rno(reply.getRno()).replyer(reply.getReplyer()).text(reply.getContent()).regdate(reply.getRegdate()).moddate(reply.getModdate()).build();
 		return dto;
 	}
 }
@@ -1720,9 +1720,121 @@ public class ReplyServiceImpl implements ReplyService {
 	private ReplyService r;
 	
 	// 댓글 목록 가져오기 테스트
+	@Test
 	public void testGetList() {
 		Long bno = 7L;
 		List<ReplyDTO> replyDTOList= r.getList(bno);
 		replyDTOList.forEach(replyDTO -> System.out.println(replyDTO));
 	}
+```  
+
+### 9) 댓글 처리를 위한 RestController를 생성하고 게시글 번호를 가지고 게시글을 찾아오는 요청 처리 메서드를 생성  
+```java
+@RestController
+@RequestMapping("/replies/")
+@Log4j2
+@RequiredArgsConstructor
+public class ReplyController {
+	private final ReplyService replyService;
+	
+	// 댓글 가져오기
+	@GetMapping(value="/board/{bno}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ReplyDTO>> getListByBoard(@PathVariable("bno")Long bno){
+		List<ReplyDTO> list = replyService.getList(bno);
+		return new ResponseEntity(list, HttpStatus.OK);
+	}
+}
+```  
+
+### 10) 브라우저에 localhost:포트번호/replies/board/게시글 번호를 입력해서 댓글이 나오는지 확인  
+
+### 11) read.html파일에 댓글을 출력  
+* 댓글 출력영역을 만들기  
+```html
+		<div>
+			<div class="mt-4">
+				<h5><span class="badge badge-secondary replyCount"> 댓글	[[${dto.replyCount}]]</span> </h5>
+			</div>
+			<div class="list-group replyList">
+			</div>
+		</div>
+```  
+
+* read.html 파일에 스크립트를 추가  
+```html
+<!--위의 코드 생략-->
+<script th:inline="javascript">
+      $(document).ready(function() {
+       //게시글 번호를 bno에 저장
+        var bno = [[${dto.bno}]];
+      
+        //댓글의 개수를 클릭했을 때 처리
+        $(".replyCount").click(function () {
+          loadJSONData();
+        });
+
+        //댓글이 추가될 영역
+        var listGroup = $(".replyList");
+        
+        //날짜 처리를 위한 함수
+        function formatTime(str){
+          var date = new Date(str);
+          return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+        }
+        
+        //특정한 게시글의 댓글을 처리하는 함수
+        function loadJSONData() {
+           //ajax의 get 방식으로 요청을 전송
+          $.getJSON('/replies/board/'+bno, function(arr){
+            console.log(arr);
+            var str = "";
+            //댓글 수 출력
+            $('.replyCount').html("댓글 수 " + arr.length);
+            //댓글을 순회하면서 댓글 출력 내용을 생성
+            $.each(arr, function(idx, reply) {
+              console.log(reply);
+              str += '<div class="card-body" data-rno="' + reply.rno + '"><b>' + reply.rno + '</b>';
+              str += '<h5 class="card-title">' + reply.text + '</h5>';
+              str += '<h6 class="card-subtitle mb-2 text-muted">' + reply.replyer + '</h6>';
+              str += '<p class="card-text">' + formatTime(reply.regDate) + '</p>';
+              str += '</div>';
+            })
+            //댓글 출력
+            listGroup.html(str);
+          });
+        }
+      });
+    </script>
+   </th:block>
+</th:block>
 ```
+
+### 12) read.html파일에 댓글 삽입, 수정 및 삭제에 이용할 모달 창영역을 생성 - script 위에 작성  
+```html
+	<div class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span> </button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+					<input class="form-control" type="text" name="replyText" placeholder="댓글 작성...">
+					</div>
+					<div class="form-group">
+						<input class="form-control" type="text" name="replyer" placeholder="작성자..." >
+						<input type="hidden" name="rno"/>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger replyRemove">삭제</button>
+					<button type="button" class="btn btn-warning replyModify">수정</button>
+					<button type="button" class="btn btn-primary replySave">추가</button>
+					<button type="button" class="btn btn-outline-secondary replyClose" data-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+```  
