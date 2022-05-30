@@ -1562,3 +1562,62 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 	alt만 누르면  0000000 0000000 00000000 00100000 -> 16  
 
 	shift 누른 것 확인 : 오른쪽으로 2번 밀기 % 2 == 1  	
+
+## 18. 댓글 작업  
+### 1) 개요  
+* 댓글을 처리하는 Controller는 Rest Controller를 이용해서 생성  
+* 웹 클라이언트에서 ajax를 이용해서 댓글을 처리  
+* URL과 전송 방식  
+  댓글 가져오기 - /replies/board/{bno - 게시글 번호} - GET 방식  
+  댓글 작성 - /replies - Post방식  
+  댓글 삭제 - /replies/{rno - 댓글번호} - DELETE 방식, 삭제 결과 문자열  
+  댓글 주정 - /repiles/{rno - 댓글번호} - PUT 방식, 수정 결과 문자열  
+
+### 2) Reply.java를 수정  
+```java
+@Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString
+public class Reply extends BaseEntity{
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long rno;
+	private String content;
+	private String replyer;
+	
+	// 다대일 관계 이고 데이터는 처음부터 가져오지 않고 나중에 가져오는 것으로 설정
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Board board;
+}
+```  
+
+### 3) ReplyRepository클래스에 게시글 번호를 이용해서 댓글 목록을 가져오는 메서드 추가  
+```java
+	// 게시글 번호를 이용해서 댓글 목록을 가져오는 메서드
+	public List<Reply> getRepliesByBoardOrderByRno (Board Board);
+```  
+
+### 4) Test클래스에서 테스트  
+* 데이터베이스에서 댓글이 있는 게시물 번호를 먼저 찾기.
+```sql
+-- reply 테이블에서 board)bno로 그룹화 해서 board_bno와 데이터 개수를 조회
+-- 데이터 개수의 내림차순으로 정렬
+select board_bno, count(*) from reply group by board_bno order by 2 desc;
+```  
+
+* 테스트 클래스에서 작성하고 실행  
+```java
+	@Test
+	public void testListByBoard() {
+		List<Reply> replyList = r.getRepliesByBoardOrderByRno(Board.builder().bno(41L).build());
+		System.out.println(replyList);
+	}
+```  
+
+### 5) Reply Entity를 화면에 출력하기 위한 ReplyDTO클래스를 생성  
+```java
+
+```

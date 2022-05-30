@@ -1,6 +1,7 @@
 package com.chocchic.board.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,6 +27,7 @@ public class Reply extends BaseEntity{
 	private String content;
 	private String replyer;
 	
-	@ManyToOne
+	// 다대일 관계 이고 데이터는 처음부터 가져오지 않고 나중에 가져오는 것으로 설정
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Board board;
 }

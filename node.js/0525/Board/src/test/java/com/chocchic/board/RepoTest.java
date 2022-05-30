@@ -126,4 +126,12 @@ public class RepoTest {
 		Page<Object[]> result = b.searchPage("tcw", "9", p);
 		System.out.println("result : " + result);
 	}
+	
+	@Test
+	// 여기에 @Transactional을 붙여도 해결이되는데, 이 경우는 toString을 호출할 때 하나의 트랜젝션으로 간주해서 Board를 가져오기 때문에 해결이 됩니다.
+	public void testListByBoard() {
+		List<Reply> replyList = r.getRepliesByBoardOrderByRno(Board.builder().bno(41L).build());
+		// 아래 코드는 실제로는 System.out.println(replyList.toString())이므로 List의 toString은 자신의 멤버 각각의 맴버.toString()을 호출합니다. 
+		System.out.println(replyList);
+	}
 }
