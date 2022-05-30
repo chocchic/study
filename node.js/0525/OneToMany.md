@@ -1926,3 +1926,44 @@ $(".replyRemove").on("click", function(){
 ```  
 -> JQuery UI에서 modal이라고 검색하면 다른 방식도 있고, Bootstrap에서 examples나 docs의 예제를 사용해도 됨  
 	우리는 JQueryUI것을 사용한 코드  
+
+### 15) 댓글 수정  
+* ReplyController클래스에 댓글 수정 요청을 처리해주는 메서드를 작성  
+```java
+	// 댓글 수정
+	@PutMapping("/{rno}")
+	// 클라이언트에서 JSON형태로 보낸 문자열을 ReplyDTO로 변경해서 저장합니다.
+	public ResponseEntity<String> modify(@RequestBody ReplyDTO replyDTO){
+		replyService.modify(replyDTO);
+		return new ResponseEntity<>("success",HttpStatus.OK);
+	}
+```  
+
+* read.html파일에 댓글 수정 요청을 위한 스크립트 코드를 추가  
+```javascript
+// 수정 버튼을 눌렀을 때 처리
+$(".replyModify").click(function() {
+	var rno = $("input[name='rno']").val();
+	var reply = { 
+		rno: rno, 
+		bno: bno,
+		text: $('input[name="replyText"]').val(),
+		replyer: $('input[name="replyer"]').val() 
+	}
+	//console.log(reply); 
+	$.ajax({
+		url: '/replies/' + rno, 
+		method: 'put',
+		data: JSON.stringify(reply),
+		contentType: 'application/json; charset=utf-8',
+		success: function(result){
+			console.log("RESULT: " + result);
+			if(result ==='success'){ 
+				alert("댓글이 수정되었습니다"); 
+				modal.modal('hide'); 
+				loadJSONData();
+			} 
+		}
+	});
+});
+```  
