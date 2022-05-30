@@ -1619,5 +1619,110 @@ select board_bno, count(*) from reply group by board_bno order by 2 desc;
 
 ### 5) Reply Entity를 화면에 출력하기 위한 ReplyDTO클래스를 생성  
 ```java
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ReplyDTO {
+	private Long rno;
+	private String text;
+	private String replyer;
+	
+	private Long bno;
+	
+	private LocalDateTime regdate;
+	private LocalDateTime moddate;
+}
+```  
 
+### 6) Reply 관련 Service 인터페이스를 생성  
+* 댓글을 삽입하는 기능, 댓글의 리스트를 가져오는 기능, 댓글을 수정하는 기능, 댓글을 삭제한느 기능을 구현  
+* Entity 클래스와 DTO 클래스 간의 변환을 위한 메서드 - 개발자들에 따라서 다르기는 한데 인터페이스에 default method로 만들기도 하고, DTO클래스에 생성자와 static 메서드를 이용해서 만들기도 합니다.  
+
+```java
+public interface ReplyService {
+	// 댓글 등록
+	public Long register(ReplyDTO replyDTO);
+	
+	// 게시글 번호를 이용해서 댓글의 목록을 가져오는 메서드
+	public List<ReplyDTO> getList(Long bno);
+	
+	// 댓글로 수정하는 메서드
+	public void modify(ReplyDTO replyDTO);
+	
+	// 댓글을 삭제하는 메서드
+	public void remove(Long rno);
+	
+	// ReplyDTO 객체를 Reply 객체로 변환하는 메서드
+	default Reply dtoToEntity(ReplyDTO replyDTO) {
+		Board board = Board.builder().bno(replyDTO.getBno()).build();
+		Reply reply = Reply.builder().rno(replyDTO.getRno()).text(replyDTO.getText()).replyer(replyDTO.getReplyer()).board(board).build();
+		return reply;
+	}
+	
+	// Reply Entity를 ReplyDTO 객체로 변환하는 메서드
+	default ReplyDTO entityToDTO(Reply reply) {
+		ReplyDTO dto = ReplyDTO.builder().rno(reply.getRno()).text(reply.getText()).regdate(reply.getRegDate()).moddate(reply.getModDate()).build();
+		return dto;
+	}
+}
+```  
+
+### 7) ReplyService 인터페이스의 메서드를 구현할 ReplyServiceImpl클래스를 만들고 구현  
+```java
+@Service
+@RequiredArgsConstructor
+public class ReplyServiceImpl implements ReplyService {
+	private final ReplyRepository replyRepository;
+	
+	@Override
+	public Long register(ReplyDTO replyDTO) {
+		Reply reply = dtoToEntity(replyDTO);
+		replyRepository.save(reply);
+		return reply.getRno();
+	}
+
+	@Override
+	public List<ReplyDTO> getList(Long bno) {
+		// 게시글 번호에 해당하느 Reply를 전부 찾아옴
+		List<Reply> result = replyRepository.getRepliesByBoardOrderByRno(Board.builder().bno(bno).build());
+		result.sort(new Comparator<Reply>() {
+			@Override
+			public int compare(Reply o1, Reply o2) {
+				// 수정 시간의 내림차순
+				// 오름차순의 경우는 o1과 o2의 순서를 바꾸면 됨 -> o1.getModDate().compareTo(o2.getModDate())
+				// 숫자의 경우는 뺄셈으 이용하면 됩니다.
+				// 양수가 리턴되면 앞의 데이터가 크다고 판단하고 음수가 리턴되면 뒤의 데이터가 크다고 판단해서 음수가 리턴될때 순서를 면경
+				// 자바스크립트에서 데이터를 정렬할 때 주의해야합ㄴ디ㅏ.
+				// 자바스크립트는 숫자도 문자열로 판단해서 정렬합니다. 숫자 데이터의 경우 정렬하고자 할 때 직접 구현해야합니다.
+				return o2.getModDate().compareTo(o1.getModDate());
+			}
+		});
+		return result.stream().map(reply-> entityToDTO(reply)).collect(Collectors.toList());
+	}
+
+	@Override
+	public void modify(ReplyDTO replyDTO) {
+		Reply reply = dtoToEntity(replyDTO);
+		replyRepository.save(reply);
+	}
+
+	@Override
+	public void remove(Long rno) {
+		replyRepository.deleteById(rno);		
+	}
+}
+```
+
+### 8) ServiceTest클래스를 이용해서 ReplyServiceImpl클래스의 메서드 테스트  
+```java
+	@Autowired
+	private ReplyService r;
+	
+	// 댓글 목록 가져오기 테스트
+	public void testGetList() {
+		Long bno = 7L;
+		List<ReplyDTO> replyDTOList= r.getList(bno);
+		replyDTOList.forEach(replyDTO -> System.out.println(replyDTO));
+	}
 ```

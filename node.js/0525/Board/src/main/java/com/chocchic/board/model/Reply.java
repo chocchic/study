@@ -19,12 +19,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@ToString
+// ToString을 만들 때 board는 제외 - FetchType.Lazy를 적용하면 에러가 발생
+@ToString(exclude = "board")
 public class Reply extends BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long rno;
-	private String content;
+	private String text;
 	private String replyer;
 	
 	// 다대일 관계 이고 데이터는 처음부터 가져오지 않고 나중에 가져오는 것으로 설정
