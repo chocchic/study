@@ -47,3 +47,149 @@ Review(Movie와 Member의 기본키를 외래키로 가짐)
 영화 이미지 번호 - 기본키  
 영화 일련번호 - 영화 테이블에 대한 외래키  
 영화 이미지 - 파일을 저장할 때는 방식이 2가지. 내용을 저장하고자 하면 BLOB. 경로를 저장하고자 하면 경로. 근데 경로는 유일무이해야 함  
+
+## 1. 프로젝트 생성
+### 1) 프로젝트 생성 - movie  
+
+### 2) application.properties에 설정을 추가  
+```ini
+#server 의 port 설정
+server.port = 80
+
+#연결할 데이터베이스 설정 - MySQL
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/node?useUnicode=yes&characterEncoding=UTF-8&serverTimezon=UTC
+spring.datasource.username=root
+spring.datasource.password=1234
+
+#연결할 데이터베이스 설정 - Oracle
+#spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+#spring.datasource.url=jdbc:oracle:thin:@192.168.10.4:1521:xe
+#spring.datasource.username=system
+#spring.datasource.password=oracle
+
+spring.jpa.properties.hibernate.show_sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.hibernate.ddl-auto=update
+logging.level.org.hibernate.type.descriptor.sql=trace
+
+spring.devtools.livereload.enabled=true
+spring.thymeleaf.cache=false
+```  
+
+### 3) EntryPoint 클래스에 데이터베이스의 변경사항을 감시하는 어노테이션 추가  
+```java
+@EnableJpaAuditing
+@SpringBootApplication
+public class MovieApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MovieApplication.class, args);
+	}
+
+}
+```  
+
+### 4) 기본패키지.model 패키지에 생성시간과 수정시간을 소유한 기본 Entity클래스 생성 - BaseEntity
+```java
+@EntityListeners(value= {AuditingEntityListener.class})
+@MappedSuperclass
+@Getter
+abstract class BaseEntity {
+	@CreatedDate
+	@Column(name = "regdate", updatable = false)
+	private LocalDateTime regDate;
+	
+	@LastModifiedDate
+	@Column(name = "moddate")
+	private LocalDateTime modDate;
+}
+```  
+
+## 2. Entity 설계  
+### 1) 영화 정보 - Movie  
+* 영화 번호와 제목  
+```java
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString
+public class Movie extends BaseEntity{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long mno;
+	
+	private String title;
+}
+```
+
+### 2) 영화 이미지 - MovieImage  
+* 이미지 번호, uuid, 파일 이름, 파일 저장 경로(날짜), Movie로의 외래키  
+```java
+@Entity
+@Embeddable
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString(exclude="movie")
+public class MovieImage {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long inum;
+	private String uuid;
+	private String imgName;
+	private String path;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Movie movie;
+}
+```  
+
+### 3) 회원 - Member  
+* 회원 구분 번호, email, pw, nickname  
+```java
+@Entity
+@Embeddable
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString
+@Table(name = "m_member") // member관련 테이블이 많으므로 이름 지정
+public class Member extends BaseEntity{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long mid;
+	private String email;
+	private String nickname;
+	private String pw;
+}
+```  
+
+### 4) 리뷰 - Review  
+* 리뷰 번호, 영화에 대한 외래키, 회원에 대한 외래키, 평점, 내용  
+```java
+@Entity
+@Embeddable
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@ToString(exclude = {"movie", "member"})
+public class Review extends BaseEntity{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private String rnum;
+	private float score;
+	private String text;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Movie movie;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Member member;
+}
+```  
