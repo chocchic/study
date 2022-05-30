@@ -1838,3 +1838,91 @@ public class ReplyController {
 		</div>
 	</div>
 ```  
+
+### 13) 데이터 삽입 요청  
+* ReplyController에 데이터 삽입 요청을 처리하는 메서드를 작성  
+```java
+	// 댓글 삽입
+	@PostMapping("")
+	// 클라이언트에서 JSON 형태로 보낸 문자열을 ReplyDTO로 변경해서 저장합니다.
+	public ResponseEntity<Long> register(@RequestBody ReplyDTO replyDTO){
+		log.info("replyDOT : " + replyDTO);
+		Long rno = replyService.register(replyDTO);
+		return new ResponseEntity<>(rno, HttpStatus.OK);
+	}
+```  
+
+* read.html파일에 댓글 삽입 요청을 생성  
+```html
+<h5><span class="badge badge-secondary addReply">댓글 작성 </span></h5>
+```  
+
+* read.html파일에 댓글 삽입 요청을 처리하기 위한 스크립트 추가  
+```javascript
+$(".replySave").click(function() {
+	var reply = { 
+		bno: bno,
+		text: $('input[name="replyText"]').val(),
+		replyer: $('input[name="replyer"]').val()
+	};
+	console.log(reply);
+	$.ajax({
+		url: '/replies/',
+		method: 'post',
+		data: JSON.stringify(reply),
+		contentType: 'application/json; charset=utf-8', dataType: 'json',
+		success: function(data){
+			console.log(data);
+			var newRno = parseInt(data);
+			alert(newRno +"번 댓글이 등록되었습니다.");
+			modal.modal('hide');
+			loadJSONData();
+		}
+	})
+});
+```  
+
+### 14) 댓글 삭제  
+* ReplyController클래스에 댓글 삭제 요청을 처리해주는 메서드를 작성  
+```java
+	// 댓글 삭제
+	@DeleteMapping("/{rno}")
+	// 클라이언트에서 JSON형태로 보낸 문자열을 ReplyDTO로 변경해서 저장합니다.
+	public ResponseEntity<String> remove(@PathVariable("rno")Long rno){
+		replyService.remove(rno);
+		return new ResponseEntity<>("Success",HttpStatus.OK);
+	}
+```  
+
+* read.html파일에 댓글 삭제 요청을 위한 스크립트 코드를 추가  
+```javascript
+//댓글을 클릭했을 때 댓글을 출력하기 위한 코드
+$('.replyList').on("click", ".card-body", function(){
+	var rno = $(this).data("rno");
+	$("input[name='replyText']").val( $(this).find('.card-title').html());
+	$("input[name='replyer']").val( $(this).find('.card-subtitle').html());
+	$("input[name='rno']").val(rno);
+	$(".modal-footer .btn").hide();
+	$(".replyRemove, .replyModify, .replyClose").show();
+	modal.modal('show');
+});
+
+//삭제 버튼을 눌렀을 때 처리
+$(".replyRemove").on("click", function(){
+	var rno = $("input[name='rno']").val(); //모달창에 보이는 댓글 번호로 hidden처리되어 있음
+	$.ajax({
+		url: '/replies/' + rno,
+		method: 'delete',
+		success: function(result){
+		//console.log("result: " + result);
+			if(result ==='success'){
+			alert("댓글이 삭제되었습니다.");
+			modal.modal('hide');
+			loadJSONData();
+			}
+		}
+	})
+});
+```  
+-> JQuery UI에서 modal이라고 검색하면 다른 방식도 있고, Bootstrap에서 examples나 docs의 예제를 사용해도 됨  
+	우리는 JQueryUI것을 사용한 코드  
