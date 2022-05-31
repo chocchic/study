@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Embeddable
+@Embeddable // 다른 entity에 포함될 수 있다는 의미의 어노테이션, 여러개로 구성되어 있지만 하나의 값처럼 사용하겠다는 의미
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

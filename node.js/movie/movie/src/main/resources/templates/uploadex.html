@@ -7,6 +7,7 @@
 <body>
 	<input name ="uploadFiles" id="uploadFiles" type="file" accept="image/*" multiple/>
 	<button class ="uploadBtn">업로드</button>
+	<div class = "uploadResult"></div>
 	<img id="img" width="200" height="200" border="1"/>
 </body>
 <!-- integerity는 소스코드가 조작되었는지 확인하기 위한 해시값이고, crossorigin은 동일한 도메인이 아닐 때 코드를 공유할 수 있도록 해주는 속성 -->
@@ -32,7 +33,7 @@
 		}
 	}
 	
-	$('.uploadBtn').click(()=>{
+	$('.uploadBtn').click(function(){
 		// 파일 전송을 위한 FormData 생성
         var formData = new FormData();
         var inputFile = $("input[type='file']");
@@ -54,11 +55,19 @@
         	dataType:"json",
         	sucess:function(result){
         		console.log(result);
+        		showUploadedImages(result);
         	},
         	error:function(jqXHR, textstatus, errorThrown){
         		console.log(textstatus);
         	}
         })
 	})
+	
+	function showUploadedImages(ar){
+		var divArea = $('.uploadResult');
+		for(var i = 0; i < ar.length; i++){
+			divArea.append("<img src='display?filename="+ ar[i].imageURL + "'>");
+		}	
+	}
 </script>
 </html>

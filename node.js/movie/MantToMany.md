@@ -404,16 +404,9 @@ public class UploadController {
 	@PostMapping(value="/uploadajax")
 	public void uploadFile(MultipartFile[] uploadFiles) {
         for (MultipartFile uploadFile : uploadFiles) {
-            //이미지 파일만 업로드 가능
-            if(uploadFile.getContentType().startsWith("image") == false) {
-                log.warn("this file is not image type");
-                return;
-            }
-
             //실제 파일 이름 IE나 Edge는 전체 경로가 들어오므로
             String originalName = uploadFile.getOriginalFilename();
             String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
-
             log.info("fileName: " + fileName);
 		}
 	}
@@ -421,4 +414,220 @@ public class UploadController {
 ```  
 
 ### 6) templates디렉터리에 uploadex.html파일을 추가하고 작성  
+```java
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>파일 업로드</title>
+</head>
+<body>
+	<input name ="uploadFiles" id="uploadFiles" type="file" accept="image/*" multiple/>
+	<button class ="uploadBtn">업로드</button>
+	<img id="img" width="200" height="200" border="1"/>
+</body>
+<!-- integerity는 소스코드가 조작되었는지 확인하기 위한 해시값이고, crossorigin은 동일한 도메인이 아닐 때 코드를 공유할 수 있도록 해주는 속성 -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
+<script>
+	document.getElementById("uploadFiles").addEventListener("change", (e)=>{
+		// 이벤트를 처리할 때 this는 이벤트가 발생한 객체
+		// 여기서는 document.getElementByID("uploadFiles")입니다.
+		readURL(e.target);
+	});
+	function readURL(input){
+		if(input.files && input.files[0]){
+			console.log("이미지 인식!!");
+			var filename = input.files[0].name;
+			var reader = new FileReader();
+			
+			reader.addEventListener("load", function(e){
+				document.getElementById("img").src = e.target.result;
+			});
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+	
+	$('.uploadBtn').click(function(){
+		// 파일 전송을 위한 FormData 생성
+        var formData = new FormData();
+        var inputFile = $("input[type='file']");
+        var files = inputFile[0].files;
+        if(files.length < 1){
+            alert("업로드할 파일을 선택하지 않으셨습니다.");
+            return;
+        }
+        for (var i = 0; i < files.length; i++) {
+            console.log(files[i]);
+            formData.append("uploadFiles", files[i]);
+        }
+        $.ajax({
+        	url:"/uploadajax",
+        	processData:false,
+        	contentType:false,
+        	data:formData,
+        	type:"POST",
+        	dataType:"json",
+        	sucess:function(result){
+        		console.log(result);
+        	},
+        	error:function(jqXHR, textstatus, errorThrown){
+        		console.log(textstatus);
+        	}
+        })
+	})
+</script>
+</html>
+```
 
+### 7) 실행하고 파일을 업로드했을 때 콘솔에 파일이름이 출력되는지 확인  
+
+### 8) application.properties파일에 업로드를 위한 디렉터리를 변수로 추가  
+```ini
+com.chocchic.upload.path=C:\\Users\\SAMSUNG\\Desktop\\java\\chocchic.github.io\\node.js\\movie\\data
+```  
+
+### 9) UploadController 클래스에 위의 변수를 읽는 부분을 생성  
+```java
+	// application.properties파일에 있는 com.chocchic.upload.path라는 속성에 설정된 값 가져오기
+	@Value("${com.chocchic.upload.path}")
+	private String uploadPath;
+```
+-> 외부로 노출되면 안되는 문자열이나 개발환경과 운영환경에서 다르게 사용될 가능성이 있는 문자열은 설정파일이나 데이터베이스에 기록해두고 불러들이는 것이 좋습니다.  
+
+* 소스코드 -> 컴파일 -> 빌드 -> 실행
+	소스코드를 변경하면 이 모든 과정을 다시 수행해야 함. 소스코드가 아닌 파일의 문자열이나 데이터베이스가 변경된 경우에는 다시 실행하거나 파일의 내용을 다시 읽기만 하면 됩니다.  
+
+### 10) UploadController 클래스에 디렉터리를 생성해주는 사용자 정의 메서드를 추가
+```java
+	private String makeFolder() {
+		// 오늘 날짜를 문자열로 가져옴
+		String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		// /문자열을 파일의 경로 구분자로 변경
+		String realUploadPath = str.replace("//",File.separator);
+		// uploadPath와 realUploadPath를 합쳐서 파일 객체를 생성
+		File uploadPathDir = new File(uploadPath, realUploadPath);
+		// 이 파일이 존재하지 않는다면 디렉터리를 생성
+		if(uploadPathDir.exists() == false) {
+			uploadPathDir.mkdirs();
+		}
+		// 디렉터리 이름을 리턴
+		return realUploadPath;
+	}
+```  
+
+### 11) UploadController클래스의 파일 업로드 처리 메서드를 수정
+```java
+
+```  
+
+### 12) 브라우저에서 파일을 업로드하고 컴퓨터에 오늘 날짜로 디렉터리가 생성되고 그안에 파일이 업로드 되었는지 확인
+* 파일이름은 원본이름앞에 uuid가 추가되어있어야합니다.  
+
+### 13) 업로드 결과를 반환하기 위한 UploadResultDTO클래스를 생성  
+* 파일이름, uuid, 업로드 경로를 소유  
+```java
+@Data
+@AllArgsConstructor
+public class UploadResultDTO {
+	private String fileName;
+	private String uuid;
+	private String uploadPath;
+	
+	// 이미지 경로를 리턴해주는메서드
+	public String getImageURL() {
+		try {
+			// 파일에 한글이 있는 경우를 대비해서 UTF-8로 인코딩
+			return URLEncoder.encode(uploadPath+"/"+uuid+fileName, "UTF-8");
+		}catch(Exception e){
+			System.out.println(e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+		return "";
+	}
+}
+```  
+
+* 자바 예외 처리는 자신이 만들지 않은 자원을 사용할 때 강제합니다.  
+
+### 14) 뺴먹음
+```java
+```
+
+### 15) 브라우저에서 파일을 업로드하고 확인 - 콘솔에서 에러가 없어집니다.  
+
+### 16) 업로드한 이미지를 화면에서 출력하기 위해서 UploadController클래스에 이미지를 다운로드 요청을 처리하는 메서드를 생성  
+```java
+	// 파일의 내용을 전송하는 요청을 처리해주는 메서드
+	@GetMapping("/display")
+	public ResponseEntity<byte []> getFile(String filename){
+		ResponseEntity<byte []> result = null;
+		try {
+			// 파일의 이름을 가지고 파일 경로를 생성
+			File file = new File(uploadPath + File.separator + URLDecoder.decode(filename, "UTF-8"));
+			// Header는 데이터의 종류가 어떤 것인지 알려주기 위한 용도
+			HttpHeaders header = new HttpHeaders();
+			// Content-Type에 이 파일의 종류가 무엇인지 설정을 해줍니다.
+			header.add("Content-Type", Files.probeContentType(file.toPath()));
+			result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+		}catch(Exception e){
+			log.error(e.getLocalizedMessage());
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+		}
+		return result;
+	}
+```
+
+### 17) uploadex.html 파일에 이미지 출력영역을 생성
+```html
+	<div class = "uploadResult"></div>
+```  
+
+### 18) upload.html파일에 업로드된 이미지를 호출하는 함수를 스크립트에 작성  
+```javascript
+	function showUploadedImages(ar){
+		var divArea = $('.uploadResult');
+		for(var i = 0; i < ar.length; i++){
+			divArea.append("<img src='display?filename="+ ar[i].imageURL + "'>");
+		}	
+	}
+```  
+
+### 19) upload.html파일의 파일 업로드 요청함수 안에 업로드된 이미지를 호출하는 함수를 호출하는 구문을 추가  
+```javascript
+	function showUploadedImages(ar){
+		var divArea = $('.uploadResult');
+		for(var i = 0; i < ar.length; i++){
+			divArea.append("<img src='display?filename="+ ar[i].imageURL + "'>");
+		}	
+	}
+```  
+
+## 설정파일
+### YAML(Yaml Ain't Markup Language)  
+	문자열을 표현한느 방법중의 하나로 인간이 알아보기 쉬워서 최근에 많이 사용되는 포맷  
+	Sprint Boot에서는 properties파일 대신에 yml파일을 만들어서 사용해도 됩니다.  
+
+### properties파일  
+```ini
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/node?useUnicode=yes&characterEncoding=UTF-8&serverTimezon=UTC
+spring.datasource.username=root
+spring.datasource.password=1234
+```  
+
+### yml 파일
+```yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 1234
+    url: jdbc:mysql://localhost:3306/node?useUnicode=yes&characterEncoding=UTF-8&serverTimezon=UTC
+    username: root
+```  
+
+### Micro Service 도입  
+Spring MVC, 전자 정부 프레임워크 -> Spring Boot  
+Maven -> gradle
+xml이나 properties -> yaml  
