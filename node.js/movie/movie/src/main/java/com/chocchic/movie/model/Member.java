@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Embeddable
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +25,6 @@ public class Member extends BaseEntity{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long mid;
 	private String email;
-	private String nickname;
 	private String pw;
+	private String nickname;
 }

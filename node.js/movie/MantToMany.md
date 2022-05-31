@@ -239,4 +239,128 @@ public class Review extends BaseEntity{
 
 ### 6) Review엔티티를 위한 Repository인터페이스 생성 - ReviewRepository  
 
-### 7) 
+### 7) Test 클래스에 Review Entity에 데이터를 삽입하는 테스트  
+```java
+	@Autowired
+	private ReviewRepository r;
+	
+	@Test
+	@Transactional
+	@Commit
+	public void insert() {
+		IntStream.range(1, 200).forEach(i -> {
+			// 존재하는 영화 번호
+			Long mno = (long)(Math.random() * 100) + 1;
+			// 회원 번호
+			Long mid = (long)(Math.random() * 100) + 1;
+			
+			Movie movie = Movie.builder().mno(mno).build();
+			Member member = Member.builder().mid(mid).build();
+			
+			Review movieReview = Review.builder().movie(movie).member(member).score((int)(Math.random() * 5) + 1).text("영화리뷰..."+i).build();
+			
+			r.save(movieReview);
+					
+		});
+	}
+```  
+
+### 8) 영화 목록을 출력하기 위한 메서드를 MovieRepository인터페이스에 추가  
+
+### 9) 영화 목록을 가져오는 메서드
+```java
+	@Test
+	public void testListPage() {
+		PageRequest pageRequest = PageRequest.of(0,10,Sort.by(Sort.Direction.DESC,"mno"));
+		Page<Object []> result = m.getListPage(pageRequest);
+		for(Object[] obj : result.getContent()) {
+			System.out.println(Arrays.toString(obj));
+		}
+	}
+```  
+
+### 10) 영화 1개의 모든 이미지와 평균 평점 및 리뷰 개수 가져오기  
+```java
+	@Query("select m, max(mi), avg(coalesce(r.grade,0)), count(distinct r) from Movie m "
+			+"left outer join MovieImage mi on mi.movie = m " 
+			+"left outer join Review r on r.movie = m where m.mno = :mno group by mi")
+	Page<Object []> getMovieAll(@Param("mno") Long mno);
+```  
+
+### 11) 영화 1개의 모든 이미지와 평균 평점 및 리뷰개수 가져오는 메서드 테스트  
+```java
+	@Test
+	public void testGetMovieWithAll() {
+		List<Object[]> result = m.getMovieAll(92L);
+		for(Object[] objs : result) {
+			System.out.println(Arrays.toString(objs));
+		}
+	}
+```  
+
+### 12) 특정 영화에 대한 모든 리뷰를 가져오는 메서드를 ReviewRepository 인터페이스에 생성  
+```java
+	// 영화 정보를 가지고 리뷰 목록을 가져오는 메서드
+	// 영화 정보를 자세히 출력할 때 필요
+	List<Review> findByMovie(Movie movie);
+```  
+
+### 13) 리뷰 목록을 가져오는 메서드 테스트  
+```java
+	@Test
+	public void testGetMovieReviews() {
+		Movie movie = Movie.builder().mno(9L).build();
+		List<Review> list = r.findByMovie(movie);
+		
+		for(Review review : list){
+			System.out.println(review);
+		}
+	}
+```  
+
+### 14) 특정 영화에 대한 모든 리뷰를 가져오는 메서드를 수정
+```java
+	// EntityGraph로 속성에 해당하는 데이터는 EAGER로 처리해서 바로 가져옵니다.
+	@EntityGraph(attributePaths = {"member"}, type=EntityGraphType.FETCH)
+	List<Review> findByMovie(Movie movie);
+```  
+
+### 15) 테스트
+```java
+	@Test
+	public void testGetMovieReviews() {
+		Movie movie = Movie.builder().mno(9L).build();
+		List<Review> list = r.findByMovie(movie);
+		for(Review review : list){
+			System.out.println(review.getMember().getEmail());
+		}
+	}
+```  
+
+### 16) 회원이 삭제될 때 회원이 작성한 댓글도 삭제하기 위해서 ReviewRepository인터페이스에 회원정보를 가지고 댓글을 삭제하는 메서드를 선언  
+```java
+	// 회원 정보를 가지고 삭제하는 메서드
+	void deleteByMember(Member member);
+```  
+
+### 17) 회원 정보를 이용해서 삭제하는 메서드
+```java
+	// 2개의 삭제 구문을 사용하므로 @Transactional와 @Commit을 이용해서 동시에 수행되거나 아니면 하나도 되지 않도록 처리를 해주어야 합니다.
+	@Test
+	@Transactional
+	@Commit
+	public void testDeleteMember() {
+		Long mid = 100L;
+		Member member = Member.builder().mid(mid).build();
+		r.deleteByMember(member);
+		mem.deleteById(mid);
+	}
+```  
+
+### 18) 회원 정보를 가지고 삭제하는 메서드를 수정  
+* 리뷰가 많으면 많을 수록 그 수만큼 리뷰를 지우는 쿼리를 사용 - 아래 코드는 delete구문이 한 번만 수행됩니다.  
+```java
+	@Modifying
+	@Query("delete from Review mr where mr.member = :member")
+	void deleteByMember(@Param("member")Member member);
+```  

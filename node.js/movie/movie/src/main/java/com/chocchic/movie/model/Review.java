@@ -1,6 +1,5 @@
 package com.chocchic.movie.model;
 
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Embeddable
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,8 +22,8 @@ import lombok.ToString;
 public class Review extends BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String rnum;
-	private float score;
+	private Long rnum;
+	private int score;
 	private String text;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
