@@ -193,3 +193,50 @@ public class Review extends BaseEntity{
 	private Member member;
 }
 ```  
+
+## 3. Repository 작업  
+### 1) Movie 엔티티 작업을 위한 Repository 인터페이스를 생성 - MovieRepository  
+
+### 2) MovieImage 엔티티 작업을 위한 Repository 인터페이스를 생성 - MovieImageRepository  
+
+### 3) Test 클래스를 만들어서 샘플 데이터를 삽입  
+```java
+	@Test
+	@Transactional // 한번에 여러개의 데이터를 삽입하므로 모두 성공하거나 실패하도록 하기 위해 추가
+	@Commit
+	public void insertMovie() {
+		IntStream.rangeClosed(1, 100).forEach(i -> {
+			Movie movie = Movie.builder().title("Movie..."+i).build();
+			m.save(movie);
+			
+			int count = (int)(Math.random() * 5) + 1;
+			for(int j = 0; j < count; j++) {
+				MovieImage movieImg = MovieImage.builder().uuid(UUID.randomUUID().toString()).movie(movie).imgName("test"+j+".jpg").build();
+				mm.save(movieImg);
+			}
+		});
+	}
+```  
+
+### 4) Member 엔티티를 위한 Repository 인터페이스 생성 - MemberRepository  
+
+### 5) Test 클래스에 Member Entity에 데이터를 삽입하는 테스트  
+```java
+	@Autowired
+	private MemberRepository mem;
+	
+	@Test
+	@Transactional
+	@Commit
+	public void insertMember() {
+		IntStream.rangeClosed(1, 100).forEach(i -> {
+			Member member = Member.builder().email("test"+i+"@aaa.com").pw("1234").nickname("tt"+i).build();
+			mem.save(member);
+		});
+		
+	}
+```  
+
+### 6) Review엔티티를 위한 Repository인터페이스 생성 - ReviewRepository  
+
+### 7) 
