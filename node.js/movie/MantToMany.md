@@ -364,3 +364,61 @@ public class Review extends BaseEntity{
 	@Query("delete from Review mr where mr.member = :member")
 	void deleteByMember(@Param("member")Member member);
 ```  
+
+## 4. 파일 업로드 처리  
+### 1) 파일 업로드 처리 방법  
+* Servlet 3.0에서부터 제공하는 자체적인 파일 업로드 라이브러리를 이용  
+* 별도의 외부 라이브러리 이용(commons-fileupload 등)  
+* WAS(Web Application Server - Tomcat이 대표적인 WAS)가 아닌 환경에서 Spring boot를 실행하거나 실행하는 WAS의 버전이 낮을 때는 별도의 라이브러리를 이용해서 파일 업로드를 처리  
+
+### 2) 이미지 파일 미리보기  
+* 자바스크립트를 이용해서 업로드하기전에 미리보기  
+* 서버에 업로드한 후 미리보기  
+
+### 3) spring boot에서의 업로드 처리  
+* application.properties에 설정만 하면 됨  
+```ini
+# 파일 업로드설정
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.location=파일 업로드할 절대 경로
+spring.servlet.multipart.max-request-size=30MB
+spring.servlet.multipart.max-file-size=10MB
+```  
+
+### 4) View를 출력하기 위한 Controller를 생성하고 요청을 처리하는 메서드를 작성 - UploadTestController  
+```java
+@Controller
+public class UploadTestController {
+	@GetMapping("/uploadex")
+	public void uploadex() {
+		
+	}
+}
+```  
+
+### 5) REST API를 위한 Controller를 생성하고 파일 업로드 요청을 처리하는 메서드를 작성 - UploadController  
+```java
+@RestController
+@Log4j2
+public class UploadController {
+	@PostMapping(value="/uploadajax")
+	public void uploadFile(MultipartFile[] uploadFiles) {
+        for (MultipartFile uploadFile : uploadFiles) {
+            //이미지 파일만 업로드 가능
+            if(uploadFile.getContentType().startsWith("image") == false) {
+                log.warn("this file is not image type");
+                return;
+            }
+
+            //실제 파일 이름 IE나 Edge는 전체 경로가 들어오므로
+            String originalName = uploadFile.getOriginalFilename();
+            String fileName = originalName.substring(originalName.lastIndexOf("\\") + 1);
+
+            log.info("fileName: " + fileName);
+		}
+	}
+}
+```  
+
+### 6) templates디렉터리에 uploadex.html파일을 추가하고 작성  
+
