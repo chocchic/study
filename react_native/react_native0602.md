@@ -58,3 +58,164 @@ PC나 Smart Phone 제작 회사에서는 이 운영체제를 직접 사용하는
     최신의 API를 사용하지 못하는 경우도 있음  
     스마트 디바이스 제조회사에서 reject를 시키는 경우가 있음  
     모든 API를 사용할 수 없기 때문에 Native Application의 API 사용법을 어느 정도는 숙지해야 합니다.  
+
+# Android Studio를 이용한 애플리케이션 개발  
+* react-native나 ionic같은 별ㄹ도의 프레임워크를 이용해서 개발을 하더라도 출시할 때는 Android Studio나 Xcode에서 빌드를 해야하고, 시뮬레이터에서 실행을 하고자할 때도 Android Studio나 Xcode가 설치되어 있어야 합니다.  
+
+## 1. Android 개발환경 설정  
+### 1) JDK 설치  
+* 11버전 이상 권장  
+* 확인 - 터미널에서 수행
+JRE(자바 실행 환경 - 자밥로 만들어진 애플리케이션을 실행할 때 필수, JavaVirtualMachine이라고 하는 사람도 있음) 버전 확인 : java -version
+JDK(자바 개발 도구 - 자바로 애플리케이션을 개발할 때 필수, Java Application Programming Interface 또는 Java SoftwareDevelopmentKit라고 하기도 합니다.) 버전 확인 : javac -version  
+
+* javac -version은 JDK가 설치되어 있어도 명령이 제대로 실행되지 않을 수도 있음 - 환경변수 설정을 하지 않아서 임.  
+    Mac은 할 필요가 없고, Windows에서만 수행하면 됩니다.  
+
+JAVA_HOME : jdk 경로 등록  
+path : jdk경로의 bin 디렉터리 등록  
+
+### 2) Android Studio 설치  
+* developers.android.com에서 자신의 운영체제에 맞는 버전을 다운로드 받아서 설치  
+* 설치 후 Application을 하나 생성한 후 [Tools] - [SDK Manager]를 실행해서 필요한 운영체제 버전의 개발도구를 설치  
+react-native 예전 버전은 29버전을 사용했고, 오늘은 31버전을 사용  
+31버전과 29버전을 설치  
+설치 시간이 조금 걸립니다.  
+
+* 환경 변수 설정 : react-native를 사용하지 않는 경우는 할 필요 없음  
+windows : ANDROID_HOME - %LOCALAAPPDATA%\Android\Sdk를 등록
+
+Mac : vim ~/.zshrc를 터미널에서 실행해서 추가 -i를 눌러서 편집모드로 변경한 후 작성  
+exprot ANDROID_HOME=$  
+exprot PATH=$PATH:$ANDROID_HOME/emulator  
+exprot PATH=$PATH:$ANDROID_HOME/tools  
+exprot PATH=$PATH:$ANDROID_HOME/tools/bin  
+exprot PATH=$PATH:$ANDROID_HOME/platform-tools  
+
+내용을 추가하고 esc를 눌러서 명령모드로 나와서 :w!를 눌러서 저장하고 빠져나옴  
+source ~/.zshrc를 실행해서 적용합니다.  
+
+* Emulator 생성 - (Tools) - (Device Manager) 메뉴에서 생성  
+현재 Android Studio는 Emulator가 독자적으로 실행되지 않고 Android Studio안에서 실행되므로 (File) - (Settings)메뉴에서 외부에서 실행되도록 설정  
+Mac의 경우는 안드로이드 스튜디오 첫번째 메뉴에서 Preferences 메뉴를 실행해야 합니다.  
+react-native에서 Android Application을 실행할 때는 Android는 에뮬레이터가 실행중이어야 합니다.  
+
+에뮬레이터가 생성되지 않는 경우는 작업관리자에서 [성능] - [CPU]에서 가상화가 사용안함으로 되어있는지 확인하고 사용안함으로 되어있는지 확인하고, 사용 안함으로 되어있는경우는 CMOS(BIOS)에서 가상화 사용 설정을 해야합니다.  
+CMOS 설정은 컴퓨터를 부팅할 때 기종에 따라서 다른데, F2나 Delete, F12등을 눌러서 들어가야 합니다.  
+
+## 2. Android Application 구조
+### 1) Gradle Scripts - 앱의 라이브러리 의존성과 SDK 버전 설정  
+* Project(1개 이상의 Application으로 구성된 디렉토리의 개념) 수준의 build.gradle  
+* Module(Application) 수준의 build.gradle  
+이 디렉터리의 내용은 실행중에는 변경이 안됩니다.  
+
+### 2) manifest/AndroidManifest.xml  
+권한 설정과 컴포넌트 등록ㅇ르 하고 스타일을 설정하는 파일  
+이 디렉터리의 내용은 실행중에는 변경이 안됩니다.  
+
+### java 디렉터리  
+source 파일이 존재하는 디렉터리  
+이 디렉터리의 내용은 실행중에는 변경이 안됩니다.  
+
+### 4) res 디렉터리  
+source 파일을 제외한 파일이 존재해야하는 디렉터리  
+이 디렉터리의 내용은 실행중에는 변경이 안됩니다.  
+다시 디렉터리가 구분되어 있는데, 각 디렉터리의 이름과 용도는 결정되어 있습니다.  
+이 디렉터리의 내용은 정수로 등록을 하게 되는데, 이 때 파일의 이름이 final 상수의 이름이 되기 때문에 대문자나 특수문자 또는 한글을 사용할 수 없습니다.  
+
+## 3. 작업 방법  
+화면 디자인은 res/layout 디렉터리의 xml파일을 이용해서 정적으로 생성하고 java코드에서 동적으로 생성하는 것이 가능  
+layout 파일에 만든 view를 java코드에서 사용하기 위해서는 반드시 id가 있어야 합니다.  
+이 id를 이용해서 java코드에서 사용을 합니다.  
+
+* 동적인 코드 작성은 java 디렉터리에서 합니다.  
+언어는 java와 kotlin 모두 가능한데, 애플리케이션을 생성할 때 언어를 설정합니다.  
+코드를 복사붙여넣기 하면 변환해줄 것인지 묻는 메뉴가 보입니다.  
+
+```java
+    Strint str = new String("Hello Kotlin");
+```
+이라는 코드를 치면 확인 후 Kotlin방식으로 바꿔주지만 Buffer를 열어서 해주어야 합니다.  
+```kotlin
+    val str : String = String(StringBuffer("Hello Kotlin"))
+```  
+
+## 4. Version Control - 소스 코드 버전 관리  
+환경 설정 메뉴에서 Version Control에서 계정을 등록하면 쉽게 가능  
+주의할 점은 계쩡을 등록할 때 비밀번호는 Git Hub의 비밀번호가 아니고 Token 번호입니다.  
+
+## 5. Application을 생성하고 실행  
+### 1) Application 생성  
+첫 화면에서 new Project를 실행하던가 (File) - ( 빼먹음)
+첫 번째 화면을 설정 - empty activity 선택  
+애플리케이션 이름과 옵션을 설정  
+
+### 2) res/layout 디렉터리의 activity_main.xml파일을 열어서 수정 - 코드 창ㅇ ㅣ안보이면 code버튼을 눌러야함  
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:id="@+id/txtView" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="버튼"
+        android:id="@+id/btn"
+    />
+</LinearLayout>
+```
+
+### 3) java디렉터리에 MainActivity.kt 파일을 열어서 코드를 작성  
+```kotlin
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // 뷰를 찾아오기
+        val txtView : TextView = findViewById(R.id.txtView)
+        val btn : Button = findViewById(R.id.btn)
+
+        btn.setOnClickListener(View.OnClickListener {
+            txtView.setText("버튼을 눌렀습니다.")
+        })
+    }
+}
+```
+
+### 4) 실행한 후 버튼을 눌러서 텍스트가 변경되는지 확인  
+
+## 6. react_native  
+* Javascript와 React라이브러리를 이용해서 스마트 디바이스의 Native Application을 개발할 수 있게 해주는 프레임워크  
+* 하나의 코드로 Android와 iOS애플리케이션을 개발할 수 있습니다.  
+* Javasscript 버전은 ECMAScript 2015(ES6)를 사용  
+* Node.js기반으로 npm 사용  
+* 장점은 빠른 개발 속도 단점은 Xcode나 Android Studio에 대한 지식이 있어야 하고 Native언어에 대한 지식도 있어야 함  
+* 자바스크립트 코드가 Native언어로 번역이 된다고 생각하는 경우가 많은데 실제로는 JavascriptCore라는 자바스크립트 엔진이 앺에 포함되어 자바스크립트로 작성한 코드를 앱 내에서 실행해 주는 형태로 동작합니다.  
+
+## 7. 개발 환경  
+### 1) node.js 설치  
+
+### 2) react native cli 설치  
+npm i -g react-native-cli  
+
+### 3) 실행의 편리성을 위해서 yarn 설치  
+npm install --global yarn  
+
+### 4) IDE(VScode) 설치  
+
+### 5) Andorid Studio 설치  
+* java도 설치되어야 하고, 환경변수도 설정해야 함  
+
+### 6) Xcode 설치  
+Mac에서는 Xcode이 외에 cocoa pods(Xcode의 의존성 관리자)도 설치되어야 함  
