@@ -146,11 +146,11 @@ layout 파일에 만든 view를 java코드에서 사용하기 위해서는 반�
 
 ## 5. Application을 생성하고 실행  
 ### 1) Application 생성  
-첫 화면에서 new Project를 실행하던가 (File) - ( 빼먹음)
+첫 화면에서 New Project를 실행하든가 [File] - [New Project]를 선택  
 첫 번째 화면을 설정 - empty activity 선택  
 애플리케이션 이름과 옵션을 설정  
 
-### 2) res/layout 디렉터리의 activity_main.xml파일을 열어서 수정 - 코드 창ㅇ ㅣ안보이면 code버튼을 눌러야함  
+### 2) res/layout 디렉터리의 activity_main.xml파일을 열어서 수정 - 코드 창이 안보이면 code버튼을 눌러야함  
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -205,11 +205,14 @@ class MainActivity : AppCompatActivity() {
 
 ## 7. 개발 환경  
 ### 1) node.js 설치  
+* 설치확인 : node --version  
+* Mac : brew install node
+* Window : https://nodejs.org/download  
 
-### 2) react native cli 설치  
+### 2) react native cli 설치 - mac의 경우는 앞에 sudo를 붙여야 함.  
 npm i -g react-native-cli  
 
-### 3) 실행의 편리성을 위해서 yarn 설치  
+### 3) 실행의 편리성을 위해서 yarn 설치 - mac의 경우는 앞에 sudo를 붙여야함.  
 npm install --global yarn  
 
 ### 4) IDE(VScode) 설치  
@@ -219,3 +222,68 @@ npm install --global yarn
 
 ### 6) Xcode 설치  
 Mac에서는 Xcode이 외에 cocoa pods(Xcode의 의존성 관리자)도 설치되어야 함  
+Xcode는 App Store에서 다운로드 받아서 설치  
+cocoa pods은 sudo gem install cocoapods  
+
+## 8. 프로젝트 생성 및 실행
+### 1) 프로젝트 생성  
+터미널에서 프로젝트를 생성할 경로에 가서 'npx react-native init 프로젝트이름' 실행  
+
+### 2) 실행  
+생성된 프로젝트의 package.json파일의 scripts 코드를 확인  
+VS Code에서 생성된 프로젝트 열어보기  
+
+```json
+"scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint ."
+  }
+```  
+-> Windows에서 VSCode의 터미널에서 react-native나 yarn 명령이 실행되지 않는 경우 터미널이 powershell로 되어있는지 확인하기. power shell로 되어있으면 명령어 수행이 안됨.  
+[도움말] - [모든 명령 표시](ctrl + shift + P)를 실행하고 검색 창에 terminal : select default profile을 선택한 후 [command prompt]로 변경한 후 터미널을 종료하고 재실행  
+
+* Metro 빌드 : 리엑트 네이티브를 위한 자바스크립트 번들로로 프로젝트에 사용된 자바 스크립트 파일을 모두 읽어서 올바른 순서로 하나의 파일로 합쳐주고 네이티브 앱에서 실행할 준비를 해주는 것  
+
+* react-native start인데, yarn이 설치된 경우는 yarn start라고 해도 됩니다.  
+
+* 안드로이드 빌드 및 실행 : 에뮬레이터를 먼저 실행  
+    react-native run-android로 실행해도 되고 yarn android라고 실행해도 됩니다.  
+    
+    에러 발생하는 경우  
+        1. 에뮬레이터를 실행시켜 두었는지 확인  
+        2. 자바와 안드로이드 환경변수 제대로 설정했는지 확인  
+            JAVA_HOME = C:\Program Files\Java\jdk-11.0.14, path  =%JAVA_HOME%\bin\, ANDROID_HOME  
+
+* iOS 빌드 및 실행 : 에뮬레이터를 먼저 실행하지 않아도 됩니다.  
+    react-native run-ios 또는 yarn ios라고 실행해도 됩니다.  
+
+### 3) 프로젝트 구조  
+* package.json : node 프로젝트의 설정 파일로 의존성이 여기 설정되어 있습니다.  
+* node_modules 디렉터리 : 의존성 관련 라이브러리의 실제 위치  
+이 디렉터리의 내용은 없어도 됩니다.  
+이 디렉터리의 내용이 사라졌을 때는 npm install 해주면 됩니다.  
+
+* index.js : Entry Point  
+이 파일의 내용은 일반적으로 수정하지 않음  
+APp.js에서 export한 내용을 가져와서 출력  
+
+* App.js : 시작 화면의 Component  
+
+* Android 디렉터리 : Android Application Project가 생성되어 있음  
+
+* ios 디렉터리 : iOS Application Project가 생성 되어 있음  
+
+## 9. 이미지를 출력하는 애플리케이션으로 변환 - VSCode에서 작업  
+### 1) 빼먹음  
+
+### 3) emulator를 확인 - 즉시 반영됩니다.  
+* 즉시 반영이 안되면 터미널에서 실행 중인 프로세스를 중지 - Ctrl + C
+    yarn android를 다시 수행  
+
+### 4) 포트가 사용중인 경우  
+netstat -ano로 포트에서 실행중인 pid 확인  
+
+'taskkill /pid pid번호'를 입력해서 프로세스를 중지시키면 됩니다.  
