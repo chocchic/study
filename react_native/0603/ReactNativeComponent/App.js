@@ -8,29 +8,39 @@
 
  import React, {useState} from 'react';
 
- import {SafeAreaView} from 'react-native'
+ import {SafeAreaView, StyleSheet, Button} from 'react-native'
+
  import Greeting from './components/Greeting'
  import Box from './components/Box'
+ import Counter from './components/Counter';
  
  const App = ()=>{
+   /*
   const [visible, setVisible] = useState(true)
   const name = "JSX"
   const onPress = ()=>{
     setVisible(!visible);
-  }
+  }*/
+  // count라는 상태를 생성하고 이 상태의 변경은 setCount함수를 이용
+  // 기본값은 0
+  const [count, setCount] = useState(0)
+
+  // 버튼에 연결될 함수
+  const onIncrease = () => setCount(count+1)
+  const onDecrease = () => setCount(count -1)
+
   return (
     <SafeAreaView>
-      <Button title="버튼" onPress={onPress} />
-      {visible  
-        ? <Box rounded={true} size="large" color="blue"/>
-        : null
-      } 
-      {/* 위와 같은 의미
-      {visible && <Box rounded={true} size="large" color="blue"/>} */}
-      <Greeting name={name}/> // 한줄 주석
+      <Counter count={count} onIncrease={onIncrease} onDecrease={onDecrease}/>
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  full:{
+    flex:1
+  }
+})
 
 /*
 import type {Node} from 'react';

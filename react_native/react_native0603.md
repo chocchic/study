@@ -395,10 +395,93 @@ export default App;
 }
 
 export default App;
-```
+```  
+
 * +) 연산자
     && 연산자 : 둘다 true일때만 true를 리턴하고 하나라도 false가 있으면 fasle 리턴, 앞의 결과가 false이면 뒤의 결과를 확인하지 않음    
     || 연산자 : 둘다 false일 때만 false를 리턴하고 하나라도 true가 있으면 true리턴, 앞의 결과가 true이면 뒤의 결과를 확인하지 않음  
 
 ## 7. Counter 만들기  
 * 화면에 숫자를 출력하고 그 아래에 버튼을 2개 추가해서 위의 버튼이 눌러지면 숫자가 1증가하고 아래의 버튼이 눌러지면 숫자가 1 감소하도록 만들기  
+
+### 1) Counter 화면 만들기 - components/Counter.js  
+```javascript
+import React from 'react'
+import {View, Text, Button, StyleSheet} from 'react-native'
+
+function Counter({count, onIncrease, onDecrease}){
+    return (
+        <View style={styles.wrapper}>
+            <View style={styles.numberArea}>
+                <Text style={styles.number}>{count}</Text>
+            </View>
+            <Button title='+1' onPress={onIncrease}/>
+            <Button title='-1' onPress={onDecrease}/>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    wrapper : {
+        flex:1
+    },
+    numberArea : {
+        flex:1,
+        alignItems:'center',
+        justifyContent:'content'
+    },
+    number : {
+        fontSize:72,
+        fontWeight:'bold'
+    }
+});
+
+export default Counter;
+```  
+
+### 2) App.js 수정하기
+```javascript
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+
+ import React, {useState} from 'react';
+
+ import {SafeAreaView, StyleSheet, Button} from 'react-native'
+
+ import Greeting from './components/Greeting'
+ import Box from './components/Box'
+ import Counter from './components/Counter';
+ 
+ const App = ()=>{
+   /*
+  const [visible, setVisible] = useState(true)
+  const name = "JSX"
+  const onPress = ()=>{
+    setVisible(!visible);
+  }*/
+  // count라는 상태를 생성하고 이 상태의 변경은 setCount함수를 이용
+  // 기본값은 0
+  const [count, setCount] = useState(0)
+
+  // 버튼에 연결될 함수
+  const onIncrease = () => setCount(count+1)
+  const onDecrease = () => setCount(count -1)
+
+  return (
+    <SafeAreaView>
+      <Counter count={count} onIncrease={onIncrease} onDecrease={onDecrease}/>
+    </SafeAreaView>
+  )
+}
+
+const styles = StyleSheet.create({
+  full:{
+    flex:1
+  }
+})
+```  
