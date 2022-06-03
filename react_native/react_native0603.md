@@ -312,4 +312,93 @@ function Box({rounded, size, color}){
         ]}/>
     );
 }
+```  
+
+## 6. useState Hook을 이용한 상태 관리  
+### 1) 상태 관리  
+* 속성의 값을 변경하는 것  
+* 가장 기본적인 방법은 useState라는 함수를 이용  
+* use로 시작하는 함수들을 Hook이라고 합니다.  
+
+### 2) useState 함수  
+* 상태값을 관리하는 함수  
+const [visible, setVisible] = useState(true)  
+
+visible이라는 상태의 값을 변경하는 함수는 setVisible이고 기본값은 true  
+
+* useState를 호출하면 2개의 데이터가 배열로 반환되는데 첫번째 원소는 상태값을 그리고 두번째 원소는 상태값을 변경하는 함수  
+
+### 3) App.js파일에 useState를 추가  
+```javascript
+ import React, {useState} from 'react';
+
+ import {SafeAreaView} from 'react-native'
+ import Greeting from './components/Greeting'
+ import Box from './components/Box'
+ 
+ const App = ()=>{
+  const [visible, setVisible] = useState(true)
+  const name = "JSX"
+  return (
+    <SafeAreaView>
+      <Box rounded={true} size="large" color="blue"/>
+      <Greeting name={name}/> // 한줄 주석
+    </SafeAreaView>
+  )
+}
+
+export default App;
+```  
+
+### 4) Hook의 규칙
+* Hook은 컴포넌트의 최상위 레벨에서만 사용  
+* 조건문이나 반복문 도는 중첩 함수에서 호출하면 안됨  
+* 함수의 흐름 중간에 return 이 있는 겨웅 return 보다 먼저 등장해야 함  
+* Hook은 react의 문법 - 일반 자바스크립트 구문에서 사용하면 에러  
+
+
+### 5) Button을 눌러서 Box를 보이게 하고 보이지 않게 하기  
+* App.js파일에 버튼을 추가하고 클릭 이벤트 처리를 수행  
+```javascript
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+
+ import React, {useState} from 'react';
+
+ import {SafeAreaView} from 'react-native'
+ import Greeting from './components/Greeting'
+ import Box from './components/Box'
+ 
+ const App = ()=>{
+  const [visible, setVisible] = useState(true)
+  const name = "JSX"
+  const onPress = ()=>{
+    setVisible(!visible);
+  }
+  return (
+    <SafeAreaView>
+      <Button title="버튼" onPress={onPress} />
+      {visible  
+        ? <Box rounded={true} size="large" color="blue"/>
+        : null
+      } 
+      {/* 위와 같은 의미
+      {visible && <Box rounded={true} size="large" color="blue"/>} */}
+      <Greeting name={name}/> // 한줄 주석
+    </SafeAreaView>
+  )
+}
+
+export default App;
 ```
+* +) 연산자
+    && 연산자 : 둘다 true일때만 true를 리턴하고 하나라도 false가 있으면 fasle 리턴, 앞의 결과가 false이면 뒤의 결과를 확인하지 않음    
+    || 연산자 : 둘다 false일 때만 false를 리턴하고 하나라도 true가 있으면 true리턴, 앞의 결과가 true이면 뒤의 결과를 확인하지 않음  
+
+## 7. Counter 만들기  
+* 화면에 숫자를 출력하고 그 아래에 버튼을 2개 추가해서 위의 버튼이 눌러지면 숫자가 1증가하고 아래의 버튼이 눌러지면 숫자가 1 감소하도록 만들기  

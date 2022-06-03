@@ -6,7 +6,33 @@
  * @flow strict-local
  */
 
-import React from 'react';
+ import React, {useState} from 'react';
+
+ import {SafeAreaView} from 'react-native'
+ import Greeting from './components/Greeting'
+ import Box from './components/Box'
+ 
+ const App = ()=>{
+  const [visible, setVisible] = useState(true)
+  const name = "JSX"
+  const onPress = ()=>{
+    setVisible(!visible);
+  }
+  return (
+    <SafeAreaView>
+      <Button title="버튼" onPress={onPress} />
+      {visible  
+        ? <Box rounded={true} size="large" color="blue"/>
+        : null
+      } 
+      {/* 위와 같은 의미
+      {visible && <Box rounded={true} size="large" color="blue"/>} */}
+      <Greeting name={name}/> // 한줄 주석
+    </SafeAreaView>
+  )
+}
+
+/*
 import type {Node} from 'react';
 import {
   SafeAreaView,
@@ -115,29 +141,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * 
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-
-import {SafeAreaView} from 'react-native'
-import Greeting from './components/Greeting'
-import Box from './components/Box'
-
-const App = ()=>{
-  const name = "JSX"
-  return (
-    <SafeAreaView>
-      <Box rounded={true} size="large" color="blue"/>
-      <Greeting name={name}/> // 한줄 주석
-    </SafeAreaView>
-  )
-}
-
+*/
 export default App;
