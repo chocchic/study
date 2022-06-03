@@ -134,7 +134,7 @@ const App = ()=>{
   const name = "JSX"
   return (
     <SafeAreaView>
-      <Box/>
+      <Box rounded={true} size="large" color="blue"/>
       <Greeting name={name}/> // 한줄 주석
     </SafeAreaView>
   )

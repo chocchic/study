@@ -162,6 +162,25 @@ const styles = StyleSheet.create({
 });
 export default Box;
 ```  
+### 3) Box.js파일에서 모서리를 둥글게 적용  
+* Box.js파일을 수정  
+```javascript
+function Box(props){
+    return (
+        <View style={[styles.box, styles.rounded]}/>
+    );
+}
+const styles = StyleSheet.create({
+    box:{
+        width:64,
+        height:64,
+        backgroundColor: 'black'
+    },
+    rounded:{
+        borderRadius:16
+    }
+});
+```  
 
 * App.js파일에서 Box를 가져다가 출력  
 ```javascript
@@ -174,3 +193,123 @@ const App = ()=>{
   )
 }
 ```  
+
+### 4) 조건 적용  
+* Box.js 파일 수정  
+```javascript
+function Box(props){
+    return (
+        <View style={[styles.box, props.rounded ? styles.rounded : null]}/>
+    );
+}
+```  
+
+* App.js파일에서 Box를 가져다가 출력  
+```javascript
+const App = ()=>{
+  const name = "JSX"
+  return (
+    <SafeAreaView>
+      <Box rounded={true}/>
+    </SafeAreaView>
+  )
+}
+```  
+
+### 5) 다양한 크기 적용  
+* Box.js 수정  
+```javascript
+function Box(props){
+    return (
+        <View style={[styles.box, 
+            props.rounded ? styles.rounded : null,
+            sizes[props.size]
+        ]}/>
+    );
+}
+
+Box.defaultProps = {size:'medium'}
+
+const styles = StyleSheet.create({
+    box:{
+        width:64,
+        height:64,
+        backgroundColor: 'black'
+    },
+    rounded:{
+        borderRadius:16
+    },
+    small:{
+        width:32,
+        height:32
+    },
+    medium:{
+        width:64,
+        height:64
+    },
+    large:{
+        width:128,
+        height:128
+    }
+});
+
+const sizes = {
+    small:styles.small,
+    medium:styles.medium,
+    large:styles.large
+}
+```  
+
+* App.js 수정  
+```javascript
+const App = ()=>{
+  const name = "JSX"
+  return (
+    <SafeAreaView>
+      <Box rounded={true} size="large"/>
+    </SafeAreaView>
+  )
+}
+```  
+
+### 6) 색상 변경 
+* Box.js 파일 수정  
+```javascript
+function Box(props){
+    return (
+        <View style={[styles.box, 
+            props.rounded ? styles.rounded : null,
+            sizes[props.size],
+            {backgroundColor:props.color}
+        ]}/>
+    );
+}
+
+Box.defaultProps = {size:'medium', color:'black'}
+```  
+
+* App.js파일에서 Box를 호출할 때 Color값 설정  
+```javascript
+const App = ()=>{
+  const name = "JSX"
+  return (
+    <SafeAreaView>
+      <Box rounded={true} size="large" color="blue"/>
+    </SafeAreaView>
+  )
+}
+```  
+
+### 7) 객체 구조 분해할당  
+* 자바스크립트는 여러개의 데이터를 전달할 때 이를 분할해서 사용하는 것이 가능  
+```javascript
+function Box({rounded, size, color}){
+    return (
+        <View style={[styles.box, 
+            rounded ? styles.rounded : null,
+            sizes[size],
+            {backgroundColor:color}
+        ]}/>
+    );
+}
+```
