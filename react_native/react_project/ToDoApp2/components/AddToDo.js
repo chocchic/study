@@ -1,30 +1,36 @@
 import React, {useState} from "react";
-import {View, StyleSheet,TextInput, Image, TouchableOpacity} from 'react-native'
+import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback, Keyboard} from 'react-native'
 
 function AddToDo(){
     // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
     const [text, setText] = useState('');
     console.log(text); // metro에 찍힘
 
+    const onPress = () =>{
+        setText("");
+        Keyboard.dismiss();
+    }
+
     return (
         <View style = {styles.block}>
             <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
-            value={text} onChangeText={setText}/>
+            value={text} onChangeText={setText} returnKeyType="done" onSubmitEditing={onPress}/>
 
             {Platform.OS === 'ios' ? (
-                <TouchableOpacity activeOpacity={0.5}>
+                <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
                     <View style={styles.buttonStyle}>
                         <Image source={require('../assets/icons/add_white/add_white.png')} />
                     </View>
                 </TouchableOpacity>
             ) : (
-                <TouchableNativeFeedback>
-                    <View style={styles.buttonStyle}>
-                        <Image source={require('../assets/icons/add_white/add_white.png')} />
-                    </View>
-                </TouchableNativeFeedback>
+                <View style={styles.circleWrapper}>
+                    <TouchableNativeFeedback>
+                        <View style={styles.buttonStyle}>
+                            <Image source={require('../assets/icons/add_white/add_white.png')} />
+                        </View>
+                    </TouchableNativeFeedback>
+                </View>
             )}
-            
         </View>
     )
 }
@@ -51,6 +57,10 @@ const styles = StyleSheet.create({
         width:48,
         height:48,
         backgroundColor:'#26a69a',
+        borderRadius:24
+    },
+    circleWrapper: {
+        overflow: 'hidden',
         borderRadius:24
     }
 })

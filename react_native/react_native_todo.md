@@ -570,5 +570,324 @@ export default AddToDo;
 * 물결효과는 안드로이드에서만 가능, iOS에서는 에러 발생  
 * 물결효과 -> TouchableNativeFeedback
 ```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback} from 'react-native'
 
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+
+            {Platform.OS === 'ios' ? (
+                <TouchableOpacity activeOpacity={0.5}>
+                    <View style={styles.buttonStyle}>
+                        <Image source={require('../assets/icons/add_white/add_white.png')} />
+                    </View>
+                </TouchableOpacity>
+            ) : (
+                <TouchableNativeFeedback>
+                    <View style={styles.buttonStyle}>
+                        <Image source={require('../assets/icons/add_white/add_white.png')} />
+                    </View>
+                </TouchableNativeFeedback>
+            )}
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```  
+
+### 5) 안드로이드에 적용된 물결 효과는 사각 영역에 적용되어서 원형에는 맞지 않으므로 물결효과가 원형에만 적용되도록 AddToDo.js 수정  
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+
+            {Platform.OS === 'ios' ? (
+                <TouchableOpacity activeOpacity={0.5}>
+                    <View style={styles.buttonStyle}>
+                        <Image source={require('../assets/icons/add_white/add_white.png')} />
+                    </View>
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.circleWrapper}>
+                    <TouchableNativeFeedback>
+                        <View style={styles.buttonStyle}>
+                            <Image source={require('../assets/icons/add_white/add_white.png')} />
+                        </View>
+                    </TouchableNativeFeedback>
+                </View>
+            )}
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    },
+    circleWrapper: {
+        overflow: 'hidden',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```  
+
+### 6) 이미지로 만든 버튼을 눌렀을 때, Input의 내용을 삭제하고 키보드를 제거하도록 AddToDo.js파일을 수정  
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback, Keyboard} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+
+    const onPress = () =>{
+        setText("");
+        Keyboard.dismiss();
+    }
+
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+
+            {Platform.OS === 'ios' ? (
+                <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
+                    <View style={styles.buttonStyle}>
+                        <Image source={require('../assets/icons/add_white/add_white.png')} />
+                    </View>
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.circleWrapper}>
+                    <TouchableNativeFeedback>
+                        <View style={styles.buttonStyle}>
+                            <Image source={require('../assets/icons/add_white/add_white.png')} />
+                        </View>
+                    </TouchableNativeFeedback>
+                </View>
+            )}
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    },
+    circleWrapper: {
+        overflow: 'hidden',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```
+
+### 7) Return Key의 모양을 설정하고 Return Key를 눌렀을 때 버튼을 누른 것과 동일한 효과를 나타내도록 AddToDo.js를 수정  
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback, Keyboard} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+
+    const onPress = () =>{
+        setText("");
+        Keyboard.dismiss();
+    }
+
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText} returnKeyType="done" onSubmitEditing={onPress}/>
+
+            {Platform.OS === 'ios' ? (
+                <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
+                    <View style={styles.buttonStyle}>
+                        <Image source={require('../assets/icons/add_white/add_white.png')} />
+                    </View>
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.circleWrapper}>
+                    <TouchableNativeFeedback>
+                        <View style={styles.buttonStyle}>
+                            <Image source={require('../assets/icons/add_white/add_white.png')} />
+                        </View>
+                    </TouchableNativeFeedback>
+                </View>
+            )}
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    },
+    circleWrapper: {
+        overflow: 'hidden',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```  
+
+## 8. todos 배열을 만들어서 항목 출력  
+### 1) App.js파일에 데이터를 저장할 배열을 생성  
+* react-native에서는 useState이용  
+```javascript
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
+
+import AddToDo from './components/AddToDo'
+import Empty from './components/Empty'
+
+function App(){
+  const today = new Date();
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        <Empty />
+        <AddToDo />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+
+const styles = StyleSheet.create({ 
+  block:{
+    flex:1
+  },
+  avoid:{
+    flex:1
+  }
+});
+
+export default App;
 ```

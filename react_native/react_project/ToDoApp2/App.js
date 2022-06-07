@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,11 @@ import Empty from './components/Empty'
 
 function App(){
   const today = new Date();
-  
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
   return (
     <SafeAreaProvider>
     <SafeAreaView edges={['bottom']} style={styles.block} >
