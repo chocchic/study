@@ -194,4 +194,108 @@ const styles = StyleSheet.create({
 });
 
 export default DateHead;
+```  
+
+## 4. 하단영역을 생성  
+### 1) Components 디렉터리에 하단 영역에 해당하는 컴포넌트를 위한 AddToDO.js파일을 생성하고 작성 
+```javascript
+import react from "react";
+import {View, StyleSheet} from 'react-native'
+
+function AddToDo(){
+    return (
+        <View style = {styles.block}>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'red',
+        height:64
+    }
+})
+
+export default AddToDo;
+```  
+
+## 2) App.js파일을 수정해서 AddToDo컴포넌트를 배치  
+```javascript
+import AddToDo from './components/AddToDo'
+
+function App(){
+  const today = new Date();
+  return(
+    <SafeAreaProvider>
+      <SafeAreaView edges={['bottom']} style={styles.block}>
+        <View>
+          <DateHead date ={today}/>
+          <AddToDo/>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  )
+}
+
+const styles = StyleSheet.create({
+  block:{
+    flex:1
+  }
+});
+```  
+
+## 5. 데이터가 없을 때
+
+### 1)
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, StatusBar} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+
+function Empty({data}){
+    return (
+        <View style = {styles.block}>
+            <Text style={styles.description}>현재는 할 일이 없습니다.</Text>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    block:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    description:{
+        fontSize:24,
+        color:'#9e9e9e'
+    }
+});
+
+export default Empty;
 ```
+
+### 2) App.js파일 수정  
+```javascript
+import Empty from './components/Empty'
+
+function App(){
+  const today = new Date();
+  return(
+    <SafeAreaProvider>
+      <SafeAreaView edges={['bottom']} style={styles.block}>
+        <View>
+          <DateHead date ={today}/>
+          <Empty/>
+          <AddToDo/>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  )
+}
+```  
+
+### 3) 출력할 이미지를 루트디렉터리에 복사 - assets/images 디렉터리에 복사 - circle.png, circle@2x.png, circle@3x.png, young_and_happy.png파일을 복사  
+  스마트 디바이스는 디바이스마다 해상도가 다른데, 이때 해상도에 따라 다른 이미지를 출력하고자 하는 경우 기본이름@2x.확장자, 기본이름@3x.확장자의 형태로 이미지를 만들어주면 됩니다.  
+  고해상도의 경우는 @3x파일을 출력하고 저해상도인 경우는 기본이름으로 만들어진 파일을 출력합니다.  
+  자신의 해상도에 맞는 파일이 없어도 기본 이름으로 만들어진 파일을 출력합니다.  
