@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
 ```  
 
 ## 5. 데이터가 없을 때
-
-### 1)
+데이터가 없을 때 보여줄 컴포넌트를 작성한다.  
+### 1) Empty.js파일 생성하고 아래 내용 작성
 ```javascript
 import React from 'react'
 import {View, Text, StyleSheet, StatusBar} from 'react-native'
