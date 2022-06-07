@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -9,17 +8,20 @@ import {
   View,
 } from 'react-native';
 
-import DateHead from './components/DateHeadDateHead';
+import DateHead from './components/DateHead';
+import { SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context'
 
 function App(){
   const today = new Date();
   return(
-    <SafeAreaView>
-      <View>
-        <Text>ToDoApp</Text>
-        <DateHead date ={today}/>
-      </View>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView>
+        <View>
+          <Text>ToDoApp</Text>
+          <DateHead date ={today}/>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }
 

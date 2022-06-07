@@ -126,10 +126,72 @@ function DateHead({data}){
 yarn add react-native-safe-area-context  
 
 * 외부 라이브러리를 설치했을 때 상황에 따라서 아래 작업을 수행해야 하는 경우가 있음  
-* ios
+* iOS - 이 작업은 Mac에서만 수행하면 됩니다.  
   iOS 디렉터리로 이동해서 pod install  
   pod은 Xcode의 의존성 관리자로 react-native가 기본 의존성 관리자로 pod을 사용하고있어서 pod으로 의존성을 설정해야하는 경우가 있습니다.  
   iOS 디렉터리의 info.plist파일을 수정해야하는 경우도 발생합니다.  
 
 * android  
   build.gradle파일에서 의존성을 설정해야하는 경우가 있습니다.  
+
+### 5) App.js 수정  
+```javascript
+import { SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context'
+
+function App(){
+  const today = new Date();
+  return(
+    <SafeAreaProvider>
+      <SafeAreaView>
+        <View>
+          <Text>ToDoApp</Text>
+          <DateHead date ={today}/>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  )
+}
+```  
+
+### 6) DateHead.js파일 수정 - StatusBar의 높이를 구해서 여백을 수정  
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, StatusBar} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+
+function DateHead({data}){
+    const year = date.getFullYear();
+    const month = date.getMonth + 1;
+    const day = date. getDate();
+    const formatted = `${year}년 ${month}월 ${day}일`
+
+    // 상태 표시줄의 높이를 구함  
+    const {top} = useSafeAreaInsets()
+
+    return (
+        <>
+            <View style={[styles.StatusBarPlaceholder,{height:top}]}/>
+            <StatusBar backgroundColor={"#26a69a"}/>
+            <View style={styles.block}>
+                <Text style={styles.dateText}>{formatted}</Text>
+            </View>
+        </>
+    );
+}
+
+const styles = StyleSheet.create({
+    StatusBarPlaceholder:{
+        backgroundColor : '#26a69a'
+    },
+    block : {
+        padding : 16,
+        backgroundColor : '#26a69a'
+    },
+    dateText : {
+        fontSize:24,
+        color: 'white'
+    }
+});
+
+export default DateHead;
+```
