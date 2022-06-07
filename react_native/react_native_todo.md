@@ -244,9 +244,8 @@ const styles = StyleSheet.create({
 });
 ```  
 
-## 5. 데이터가 없을 때
-데이터가 없을 때 보여줄 컴포넌트를 작성한다.  
-### 1) Empty.js파일 생성하고 아래 내용 작성
+## 5. 데이터가 없을 때 보여지는 화면을 AddToDo 위에 출력  
+### 1)components 디렉토리에 Empty.js 파일을 생성하고 작성  
 ```javascript
 import React from 'react'
 import {View, Text, StyleSheet, StatusBar} from 'react-native'
@@ -275,7 +274,7 @@ const styles = StyleSheet.create({
 export default Empty;
 ```
 
-### 2) App.js파일 수정  
+### 2) App.js 파일에서 Empty.js 파일을 출력하도록 설정  
 ```javascript
 import Empty from './components/Empty'
 
@@ -299,3 +298,131 @@ function App(){
   스마트 디바이스는 디바이스마다 해상도가 다른데, 이때 해상도에 따라 다른 이미지를 출력하고자 하는 경우 기본이름@2x.확장자, 기본이름@3x.확장자의 형태로 이미지를 만들어주면 됩니다.  
   고해상도의 경우는 @3x파일을 출력하고 저해상도인 경우는 기본이름으로 만들어진 파일을 출력합니다.  
   자신의 해상도에 맞는 파일이 없어도 기본 이름으로 만들어진 파일을 출력합니다.  
+
+* resizeMode속성을 이용해서 크기가 원본 이미지와 맞지 않을 때 이미지크기를 조정  
+  - cover(기본 값 - 리사이징만 수행)  
+  - contain(이미지의 가로세로 비율을 유지한 이미지를 리사이징해서 이미지의 모든 영역이 뷰 안에 보이게 함)  
+  - stretch(뷰의 크기대로 이미지를 리사이징 - 가로세로 비율이 변경됨)  
+  - repeat
+  - center
+
+### 4) 이미지 출력을 위해서 Empty.js파일을 수정  
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, Image} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+
+function Empty({data}){
+    return (
+        <View style = {styles.block}>
+            <Image source={require('../assets/images/young_and_happy.png')} style={styles.image} resizeMode="stretch"/>
+            <Text style={styles.description}>현재는 할 일이 없습니다.</Text>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    block:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    description:{
+        fontSize:24,
+        color:'#9e9e9e'
+    },
+    image:{
+        width:240,
+        height:179,
+        marginBottom:16
+    }
+});
+
+export default Empty;
+```  
+
+## 6. 사용자 입력을 받기 위한 준비 - 키보드 입력  
+### 1) AddToDo.js파일에 키보드 입력을 위한 뷰(TextInput)를 배치  
+```javascript
+import React from "react";
+import {View, StyleSheet,TextInput} from 'react-native'
+
+function AddToDo(){
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}/>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'red',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center'
+    },
+    input:{
+        fontSize:16,
+        paddingVertical:8
+    }
+})
+
+export default AddToDo;
+```  
+
+### 2) 키보드를 출력하는 UI를 화면에 배치했을 때 고려사항  
+* Android는 하단에 메뉴가 있어서 키보드를 메뉴를 이용해서 내릴 수 있지만 아이폰은 안됩니다.  
+  return키를 누를 때나 빈 화면을 눌렀을 때 키보드가 내려가도록 하는 것이 일반적  
+* 키보드가 화면에 출력되었을 때 다른 뷰를 가리는 현상이 벌어지는데 이를 해결하는 방법에 대해 고민을 해봐야 합니다.  
+  키보드가 화면에 출력될 때 다른 뷰들을 약간 올려서 출력하는 방법으로 해결  
+  리액트 네이티브에서는 이 문제를 KeyboardAvoidingView를 이용해서 해결
+
+3)App.js 파일을 수정  
+```javascript
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
+
+import AddToDo from './components/AddToDo'
+import Empty from './components/Empty'
+
+function App(){
+  const today = new Date();
+  
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        <Empty />
+        <AddToDo />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+
+const styles = StyleSheet.create({ 
+  block:{
+    flex:1
+  },
+  avoid:{
+    flex:1
+  }
+});
+
+export default App;
+```

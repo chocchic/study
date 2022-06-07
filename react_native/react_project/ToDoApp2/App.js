@@ -1,36 +1,40 @@
 import React from 'react';
 import {
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 
-import DateHead from './components/DateHead';
-import { SafeAreaView, SafeAreaProvider} from 'react-native-safe-area-context'
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
 
 import AddToDo from './components/AddToDo'
 import Empty from './components/Empty'
 
 function App(){
   const today = new Date();
-  return(
+  
+  return (
     <SafeAreaProvider>
-      <SafeAreaView edges={['bottom']} style={styles.block}>
-        <View>
-          <DateHead date ={today}/>
-          <Empty/>
-          <AddToDo/>
-        </View>
-      </SafeAreaView>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        <Empty />
+        <AddToDo />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
     </SafeAreaProvider>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ 
   block:{
+    flex:1
+  },
+  avoid:{
     flex:1
   }
 });
