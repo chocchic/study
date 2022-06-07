@@ -425,4 +425,150 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+```  
+### 4) App.js파일을 수정
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'red',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center'
+    },
+    input:{
+        fontSize:16,
+        paddingVertical:8
+    }
+})
+
+export default AddToDo;
+```  
+
+## 7. Custom Button 만들기  
+* 이미지나 직접 드로잉 한 객체를 이용해서 버튼과 유사한 효과를 만들기  
+
+### 1) AddToDo.js 수정하기
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+
+            <View style={styles.buttonStyle}>
+                <Image source={require('../assets/icons/add_white/add_white.png')} />
+            </View>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```  
+
+### 3) 이미지를 눌렀을 떄 버튼을 눌렀을 때의 반응과 비슷하게 해주기 위해 AddToDo.js에 추가
+```javascript
+import React, {useState} from "react";
+import {View, StyleSheet,TextInput, Image, TouchableOpacity} from 'react-native'
+
+function AddToDo(){
+    // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
+    const [text, setText] = useState('');
+    console.log(text); // metro에 찍힘
+    return (
+        <View style = {styles.block}>
+            <TextInput placeholder="수행할 내용을 입력하세요" style={styles.input}
+            value={text} onChangeText={setText}/>
+            <TouchableOpacity activeOpacity={0.5}>
+            <View style={styles.buttonStyle}>
+                <Image source={require('../assets/icons/add_white/add_white.png')} />
+            </View>
+            </TouchableOpacity>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        backgroundColor:'white',
+        height:64,
+        paddingHorizontal:16,
+        borderColor:"#bdbdbd",
+        borderBottomWidth:1,
+        borderTopWidth:1,
+        justifyContent:'center',
+        flexDirection:'row' // 옆으로 매치하기 위해
+    },
+    input:{
+        flex:1,
+        fontSize:16,
+        paddingVertical:8
+    },
+    buttonStyle:{
+        alignItems:'center',
+        justifyContent:'center',
+        width:48,
+        height:48,
+        backgroundColor:'#26a69a',
+        borderRadius:24
+    }
+})
+
+export default AddToDo;
+```  
+
+### 4) 이미지를 터치하면 물결효과를 나타내도록 AddToDo.js파일을 수정  
+* 물결효과는 안드로이드에서만 가능, iOS에서는 에러 발생  
+* 물결효과 -> TouchableNativeFeedback
+```javascript
+
 ```
