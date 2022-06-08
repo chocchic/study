@@ -15,12 +15,27 @@ import Empty from './components/Empty'
 import ToDoList from './components/ToDoList';
 
 function App(){
+  // 오늘 날짜 생성
   const today = new Date();
+
+  // 데이터를 저장하기 위한 속성 생성
   const [todos, setTodos] = useState([
     {id : 1, text:'작업 환경 설정', done:true},
     {id : 2, text:'BackEnd - Spring Boot', done:true},
     {id : 3, text:'FrontEnd - ReactNative', done:false}
   ])
+
+  // 데이터를 삽입하기 위한 함수
+  function onInsert(text){
+    // 가장 큰 id를 찾아서 +1
+    const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+
+    const todo={id:nextId, text, done:false}
+    // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
+    //setTodos(todos.push(todo))
+    setTodos(todos.concat(todo))
+  }
+
   return (
     <SafeAreaProvider>
     <SafeAreaView edges={['bottom']} style={styles.block} >

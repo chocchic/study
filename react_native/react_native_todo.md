@@ -974,5 +974,145 @@ export default App;
 
 ### 4) FlatList에서 하나의 항목을 출력할 때 사용하기 위한 컴포넌트를 components디렉터리에 ToDoItem.js파일에 작성  
 ```javascript
+import React from 'react'
+import {View, Text, StyleSheet, FlatList} from 'react-native'
+
+function ToDoItem({id, text, done}){
+    return (
+       <View style={styles.item}>
+           <View style={styles.circle}/>
+           <Text style={styles.text}>{text}</Text>
+       </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    item:{
+        flexDirection:"row",
+        padding:16,
+        borderBottomColor:"#e0e0e0",
+        alignItems:'center'
+    },
+    circle:{
+        width:24,
+        height:24,
+        borderRadius:12,
+        borderColor:'#26a69a',
+        borderWidth:1,
+        marginRight:16
+    },
+    text:{
+        flex:1,
+        fontSize:16,
+        color:'#212121'
+    }
+});
+
+export default ToDoItem;
+``` 
+
+
+### 5) FlatList에서 ToDoItem을 출력할 수 있도록 ToDoList.js를 수정  
+```javascript
+// 출력할 데이터를 todos라는 이름으로 넘겨받는다
+function ToDoList({todos}){
+    return (
+       <FlatList style={styles.list} data={todos} renderItem={({item})=>{
+            <ToDoItem id={item.id} text={item.text} done={item.done}/>
+       }} keyExtractor={item=> item.id.toString()} />
+    );
+}
+```  
+
+### 6) ToDoList.js파일을 수정해서 Item사이에 구분선을 설정  
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, FlatList} from 'react-native'
+import ToDoItem from './ToDoItem'
+
+// 출력할 데이터를 todos라는 이름으로 넘겨받는다
+function ToDoList({todos}){
+    return (
+       <FlatList style={styles.list} data={todos} renderItem={({item})=>{
+            <ToDoItem id={item.id} text={item.text} done={item.done}/>
+       }} keyExtractor={item=> item.id.toString()} 
+       ItemSeparatorComponent={()=> <View style={styles.seperator}/>}
+       />
+    );
+}
+
+const styles = StyleSheet.create({
+    list :{
+        flex:1
+    },
+    seperator:{
+        backgroundColor:'#e0e0e0',
+        height:1
+    }
+});
+
+export default ToDoList;
+```  
+
+### 7) done 항목의 값이 true일 때 이미지를 출력하기 위해서 사용할 이미지 파일을 복사 - assets/icons/check_white  
+
+### 8) ToDoItem.js파일의 내용을 수정해서 done이 true일 때와 그렇지 않을 때의 출력을 변경  
+* done && styles.filled는 done?styles.filled:null와 같은 의미
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, Image} from 'react-native'
+
+function ToDoItem({id, text, done}){
+    return (
+       <View style={styles.item}>
+            <View style={[styles.circle, done && styles.filled]}>
+                {done && (<Image source={require('../assets/icons/check_white/check_white.png')}/>)}
+            </View> 
+            <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
+       </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    item:{
+        flexDirection:"row",
+        padding:16,
+        borderBottomColor:"#e0e0e0",
+        alignItems:'center'
+    },
+    circle:{
+        width:24,
+        height:24,
+        borderRadius:12,
+        borderColor:'#26a69a',
+        borderWidth:1,
+        marginRight:16
+    },
+    text:{
+        flex:1,
+        fontSize:16,
+        color:'#212121'
+    },
+    filled:{
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:'#26a69a'
+    },
+    lineThrough:{
+        color:'#9e9e9e',
+        textDecorationLine:'line-through'
+    }
+});
+
+export default ToDoItem;
+```
+
+## 9. 새 항목 등록  
+### 1) App.js파일에 새 항목 등록에 필요한 함수를 구현  
+* javascript에서 for 안쓰는 이유
+    var ar = ["one", "two"]
+    for(idx in ar) {ar[idx]}
+    이런식으로 작성하면 귀찮으니깐 ...map()을 사용한다.
+```javascript
 
 ```
