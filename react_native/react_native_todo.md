@@ -890,4 +890,89 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+``` 
+
+### 2) todos 목록을 출력하기 위한 ToDoList컴포넌트를 위한 ToDoList.js파일을 components 디렉터리에 생성하고 작성  
+* 여러 개의 데이터 목록은 Table 형태의 View를 이용해서 출력하는 것이 일반적인데 ReactNative에서는 FlatList를 제공하는데, Android에서는 TableVIew나 RecyclerView를 제공하고 iOS에서는 TableView와 같은 뷰를 제공해서 뛰어난 UI와 기능을 제공합니다.  
+
+* 특별한 경우가 아니라면 여러개의 데이터 목록은 프레임워크나 API에서 제공해주는 기능을 이용하는 것이 좋습니다.  
+
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, FlatList} from 'react-native'
+
+// 출력할 데이터를 todos라는 이름으로 넘겨받는다
+function ToDoList({todos}){
+    return (
+       <FlatList style={styles.list} data={todos} renderItem={({item})=>{
+            <View>
+                <Text>{item.next}</Text>
+            </View>
+       }} keyExtractor={item=> item.id.toString()} />
+    );
+}
+
+const styles = StyleSheet.create({
+    list :{
+        flex:1
+    }
+});
+
+export default ToDoList;
+```  
+
+### 3) App.js파일에서 ToDOList 컴포넌트 추가하는 코드를 추가  
+```javascript
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
+
+import AddToDo from './components/AddToDo'
+import Empty from './components/Empty'
+import ToDoList from './components/ToDoList';
+
+function App(){
+  const today = new Date();
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos}/>}
+        <AddToDo />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+
+const styles = StyleSheet.create({ 
+  block:{
+    flex:1
+  },
+  avoid:{
+    flex:1
+  }
+});
+
+export default App;
+```  
+
+### 4) FlatList에서 하나의 항목을 출력할 때 사용하기 위한 컴포넌트를 components디렉터리에 ToDoItem.js파일에 작성  
+```javascript
+
 ```
