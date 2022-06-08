@@ -1323,3 +1323,197 @@ const styles = StyleSheet.create({
 
 export default ToDoItem;
 ```  
+
+### 6) App.js파일에 삭제를 위한 함수 추가  
+```javascript
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
+
+import AddToDo from './components/AddToDo'
+import Empty from './components/Empty'
+import ToDoList from './components/ToDoList';
+
+function App(){
+  // 오늘 날짜 생성
+  const today = new Date();
+
+  // 데이터를 저장하기 위한 속성 생성
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+
+  // 데이터를 삽입하기 위한 함수
+  function onInsert(text){
+    // 가장 큰 id를 찾아서 +1
+    const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+    // 하나의 인스턴스 생성
+    const todo={id:nextId, text, done:false}
+    // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
+    //setTodos(todos.push(todo))
+    setTodos(todos.concat(todo))
+  }
+
+  // done의 값을 토글시키기 위한 함수 
+  // id를 찾아서 id에 해당하는 데이터를 찾아서 done의 값을 토글시키기
+  function onToggle(id){
+    const nextTodos = todos.map(todo=> todo.id === id? {...todo, done:!todo.done}:todo);
+    setTodos(nextTodos)
+  }
+
+  // 데이터를 삭제하기 위한 함수
+  function onRemove(id){
+    // 매개변수로 넘어온 아이디가 아닌 것만 골라서 nextTodos를 생성
+    const nextTodos = todos.filter(todo => todo.id != id)
+    setTodos(nextTodos)
+  }
+
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos} onToggle={onToggle} onRemove={onRemove}/>}
+        <AddToDo onInsert={onInsert} />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+
+const styles = StyleSheet.create({ 
+  block:{
+    flex:1
+  },
+  avoid:{
+    flex:1
+  }
+});
+
+export default App;
+```
+
+### 7) ToDoList.js 파일에 삭제함수를 받아서 ToDoItem.js파일에 넘겨주는 코드를 작성  
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, FlatList} from 'react-native'
+import ToDoItem from './ToDoItem'
+
+// 출력할 데이터를 todos라는 이름으로 넘겨받는다
+function ToDoList({todos, onToggle, onRemove}){
+    return (
+       <FlatList style={styles.list} data={todos}
+        renderItem={({item})=>{
+            <ToDoItem id={item.id} text={item.text} done={item.done} onToggle={onToggle} onRemove={onRemove}/>
+        }} keyExtractor={item=> item.id.toString()} 
+        ItemSeparatorComponent={()=> <View style={styles.seperator}/>}
+       />
+    );
+}
+
+const styles = StyleSheet.create({
+    list :{
+        flex:1
+    },
+    seperator:{
+        backgroundColor:'#e0e0e0',
+        height:1
+    }
+});
+
+export default ToDoList;
+```  
+
+### 8) ToDoItem.js파일에서 삭제함수를 건네받도록 수정
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+
+import Icon from 'react-native-vector-icons/MaterialIcons'
+
+function ToDoItem({id, text, done, onToggle, onRemove}){
+    return (
+       <View style={styles.item}>
+           <TouchableOpacity onPress={()=>onToggle(id)}>
+            <View style={[styles.circle, done && styles.filled]}>
+                {done && (<Image source={require('../assets/icons/check_white/check_white.png')}/>)}
+            </View> 
+            </TouchableOpacity>
+            <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
+            {done?(
+                <TouchableOpacity onPress={()=>onRemove(id)}>
+                    <Icon name="delete" size={32} color="red"/>
+                </TouchableOpacity>
+            ):(
+                <View style={styles.removePlaceholder}/>
+            )}
+       </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    item:{
+        flexDirection:"row",
+        padding:16,
+        borderBottomColor:"#e0e0e0",
+        alignItems:'center'
+    },
+    circle:{
+        width:24,
+        height:24,
+        borderRadius:12,
+        borderColor:'#26a69a',
+        borderWidth:1,
+        marginRight:16
+    },
+    text:{
+        flex:1,
+        fontSize:16,
+        color:'#212121'
+    },
+    filled:{
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:'#26a69a'
+    },
+    lineThrough:{
+        color:'#9e9e9e',
+        textDecorationLine:'line-through'
+    },
+    removePlaceholder:{
+        width:32,
+        height:32,
+
+    }
+});
+
+export default ToDoItem;
+```  
+
+### 9) 삭제하기 전에 대화상자를 출력해서 삭제 여부 확인하는 코드를 ToDoItem.js파일에 추가  
+* GUI Programming에서 주의해야할 점이 하나 있는데, 화면을 출력하는 코드는 함수 내에서 가장 마지막에 수행됩니다.  
+    하나의 함수 내에서 이루어지는 화면 출력 코드느 모아서 마지막에 한번만 수행합니다.  
+
+    화면에 요소를 출력하는 코드에 이어서 다른 코드가 존재하는 경우 화면을 출력하는 코드 뒤에 있더라도 이 코드가 화면 출력코드보다 뒤에서 수행된다는 보장을 할 수가 없습니다. 대화상자를 출력하는 코드는 콜백 메서드를 가지고 있어서 대화 상자가 닫히고 난 후 수행된 코드를 작성할 수 있도록 합니다.
+
+    하나의 함수 내에서 스레드나 운영체제 자체의 스레드와 유사한 객체를 이용하지 않고 단순하게 타이머의 형태로 GUI를 변경하는 코드를 작성하게 되면 에러가 발생하거나 모아서 한꺼번에 처리합니다.  
+
+* 예를 들어,
+```javascript
+    for(int i = 0; i < 9; i++){
+        sleep(1000);
+        // 텍스트 뷰에 i 값 출력
+    }
+```  
+라는 수도코드가 있을 때, 0 1 2 3 4 5 ... 이런 식으로 찍히길 바라지만 실제로는 9 만 찍힙니다.  

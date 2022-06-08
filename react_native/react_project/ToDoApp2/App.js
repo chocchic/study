@@ -43,13 +43,20 @@ function App(){
     setTodos(nextTodos)
   }
 
+  // 데이터를 삭제하기 위한 함수
+  function onRemove(id){
+    // 매개변수로 넘어온 아이디가 아닌 것만 골라서 nextTodos를 생성
+    const nextTodos = todos.filter(todo => todo.id != id)
+    setTodos(nextTodos)
+  }
+
   return (
     <SafeAreaProvider>
     <SafeAreaView edges={['bottom']} style={styles.block} >
         <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
         <DateHead date={today} />
-        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos} onToggle={onToggle}/>}
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos} onToggle={onToggle} onRemove={onRemove}/>}
         <AddToDo onInsert={onInsert} />
         </KeyboardAvoidingView>
     </SafeAreaView>

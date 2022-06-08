@@ -1,9 +1,22 @@
 import React from 'react'
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native'
 
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
-function ToDoItem({id, text, done, onToggle}){
+function ToDoItem({id, text, done, onToggle, onRemove}){
+    // 대화상자를 출력해서 삭제여부를 묻는 함수
+    // AlertStatic.alert: (title: string,
+    //                     message?: string, 
+    //                     buttons?: AlertButton[],
+    //                     options?: AlertOptions) => void
+    const remove = ()=>{
+        Alert.alert(
+            '삭제', '정말로 삭제?', [
+            {text:"취소", onPress:()=>{}, style:'cancel'},  // 취소 버튼 누르면 아무 일도 안함
+            {text:"삭제", onPress:()=>{onRemove(id)}, style:'destructive'}],  // 삭제 버튼 눌렀을 때만 발동
+            {cancelable:true, onDismiss:()=>{}}
+        )
+    }
     return (
        <View style={styles.item}>
            <TouchableOpacity onPress={()=>onToggle(id)}>
@@ -13,7 +26,9 @@ function ToDoItem({id, text, done, onToggle}){
             </TouchableOpacity>
             <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
             {done?(
-                <Icon name="delete" size={32} color="red"/>
+                <TouchableOpacity onPress={()=>{remove}}>
+                    <Icon name="delete" size={32} color="red"/>
+                </TouchableOpacity>
             ):(
                 <View style={styles.removePlaceholder}/>
             )}
@@ -52,7 +67,8 @@ const styles = StyleSheet.create({
     },
     removePlaceholder:{
         width:32,
-        height:32
+        height:32,
+
     }
 });
 
