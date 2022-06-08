@@ -1114,5 +1114,143 @@ export default ToDoItem;
     for(idx in ar) {ar[idx]}
     이런식으로 작성하면 귀찮으니깐 ...map()을 사용한다.
 ```javascript
+function App(){
+  // 오늘 날짜 생성
+  const today = new Date();
 
+  // 데이터를 저장하기 위한 속성 생성
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+
+  // 데이터를 삽입하기 위한 함수
+  function onInsert(text){
+    // 가장 큰 id를 찾아서 +1
+    const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+    // 하나의 인스턴스 생성
+    const todo={id:nextId, text, done:false}
+    // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
+    //setTodos(todos.push(todo))
+    setTodos(todos.concat(todo))
+  }
+
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos}/>}
+        <AddToDo onInsert={onInsert} />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
 ```
+
+### 2) 데이터 삽입을 위해서 AddToDo.js파일을 수정  
+```javascript
+    // 버튼을 누르거나 Return Key를 눌렀을 때 호출되는 함수  
+    const onPress = () =>{
+        onInsert({text});
+        setText("");
+        Keyboard.dismiss();
+    }
+```  
+
+## 10. 할 일 완료 상태 토글 - done의 값을 toggle  
+### 1) App.js파일에 토글을 위한 함수를 생성  
+```javascript
+function App(){
+  // 오늘 날짜 생성
+  const today = new Date();
+
+  // 데이터를 저장하기 위한 속성 생성
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+
+  // 데이터를 삽입하기 위한 함수
+  function onInsert(text){
+    // 가장 큰 id를 찾아서 +1
+    const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+    // 하나의 인스턴스 생성
+    const todo={id:nextId, text, done:false}
+    // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
+    //setTodos(todos.push(todo))
+    setTodos(todos.concat(todo))
+  }
+
+  // done의 값을 토글시키기 위한 함수 
+  // id를 찾아서 id에 해당하는 데이터를 찾아서 done의 값을 토글시키기
+  function onToggle(id){
+    const nextTodos = todos.map(todo=> todo.id === id? {...todo, done:!todo.done}:todo);
+    setTodos(nextTodos)
+  }
+
+  return (
+    <SafeAreaProvider>
+    <SafeAreaView edges={['bottom']} style={styles.block} >
+        <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
+        <DateHead date={today} />
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos} onToggle={onToggle}/>}
+        <AddToDo onInsert={onInsert} />
+        </KeyboardAvoidingView>
+    </SafeAreaView>
+    </SafeAreaProvider>
+  );
+};
+```  
+
+### 2) ToDoList.js파일에 토글 이벤트 설정을 위한 코드를 작성  
+```javascript
+// 출력할 데이터를 todos라는 이름으로 넘겨받는다
+function ToDoList({todos, onToggle}){
+    return (
+       <FlatList style={styles.list} data={todos}
+        renderItem={({item})=>{
+            <ToDoItem id={item.id} text={item.text} done={item.done} onToggle={onToggle}/>
+        }} keyExtractor={item=> item.id.toString()} 
+        ItemSeparatorComponent={()=> <View style={styles.seperator}/>}
+       />
+    );
+}
+```  
+
+### 3) FlatList의 각 항목이 터치를 사용할 수 있도록 ToDoItem.js를 수정  
+```javascript
+function ToDoItem({id, text, done, onToggle}){
+    return (
+       <View style={styles.item}>
+           <TouchableOpacity onPress={()=>onToggle(id)}>
+            <View style={[styles.circle, done && styles.filled]}>
+                {done && (<Image source={require('../assets/icons/check_white/check_white.png')}/>)}
+            </View> 
+            </TouchableOpacity>
+            <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
+       </View>
+    );
+}
+```  
+
+## 11. 항목 삭제  
+### 1) 벡터 아이콘 사용을 위한 패키지 설치  
+yarn add react-native-vector-icons -> https://oblador.github.io/react-native-vector-icons  
+
+### 2) iOS 환경인 경우 해줘야 하는 작업  
+* 터미널에서 작성
+    cd ios  
+    pod install  
+
+* ios/앱이름 디렉터리의 info.plist파일을 열어서 가장 하단(</dict> 앞)에 추가  
+    <array>
+        <string> MaterialIcons.ttf</string>
+    </array>
+
+### 3) application을 다시 빌드  

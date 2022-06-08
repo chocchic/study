@@ -1,12 +1,14 @@
 import React, {useState} from "react";
 import {View, StyleSheet,TextInput, Image, TouchableOpacity, Platform, TouchableNativeFeedback, Keyboard} from 'react-native'
 
-function AddToDo(){
+function AddToDo({onInsert}){
     // text라는 속성을 생성하고 setText라는 함수로 수정. 기본값은 ''
     const [text, setText] = useState('');
     console.log(text); // metro에 찍힘
 
+    // 버튼을 누르거나 Return Key를 눌렀을 때 호출되는 함수  
     const onPress = () =>{
+        onInsert({text});
         setText("");
         Keyboard.dismiss();
     }

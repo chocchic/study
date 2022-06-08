@@ -36,14 +36,21 @@ function App(){
     setTodos(todos.concat(todo))
   }
 
+  // done의 값을 토글시키기 위한 함수 
+  // id를 찾아서 id에 해당하는 데이터를 찾아서 done의 값을 토글시키기
+  function onToggle(id){
+    const nextTodos = todos.map(todo=> todo.id === id? {...todo, done:!todo.done}:todo);
+    setTodos(nextTodos)
+  }
+
   return (
     <SafeAreaProvider>
     <SafeAreaView edges={['bottom']} style={styles.block} >
         <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.avoid}>
         <DateHead date={today} />
-        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos}/>}
-        <AddToDo />
+        {todos.length === 0 ? <Empty /> : <ToDoList todos={todos} onToggle={onToggle}/>}
+        <AddToDo onInsert={onInsert} />
         </KeyboardAvoidingView>
     </SafeAreaView>
     </SafeAreaProvider>

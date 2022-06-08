@@ -1,12 +1,14 @@
 import React from 'react'
-import {View, Text, StyleSheet, Image} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
 
-function ToDoItem({id, text, done}){
+function ToDoItem({id, text, done, onToggle}){
     return (
        <View style={styles.item}>
+           <TouchableOpacity onPress={()=>onToggle(id)}>
             <View style={[styles.circle, done && styles.filled]}>
                 {done && (<Image source={require('../assets/icons/check_white/check_white.png')}/>)}
             </View> 
+            </TouchableOpacity>
             <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
        </View>
     );
