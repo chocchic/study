@@ -29,7 +29,7 @@ function App(){
   function onInsert(text){
     // 가장 큰 id를 찾아서 +1
     const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
-
+    // 하나의 인스턴스 생성
     const todo={id:nextId, text, done:false}
     // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
     //setTodos(todos.push(todo))
