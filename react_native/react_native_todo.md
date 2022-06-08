@@ -1243,7 +1243,7 @@ function ToDoItem({id, text, done, onToggle}){
 ### 1) 벡터 아이콘 사용을 위한 패키지 설치  
 yarn add react-native-vector-icons -> https://oblador.github.io/react-native-vector-icons  
 
-### 2) iOS 환경인 경우 해줘야 하는 작업  
+### 2) iOS 작업  
 * 터미널에서 작성
     cd ios  
     pod install  
@@ -1517,3 +1517,125 @@ export default ToDoItem;
     }
 ```  
 라는 수도코드가 있을 때, 0 1 2 3 4 5 ... 이런 식으로 찍히길 바라지만 실제로는 9 만 찍힙니다.  
+
+* ToDoItem.js 전체  
+```javascript
+import React from 'react'
+import {View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native'
+
+import Icon from 'react-native-vector-icons/MaterialIcons'
+
+function ToDoItem({id, text, done, onToggle, onRemove}){
+    // 대화상자를 출력해서 삭제여부를 묻는 함수
+    // AlertStatic.alert: (title: string,
+    //                     message?: string, 
+    //                     buttons?: AlertButton[],
+    //                     options?: AlertOptions) => void
+    const remove = ()=>{
+        Alert.alert(
+            '삭제', '정말로 삭제?', [
+            {text:"취소", onPress:()=>{}, style:'cancel'},  // 취소 버튼 누르면 아무 일도 안함
+            {text:"삭제", onPress:()=>{onRemove(id)}, style:'destructive'}],  // 삭제 버튼 눌렀을 때만 발동
+            {cancelable:true, onDismiss:()=>{}}
+        )
+    }
+    return (
+       <View style={styles.item}>
+           <TouchableOpacity onPress={()=>onToggle(id)}>
+            <View style={[styles.circle, done && styles.filled]}>
+                {done && (<Image source={require('../assets/icons/check_white/check_white.png')}/>)}
+            </View> 
+            </TouchableOpacity>
+            <Text style={[styles.text, done && styles.lineThrough]}>{text}</Text>
+            {done?(
+                <TouchableOpacity onPress={()=>{remove}}>
+                    <Icon name="delete" size={32} color="red"/>
+                </TouchableOpacity>
+            ):(
+                <View style={styles.removePlaceholder}/>
+            )}
+       </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    item:{
+        flexDirection:"row",
+        padding:16,
+        borderBottomColor:"#e0e0e0",
+        alignItems:'center'
+    },
+    circle:{
+        width:24,
+        height:24,
+        borderRadius:12,
+        borderColor:'#26a69a',
+        borderWidth:1,
+        marginRight:16
+    },
+    text:{
+        flex:1,
+        fontSize:16,
+        color:'#212121'
+    },
+    filled:{
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:'#26a69a'
+    },
+    lineThrough:{
+        color:'#9e9e9e',
+        textDecorationLine:'line-through'
+    },
+    removePlaceholder:{
+        width:32,
+        height:32,
+
+    }
+});
+
+export default ToDoItem;
+```  
+
+## 12. 스마트 디바이스 앱에 데이터 저장  
+* react-native 에서는 AsyncStorage라는 API를 이용해서 앱 내에 데이터를 저장할 수 있도록 해줍니다.  iOS에서는 네이티브 코드로 만들어지고 안드로이드에서는 SQLite를 기반으로 구현되어 있습니다.  
+* 저장 방식은 Key-Value 형식이고, getItem, setItem, removeItem, clear등의 함수가 구현되어 있습니다.  
+* Promise를 리턴하는 방식으로 구현되어 있습니다.  
+* 도큐먼트 : https://reactnative.dev/docs/asyncstorage
+* 설치 
+yarn add @react-native-community/async-storage
+cd ios
+pod install
+
+### +) 데이터 활용
+* 에플리케이션이 실행 중인 동안만 데이터를 활용 - 메모리에 저장하는 방식(variable을 이용하는 방식)  
+
+* 애플리케이션에 데이터를 반영구적으로 저장  
+  애플리케이션의 파일 시스템을 이용 - 안드로이드나 아이폰은 애플리케이션마다 documents라고 하는 디렉터리를 가지고 있어서 파일 입출력을 할 수 있도록 해줍니다.  
+
+  애플리케이션의 환경 설정 파일을 이용 - 작은 양의 데이터만 보관  
+
+  스마트폰 디바이스의 로컬 데이터베이스 이용(SQLite)
+
+  iOS의 경우는 인 메모리 데이터베이스형태인 CoreData 이용  
+
+* 다른 컴퓨터(서버)에 데이터를 보관  
+애플리케이션에 데이터를 보관했을 때 문제점은 애플리케이션이 삭제되면 데이터도 같이 삭제됩니다.  
+서버에 데이터를 보관하면 애플리케이션이 삭제되더라도 데이터를 복원할 수 있습니다.  
+네트워크가 되지 않으면 서버의 데이터를 사용할 수 없습니다.  
+
+* 애플리케이션의 성격에 따라 적절하게 혼합해서 사용해야 합니다.  
+현재 네트워크의 상태를 확인해서 네트워크 상태가 불안정하면 애플리케이션 내의 데이터를 활용하는 방법을 고려할 만 하고, 애플리케이션 내의 데이터와 서버의 존재하는 데이터 사이의 불일치 문제를 해결해야 합니다.  
+
+클라이언트 -------------- 애플리케이션 서버 ------------ 저장소  
+
+일반적인 방식은 클라이언트가 애플리케이션 서버에게 요청을 하면 애플리케이션 서버는 저장소에 요청을 하교 저장소가 준 결과를 애플리케이션 서버가 받아서 클라이언트에게 전송  
+
+저장소의 데이터를 미리 애플리케이션 서버에게 전달하고 클라이언트가 애플리케이션 서버에게 요청을 하면 그 때, 애플리케이션 서버의 데이터를 가지고 응답을 하고, 나ㅏ중에 저장소와 동기화를 수행하는 방식을 이용하면 저장소 활용 속도가 빨라지고 트래픽도 감소합니다.  
+
+    데이터가 100개 <-------> 저장소에도 데이터가 100개  
+데이터 1개가 삽입 - 데이터가 101개 <---------> 저장소에 데이터가 101개  
+
+안드로이드(ArrayList - 데이터베이스에서 불러온 데이터 저장, 100)  
+
+데이터베이스 100개  
