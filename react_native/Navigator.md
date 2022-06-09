@@ -343,15 +343,122 @@ function HomeScreen({navigation}){
 export default HomeScreen
 ```  
 
+* DetailScreen 의 헤더의 타이틀을 파라미터로 넘겨받은 데이터로 설정하도록 App.js를 수정  
+```javascript
+import React from 'react';
+import  {NavigationContainer, StackActions} from '@react-navigation/native'
+
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import HomeScreen from './screens/HomeScreen';
+import DetailScreen from './screens/DetailScreen';
+
+//스택 생성
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{title:"홈"}}/>
+        <Stack.Screen name="Detail" component={DetailScreen} 
+        options={({route}) => ({title: `상세 정보 - ${route.params.id}`})}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
+```  
+
+* headerStyle 속성을 이용하면 header 의 모양을 변경할 수 있음
+
+* App.js 파일을 수정해서 HomeScreen의 헤더 모양을 변경  
+```javascript
+import React from 'react';
+import  {NavigationContainer, StackActions} from '@react-navigation/native'
+
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import HomeScreen from './screens/HomeScreen';
+import DetailScreen from './screens/DetailScreen';
+
+//스택 생성
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{title:"홈",
+      headerStyle:{
+        backgroundColor: '#2966f6',
+        headerTintColor: '#ffff00',
+        headerTitleStyle:{fontWeight:'bold', fontSize:40}
+      }}}/>
+        <Stack.Screen name="Detail" component={DetailScreen} 
+        options={({route}) => ({title: `상세 정보 - ${route.params.id}`})}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
+```  
+
 * header(Navigation Bar)에는 왼쪽 부분과 가운데 영역과 오른쪽 부분으로 나누어져 있습니다.  
 왼쪽 영역에 뒤로가기를 배치하고 가운데 영역에는 현재 영역에 대한 설명을 나타내는 텍스트나 이미지를 배치하고 오른쪽은 편집할 수 있는 UI를 제공하는 경우가 많습니다.  
 
-* 상세보기 화면인 DetailScreen에 header부분에 UI를 변경하기 위해서 DetailScreen.js파일을 수정  
+* 상세보기 화면인 DetailScreen 에 header 부분에 UI를 변경하기 위해서 App.js 파일을 수정  
 ```javascript
+import React from 'react';
+import  {NavigationContainer, StackActions} from '@react-navigation/native'
 
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import HomeScreen from './screens/HomeScreen';
+import DetailScreen from './screens/DetailScreen';
 
-빼먹음
+import {View, Text, TouchableOpacity} from 'react-native'
+//스택 생성
+const Stack = createNativeStackNavigator();
 
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{title:"홈",
+      headerStyle:{
+        backgroundColor: '#2966f6',
+        headerTintColor: '#ffff00',
+        headerTitleStyle:{fontWeight:'bold', fontSize:40}
+      }}}/>
+        <Stack.Screen name="Detail" component={DetailScreen} 
+        options={{
+          //뒤로가기 버튼 삭제
+          headerBackVisible:false,
+          //바의 왼쪽에 버튼 생성
+          headerLeft:({onPress}) => (
+            <TouchableOpacity onPress={onPress}>
+              <Text>Left</Text>
+            </TouchableOpacity>
+          ),
+          //바의 가운데에 텍스트 출력
+          headerTitle:({children}) => (
+            <View>
+              <Text>{children}</Text>
+            </View>
+          ),
+          //바의 오른쪽에 배치
+          headerRight:() => (
+          <View>
+            <Text>오른쪽</Text>
+          </View>
+        )
+        }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default App;
 ```  
 
 ### 7) 헤더 숨기기  
