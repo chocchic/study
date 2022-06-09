@@ -1,52 +1,49 @@
 import React from 'react'
-import { NavigationContainer, StackActions } from '@react-navigation/native';
+import { NavigationContainer} from '@react-navigation/native';
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import {Text} from 'react-native'
 
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import HomeScreen from './screens/HomeScreen';
-import DetailScreen from './screens/DetailScreen';
-import HeaderlessScreen from './screens/HeaderlessScreen';
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
-import {View, Text, TouchableOpacity} from 'react-native'
+// 탭으로 사용할 컴포넌트 생성
+function HomeScreen(){
+    return <Text>Home</Text>
+}
 
-// 스택생성
-const Stack = createNativeStackNavigator()
+function SearchScreen(){
+    return <Text>Search</Text>
+}
+
+function NotificationScreen(){
+    return <Text>Notification</Text>
+}
+
+function MessageScreen(){
+    return <Text>Message</Text>
+}
+
+// 탭을 생성
+const Tab = createBottmTabNavigator();
 
 function App(){
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Home'>
-        <Stack.Screen name='Home' component={HomeScreen} options={{title:"홈", headerStyle: {
-          backgroundColor:'#2966f6',
-          headerTintColor:'#ffff00',
-          headerTitleStyle:{fontweight:'bold', fontSize:20}
-        }}}/>
-        <Stack.Screen name='Detail' component={DetailScreen} options={{
-          // 뒤로가기 버튼 삭제
-          headerBackVisible:false,
-          // 바의 왼쪽에 버튼 생성
-          headerLeft:({onPress}) =>{
-            <TouchableOpacity onPress={onPress}>
-              <Text>Left</Text>
-            </TouchableOpacity>
-          },
-          // 바의 가운데에 텍스트 출력
-          headerTitle:({children})=>{
-            <View>
-              <Text>{children}</Text>  
-            </View>
-          },
-          // 바의 오른쪽에 배치
-          headerRight:()=>{
-            <View>
-              <Text>오른쪽</Text>
-            </View>
-          }
-        }}/>
-        <Stack.Screen name='Headerless' component={HeaderlessScreen} options={
-          headerShown: false
-        }
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
+    return (
+        <NavigationContainer>
+            <Tab.Navigator initailRouteName='Home'>
+                <Tab.Screen name='Home' component={HomeScreen} options={{title:"홈", tabBarIcon: ({color, size})=>(
+                    <Icon name='home' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Search' component={SearchScreen} options={{title:"검색", tabBarIcon: ({color, size})=>(
+                    <Icon name='search' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Notification' component={NotificationScreen} options={{title:"알림", tabBarIcon: ({color, size})=>(
+                    <Icon name='notification' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Message' component={MessageScreen} options={{title:"메세짖", tabBarIcon: ({color, size})=>(
+                    <Icon name='message' color={color} size ={size} />
+                )}}/>
+            </Tab.Navigator>
+        </NavigationContainer>
+    );
 }
-export default App;
+
+export default App

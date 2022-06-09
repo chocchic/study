@@ -2,7 +2,7 @@ import React from "react";
 import {View, Button, Text} from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 
-function HomeScreen({navigation}){
+function HeaderlessScreen({navigation}){
     return (
         <SafeAreaView>
             <View>
@@ -13,4 +13,4 @@ function HomeScreen({navigation}){
     );
 }
 
-export default HomeScreen
+export default HeaderlessScreen

@@ -411,3 +411,121 @@ export default HomeScreen
 
 ## 4. 여러 형태의 화면 전환  
 ### 1) 하단 탭 네비게이터  
+* 도큐먼트 : https://reactnavigation.org/docs/bottom-tab-navigator  
+* 설치
+    yarn add @react-navigation/bottom-tabs react-native-vector-icons  
+* Mac 환경 추가 작업
+    cd ios  
+    pod install  
+* 설치 후 실행  
+    cd ..
+    yarn android
+    yarn ios
+
+* 텍스트만 존재하는 하단 탭 생성하기 위해서 App.js 수정
+```javascript
+import React from 'react'
+import { NavigationContainer} from '@react-navigation/native';
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import {Text} from 'react-native'
+
+// 탭으로 사용할 컴포넌트 생성
+function HomeScreen(){
+    return <Text>Home</Text>
+}
+
+function SearchScreen(){
+    return <Text>Search</Text>
+}
+
+function NotificationScreen(){
+    return <Text>Notification</Text>
+}
+
+function MessageScreen(){
+    return <Text>Message</Text>
+}
+
+// 탭을 생성
+const Tab = createBottmTabNavigator();
+
+function App(){
+    return (
+        <NavigationContainer>
+            <Tab.Navigator initailRouteName='Home'>
+                <Tab.Screen name='Home' component={HomeScreen}/>
+                <Tab.Screen name='Search' component={SearchScreen}/>
+                <Tab.Screen name='Notification' component={NotificationScreen}/>
+                <Tab.Screen name='Message' component={MessageScreen}/>
+            </Tab.Navigator>
+        </NavigationContainer>
+    );
+}
+
+export default App
+```  
+
+* 하단 탭에 아이콘을 배치하기 위한 설정  
+    - ios/앱이름/info.plit파일에 추가	 
+        <key>UIAppFonts</key>  
+	    <array><string><MaterailIcons.ttf</string></array>  
+
+    - android/app/build.gradle파일의 하단에 추가  
+        project.ext.vectoricons = [ iconFontNames: ['MaterialIcons.ttf']]
+        apply from:"../../node_modules/react-native-vector-icons/fonts.gradle"
+
+* 빌드 다시 수행  
+
+* App.js파일의 Tab을 생성하는 부분을 수정해서 아이콘을 출력  
+```javascript
+import React from 'react'
+import { NavigationContainer} from '@react-navigation/native';
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import {Text} from 'react-native'
+
+import Icon from 'react-native-vector-icons/MaterialIcons'
+
+// 탭으로 사용할 컴포넌트 생성
+function HomeScreen(){
+    return <Text>Home</Text>
+}
+
+function SearchScreen(){
+    return <Text>Search</Text>
+}
+
+function NotificationScreen(){
+    return <Text>Notification</Text>
+}
+
+function MessageScreen(){
+    return <Text>Message</Text>
+}
+
+// 탭을 생성
+const Tab = createBottmTabNavigator();
+
+function App(){
+    return (
+        <NavigationContainer>
+            <Tab.Navigator initailRouteName='Home'>
+                <Tab.Screen name='Home' component={HomeScreen} options={{title:"홈", tabBarIcon: ({color, size})=>(
+                    <Icon name='home' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Search' component={SearchScreen} options={{title:"검색", tabBarIcon: ({color, size})=>(
+                    <Icon name='search' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Notification' component={NotificationScreen} options={{title:"알림", tabBarIcon: ({color, size})=>(
+                    <Icon name='notification' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Message' component={MessageScreen} options={{title:"메세짖", tabBarIcon: ({color, size})=>(
+                    <Icon name='message' color={color} size ={size} />
+                )}}/>
+            </Tab.Navigator>
+        </NavigationContainer>
+    );
+}
+
+export default App
+```  
+
