@@ -321,3 +321,93 @@ export default DetailScreen
 * headerStyle 속성을 이용하면 header의 모양을 변경할 수 있음  
 
 * HomeScreen.js 파일을 수정해서 HomeScreen의 헤더모양을 변경  
+```javascript
+import React, {useEffect} from "react";
+import {View, Button} from 'react-native'
+import { useEffect } from 'react/cjs/react.production.min';
+
+function HomeScreen({navigation}){
+    useEffect(()=>{
+        navigation.setOptions({title:'함수를 이용한 변경'})
+    }, [navigation])
+
+    return (
+        <View>
+            <Button title="Detail 1 Open" onPress={()=> navigation.naviate("Detail", {id:1})} />
+            <Button title="Detail 2 Open" onPress={()=> navigation.naviate("Detail", {id:2})} />
+            <Button title="Detail 3 Open" onPress={()=> navigation.naviate("Detail", {id:3})} />
+        </View>
+    );
+}
+
+export default HomeScreen
+```  
+
+* header(Navigation Bar)에는 왼쪽 부분과 가운데 영역과 오른쪽 부분으로 나누어져 있습니다.  
+왼쪽 영역에 뒤로가기를 배치하고 가운데 영역에는 현재 영역에 대한 설명을 나타내는 텍스트나 이미지를 배치하고 오른쪽은 편집할 수 있는 UI를 제공하는 경우가 많습니다.  
+
+* 상세보기 화면인 DetailScreen에 header부분에 UI를 변경하기 위해서 DetailScreen.js파일을 수정  
+```javascript
+
+
+빼먹음
+
+```  
+
+### 7) 헤더 숨기기  
+* 네비게이션 이동 중에 특정 화면에서 헤더를 숨기고자 하는 경우에는 options에 headerShown이라는 속성의 값을 false로 설정하면 됩니다.  
+* 헤더가 없기 떄문에 뒤로가기를 위한 UI를 직접 생성해야 합니다.  
+* 헤더가 없는 컴포넌트를 screens/HeaderlessScreen.js파일로 작성  
+```javascript
+import React from "react";
+import {View, Button, Text} from 'react-native'
+import {SafeAreaView} from 'react-native-safe-area-context'
+
+function HeaderlessScreen({navigation}){
+    return (
+        <SafeAreaView>
+            <View>
+                <Text>HeaderLess</Text>
+                <Button onPress={()=>{navigation.pop()}} title='뒤로'/>
+            </View>
+        </SafeAreaView>
+    );
+}
+
+export default HeaderlessScreen
+```  
+
+* App.js에서 추가한 컴포넌트를 출력하기 위한 코드를 작성  
+```javascript
+// ... 위에 생략 ... 
+        <Stack.Screen name='Headerless' component={HeaderlessScreen} options={{
+          headerShown: false
+        }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
+}
+export default App;
+```  
+
+* HomeScreen.js파일에 HeaderlessScreen으로 이동할 수 있는 UI를 추가  
+```javascript
+import React from "react";
+import {View, Button} from 'react-native'
+
+function HomeScreen({navigation}){
+    return (
+        <View>
+            <Button title="Detail 1 Open" onPress={()=> navigation.naviate("Detail", {id:1})} />
+            <Button title="Detail 2 Open" onPress={()=> navigation.naviate("Detail", {id:2})} />
+            <Button title="Detail 3 Open" onPress={()=> navigation.naviate("Detail", {id:3})} />
+            <Button title="Headerless" onPress={()=> navigation.naviate("Headerless")}/>
+        </View>
+    );
+}
+
+export default HomeScreen
+```  
+
+## 4. 여러 형태의 화면 전환  
+### 1) 하단 탭 네비게이터  
