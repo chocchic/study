@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,6 +14,8 @@ import AddToDo from './components/AddToDo'
 import Empty from './components/Empty'
 import ToDoList from './components/ToDoList';
 
+import todosStorage from './storages/todoStorage';
+
 function App(){
   // 오늘 날짜 생성
   const today = new Date();
@@ -25,6 +27,16 @@ function App(){
     {id : 3, text:'FrontEnd - ReactNative', done:false}
   ])
 
+  // 데이터 불러오기
+  useEffect(()=>{
+    // 데이터를 가져온 후 setTodos함수에 대입해서 수행
+    todosStorage.get().then(setTodos).catch(console.error)
+  }, [])
+
+  // 데이터 저장하기
+  useEffect(()=>{
+    todosStorage.set(todos).catch(console.error)
+  }, [todos])
   // 데이터를 삽입하기 위한 함수
   function onInsert(text){
     // 가장 큰 id를 찾아서 +1

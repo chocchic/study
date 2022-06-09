@@ -1598,7 +1598,13 @@ export default ToDoItem;
 ```  
 
 ## 12. 스마트 디바이스 앱에 데이터 저장  
-* react-native 에서는 AsyncStorage라는 API를 이용해서 앱 내에 데이터를 저장할 수 있도록 해줍니다.  iOS에서는 네이티브 코드로 만들어지고 안드로이드에서는 SQLite를 기반으로 구현되어 있습니다.  
+### 1) Smart Device API
+* Android : 환경 설정 파일, Flat File(파일 시스템에 직접 생성), SQLite 활용  
+* iOS : 환경설정파일, Flat File, SQLite 활용, Core Data 활용  
+* Flat File을 이용할 때 주의할 점은 스마트 디바이스에서는 읽기 전용 디렉토리와 읽고 쓰기가 가능한 디렉터리가 구분되어 있습니다. 스마트 디바이스의 네이티브 코드르 이용해서 저장하는 경우에는 각 디렉터리의 권한을 확인할 수 있어야 합니다.  
+    
+## 2) react-native
+* AsyncStorage라는 API를 이용해서 앱 내에 데이터를 저장할 수 있도록 해줍니다.  iOS에서는 네이티브 코드로 만들어지고 안드로이드에서는 SQLite를 기반으로 구현되어 있습니다.  
 * 저장 방식은 Key-Value 형식이고, getItem, setItem, removeItem, clear등의 함수가 구현되어 있습니다.  
 * Promise를 리턴하는 방식으로 구현되어 있습니다.  
 * 도큐먼트 : https://reactnative.dev/docs/asyncstorage
@@ -1639,3 +1645,93 @@ pod install
 안드로이드(ArrayList - 데이터베이스에서 불러온 데이터 저장, 100)  
 
 데이터베이스 100개  
+
+### 3) AsyncStorage에 데이터를 읽고 쓰기위한 객체를 생성 - storage/todoStorage.js  
+```javascript
+import AsyncStorage from "@react-native-community/async-storage";
+
+// 키 설정
+const key = 'todos'
+
+const todosStorage ={
+    // 데이터 가져오는 함수
+    async get(){
+        try{
+            // 데이터 가져오기
+            const rawTodos = await AsyncStorage.getItem(key)
+            // 데이터를 파싱해서 리턴
+            const savedTodos = JSON.parse(rawTodos)
+            return savedTodos
+        }catch(e){
+            throw new Error('Failed to load todos')
+        }
+    }, async set(data){
+        try{
+            await AsyncStorage.setItem(key, JSON.stringify(data))
+        }catch(e){
+            throw new Error('Failed to save todos')
+        }
+    }
+}
+
+export default todosStorage;
+```  
+
+### 4) App.js파일 수정  
+```javascript
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
+
+import DateHead from './components/DateHead'
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context'
+
+import AddToDo from './components/AddToDo'
+import Empty from './components/Empty'
+import ToDoList from './components/ToDoList';
+
+import todosStorage from './storages/todoStorage';
+
+function App(){
+  // 오늘 날짜 생성
+  const today = new Date();
+
+  // 데이터를 저장하기 위한 속성 생성
+  const [todos, setTodos] = useState([
+    {id : 1, text:'작업 환경 설정', done:true},
+    {id : 2, text:'BackEnd - Spring Boot', done:true},
+    {id : 3, text:'FrontEnd - ReactNative', done:false}
+  ])
+
+  // 데이터 불러오기
+  useEffect(()=>{
+    // 데이터를 가져온 후 setTodos함수에 대입해서 수행
+    todosStorage.get().then(setTodos).catch(console.error)
+  }, [])
+
+  // 데이터 저장하기
+  useEffect(()=>{
+    todosStorage.set(todos).catch(console.error)
+  }, [todos])
+  // 데이터를 삽입하기 위한 함수
+  function onInsert(text){
+    // 가장 큰 id를 찾아서 +1
+    const nextId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
+    // 하나의 인스턴스 생성
+    const todo={id:nextId, text, done:false}
+    // 배열에 추가한 후 배열을 todos에 대입, 둘 다 가능 
+    //setTodos(todos.push(todo))
+    setTodos(todos.concat(todo))
+  }
+
+// 뒤에 생략 ...
+```  
+
+### 5) 테스트  
+애플리케이션을 실행해서 데이터를 추가하거나 삭제한 후 에뮬레이터나 시뮬레이터를 종료  
+앱을 다시 빌드했을 때 마지막에 수행한 데이터가 다시 출력되는지 확인 - 앱 내에 저장하므로 앱을 삭제하고 다시 시작하지 않는 이상 항상 데이터가 유지됩니다.
