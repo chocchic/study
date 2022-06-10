@@ -1,17 +1,32 @@
-import React from 'react'
+import React, {useCallback} from 'react'
 import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import {Text, Button, View} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import { NavigationContainer } from '@react-navigation/native'
+import { useFocusEffect, useNavigation, NavigationContainer } from '@react-navigation/native'
+
+// Detail 화면을 출력하는 함수
+function OpenDetailButton(){
+    const navigation = useNavigation()
+
+    return(
+        <Button title="Detail Open" onPress={()=> navigation.push("Detail", {id:1})}/>
+    )
+}
 
 // 탭으로 사용할 컴포넌트 생성
 function HomeScreen({navigation}){
+    useFocusEffect(
+        useCallback(()=> {
+            console.log("이 화면을 보고 있음") 
+            return ()=>{console.log("다른 화면으로 넘어감")}
+        }, [])
+    )
     return (
         <View>
             <Text>Home</Text>
-            <Button title="Detail 열기" onPress={() => navigation.push("Detail", {id:1})}/>
+            <OpenDetailButton />
         </View>
     )
 }
