@@ -801,4 +801,114 @@ export default MainScreen
 
 ### 4) Material 하단 탭 네비게이터  
 * 도큐먼트 : https://callstack.github.io/react-native-paper  
-* 설치 : yarn add react-native-paper  
+* 설치 : yarn add @react-navigation/material-bottom-tabs react-native-paper  
+
+* MainScreen.js파일을 수정해서 하단 탭을 적용  
+```javascript
+import React from 'react'
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
+import {Text, Button, View} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { NavigationContainer } from '@react-navigation/native'
+
+// ... 생략 ... 
+// 탭을 생성 
+const Tab = createMaterialBottomTabNavigator();
+
+function MainScreen(){
+    return (
+//  screenOptions={{tabBarActiveTintColor:'#fb8c00', tabBarIndicatorStyle:{backgroundColor:'#009688'}}} 제거
+            <Tab.Navigator initailRouteName='Home'>
+                <Tab.Screen name='Home' component={HomeScreen} options={{title:"홈", tabBarIcon: ({color})=>(
+                    <Icon name='home' color={color} size ={24} />
+                ), tabBarColor:'black', tabBarBadge:'new'}}/>
+                <Tab.Screen name='Search' component={SearchScreen} options={{tabBarLabel:"검색", tabBarIcon: ({color})=>(
+                    <Icon name='search' color={color} size ={24} />
+                ), tabBarColor:'green', tabBarBadge:30}}/>
+                <Tab.Screen name='Notification' component={NotificationScreen} options={{tabBarLabel:"알림", tabBarIcon: ({color})=>(
+                    <Icon name='notification' color={color} size ={24} />
+                )}}/>
+                <Tab.Screen name='Message' component={MessageScreen} options={{tabBarLabel:"메세지", tabBarIcon: ({color})=>(
+                    <Icon name='message' color={color} size ={24} />
+                )}}/>
+            </Tab.Navigator>
+    );
+}
+
+export default MainScreen
+```  
+* 선택한 탭과 헤더의 타이틀을 동기화 시키기위해 App.js파일을 수정  
+```javascript
+```
+
+### 5) DrawerNavigator
+* 도큐먼트 : https://reactnavigation.org/docs/drawer-navigator/  
+* 설치 : yarn add @react-navigation/drawer react-native-gesture-handler react-native-reanimated  
+
+* App.js 수정 - 안쓰는 요소들은 지워주기  
+```javascript
+import React from 'react'
+import { NavigationContainer} from '@react-navigation/native';
+
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import {Text, View , Button} from 'react-native'
+
+const Drawer = createDrawerNavigator()
+
+function HomeScreen({navigation}){
+    return (
+        <View>
+            <Text>Home</Text>
+            <Button title='Drawer 열기' onPress={()=> navigation.openDrawer()}/>
+            <Button title='Setting 열기' onPress={()=> navigation.navigate("Setting")}/>
+        </View>
+    )
+}
+
+function SettingScreen({navigation}){
+    return(
+        <View>
+            <Text>Setting</Text>
+            <Button title='뒤로가기' onPress={()=>navigation.goBack()}/>
+        </View>
+    )
+}
+
+function App(){
+    return(
+        <NavigationContainer>
+            <Drawer.Navigator initialRouteName='Home' drawerPosition='left' backBehavior='history' 
+            drawerContent={({navigation})=> (
+                <SafeAreaView>
+                    <Text>A Custom Drawer</Text>
+                    <Button onPress={()=>navigation.closeDrawer()} title='Drawer닫기'/>
+                </SafeAreaView>
+            )}>
+                <Drawer.Screen name="Home" component={HomeScreen} 
+                options={{title:"홈", headerLeft:()=> <Text>Left</Text>}}/>
+
+                <Drawer.Screen name="Setting" component={SettingScreen}
+                options={{title:"설정"}}/>
+            </Drawer.Navigator>
+        </NavigationContainer>
+    )
+}
+
+export default App
+```  
+-> 이전의 App.js는 App_Tab.js로 이름 변경  
+
+* babel.config.js 파일 수정  
+```javascript
+module.exports = {
+  presets: ['module:metro-react-native-babel-preset'],
+  plugins:['react-native-reanimated/plugin'],
+};
+```
+
+* 이전에 실행한 내역을 전부 삭제 - 터미널에서 수행  
+npx react-native start --reset-cache  
