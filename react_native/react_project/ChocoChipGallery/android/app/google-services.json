@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "439330422105",
+    "project_id": "chocchic",
+    "storage_bucket": "chocchic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439330422105:android:5af80d880a7d1b8c40e048",
+        "android_client_info": {
+          "package_name": "com.chocochipgallery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "439330422105-21sseh0kupum97laqv3ov964vccjk6jj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chocochipgallery",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "439330422105-50a2cnhhjdth8v52283ild7jg4inigee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-sm2Oo4jeO5gxfJ5orCT3eiSvOUlYiw8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "439330422105-50a2cnhhjdth8v52283ild7jg4inigee.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
