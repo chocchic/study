@@ -636,3 +636,169 @@ function App(){
 export default App
 ```  
 
+* 하단 탭 커스터마이징을 위해서 App.js파일의 Tab.Navigator을 수정  
+```javascript
+// ... 생략
+<Tab.Navigator initailRouteName='Home' screenOptions={{tabBarActiveTintColor:'#fb8c00', tabBarShowLabel:false}}>
+// ... 생략
+</Tab.Navigator>
+// ... 생략
+```  
+
+### 2) HomeScreen(탭바 배치)과 DetailScreen(탭 바 배치하지 않음)을 활용한 탭
+* screens 디렉터리에 MainScreen.js파일을 생성하고 작성  
+```javascript
+import React from 'react'
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import {Text, Button, View} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { NavigationContainer } from '@react-navigation/native'
+
+// 탭으로 사용할 컴포넌트 생성
+function HomeScreen({navigation}){
+    return (
+        <View>
+            <Text>Home</Text>
+            <Button title="Detail 열기" onPress={() => navigation.push("Detail", {id:1})}/>
+        </View>
+    )
+}
+
+function SearchScreen(){
+    return <Text>Search</Text>
+}
+
+function NotificationScreen(){
+    return <Text>Notification</Text>
+}
+
+function MessageScreen(){
+    return <Text>Message</Text>
+}
+
+// 탭을 생성
+const Tab = createBottmTabNavigator();
+
+function MainScreen(){
+    return (
+//        <NavigationContainer> 밖에서 만들기 때문에 여기서 있으면 오류남
+            <Tab.Navigator initailRouteName='Home' screenOptions={{tabBarActiveTintColor:'#fb8c00', tabBarShowLabel:false}}>
+                <Tab.Screen name='Home' component={HomeScreen} options={{title:"홈", tabBarIcon: ({color, size})=>(
+                    <Icon name='home' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Search' component={SearchScreen} options={{title:"검색", tabBarIcon: ({color, size})=>(
+                    <Icon name='search' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Notification' component={NotificationScreen} options={{title:"알림", tabBarIcon: ({color, size})=>(
+                    <Icon name='notification' color={color} size ={size} />
+                )}}/>
+                <Tab.Screen name='Message' component={MessageScreen} options={{title:"메세짖", tabBarIcon: ({color, size})=>(
+                    <Icon name='message' color={color} size ={size} />
+                )}}/>
+            </Tab.Navigator>
+//        </NavigationContainer>
+    );
+}
+
+export default MainScreen
+```  
+
+* App.js 수정  
+```javascript
+import React from 'react'
+import { NavigationContainer, StackActions} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import {Text} from 'react-native'
+
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { Colors } from 'react-native/Libraries/NewAppScreen'
+
+// 탭으로 사용할 컴포넌트 생성 - 이제 다른 파일로 분리해놨으므로 import해줌
+import MainScreen from './screens/MainScreen';
+import DetailScreen from './screens/DetailScreen'
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// 탭을 생성
+const Tab = createBottmTabNavigator();
+
+const Stack = createNativeStackNavigator();
+
+function App(){
+    return (
+        <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="Main" components={MainScreen} options={{headerShown:false}}/>
+                <Stack.Screen name="Detail" components={DetailScreen}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+}
+
+export default App
+```  
+
+### 3) Material 상단 탭 네비게이터  
+* 도큐먼트 : https://reactnavigation.org/docs/material-top-tab-navigator
+* 설치 : yarn add @react-navigation/material-top-tabs react-native-tab-view react-native-pager-view
+
+* MainScreen.js 파일을 수정해서 하단 탭을 상단 탭으로 변경  
+```javascript
+import React from 'react'
+import {createBottmTabNavigator} from '@react-navigation/bottom-tabs'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import {Text, Button, View} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { NavigationContainer } from '@react-navigation/native'
+
+// 탭으로 사용할 컴포넌트 생성
+function HomeScreen({navigation}){
+    return (
+        <View>
+            <Text>Home</Text>
+            <Button title="Detail 열기" onPress={() => navigation.push("Detail", {id:1})}/>
+        </View>
+    )
+}
+
+function SearchScreen(){
+    return <Text>Search</Text>
+}
+
+function NotificationScreen(){
+    return <Text>Notification</Text>
+}
+
+function MessageScreen(){
+    return <Text>Message</Text>
+}
+
+// 탭을 생성 - createBottmTabNavigator에서 createMaterialTopTabNavigator으로 변경
+const Tab = createMaterialTopTabNavigator();
+
+function MainScreen(){
+    return (
+//        <NavigationContainer> 밖에서 만들기 때문에 여기서 있으면 오류남
+            <Tab.Navigator initailRouteName='Home' screenOptions={{tabBarActiveTintColor:'#fb8c00', tabBarIndicatorStyle:{backgroundColor:'#009688'}}}>
+                <Tab.Screen name='Home' component={HomeScreen} options={{title:"홈", tabBarIcon: ({color})=>(
+                    <Icon name='home' color={color} size ={24} />
+                )}}/>
+                <Tab.Screen name='Search' component={SearchScreen} options={{tabBarLabel:"검색", tabBarIcon: ({color})=>(
+                    <Icon name='search' color={color} size ={24} />
+                )}}/>
+                <Tab.Screen name='Notification' component={NotificationScreen} options={{tabBarLabel:"알림", tabBarIcon: ({color})=>(
+                    <Icon name='notification' color={color} size ={24} />
+                )}}/>
+                <Tab.Screen name='Message' component={MessageScreen} options={{tabBarLabel:"메세지", tabBarIcon: ({color})=>(
+                    <Icon name='message' color={color} size ={24} />
+                )}}/>
+            </Tab.Navigator>
+//        </NavigationContainer>
+    );
+}
+
+export default MainScreen
+```  
+
+### 4) Material 하단 탭 네비게이터  
+* 도큐먼트 : https://callstack.github.io/react-native-paper  
+* 설치 : yarn add react-native-paper  
