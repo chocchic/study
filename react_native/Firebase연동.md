@@ -312,8 +312,8 @@ function BorderedInput({hasMarginBottom, ...rest}){
 ```  
 
 ### 6) CustomButton에 Secondary Button Style 지정  
-* CustomButton.js 수정
-````javascript
+* CustomButton.js 수정  
+```javascript
 import React from 'react'
 import { StyleSheet, View, Pressable, Text, Platform } from 'react-native'
 
@@ -323,6 +323,7 @@ function CustomButton({onPress, title, hasMarginBottom, theme}){
     return(
         <View style={[styles.block, hasMarginBottom && styles.margin]} >
             <Pressable onPress={onPress} style={({pressed})=> [styles.wrapper, 
+                    isPrimary && styles.primaryWrapper,
                     Platform.OS === 'ios' && pressed && {opacity : 0.5}]}
                 android_ripple={{color:isPrimary?'#ffffff':'#6200ee'}}>
                     <Text style={[styles.text]}>{title}</Text>
@@ -371,3 +372,79 @@ const styles = StyleSheet.create({
 
 export default CustomButton;
 ```  
+
+* SignInScreen.js파일의 회원 가입버튼을 수정  
+```javascript
+<CustomButton title="회원가입" theme="secondary"/>
+```  
+
+### 7) 회원가입화면 만들기 - 하나의 화면을 동적으로 수정  
+* SignInScreen.js 수정  
+```javascript
+import React, { useState } from 'react'
+
+import { StyleSheet, Text, View } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import BorderedInput from '../components/Borderedinput'
+import CustomButton from '../components/CustomButton'
+
+function SignInScreen( {navigation, route}){
+    // 로그인인지 회원 가입인지 구분하기 위한 변수 생성
+    const {isSignUp} = route.params ?? {};
+    return(
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>ChocoChip Gallery</Text>
+            <View style={styles.form}>
+                <BorderedInput hasMarginBottom placeholder="이메일"/>
+                <BorderedInput placeholder="비밀번호" hasMarginBottom={isSignUp}/>
+                {isSignUp && <BorderedInput placeholder="비밀번호 확인" />}
+                <View style={styles.buttons}>
+                    {isSignUp ? (
+                        <>
+                            <CustomButton title="회원가입" hasMarginBottom />
+                            <CustomButton title="로그인" theme="secondary" onPress={()=>{
+                                navigation.goBack();
+                            }}/>
+                        </>
+                    ) : (
+                        <>
+                            <CustomButton title="로그인" hasMarginBottom />
+                            <CustomButton title="회원가입" theme="secondary" onPress={()=>{
+                                navigation.push("SignIn", {isSignUp:true});
+                            }}/>
+                        </>
+                    )}
+                    
+                </View>
+            </View>
+        </SafeAreaView>
+    )
+}
+
+const styles = StyleSheet.create({
+    fullscreen:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    text:{
+        fontSize:32,
+        fontWeight:"bold"
+    },
+    form:{
+        marginTop:64,
+        width:'100%',
+        paddingHorizontal:26
+    },
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignInScreen
+```  
+
+### 8) 입력받은 내용 관리 - 입력받은 내용을 변수에 지정  
+* SignInScreen.js을 수정  

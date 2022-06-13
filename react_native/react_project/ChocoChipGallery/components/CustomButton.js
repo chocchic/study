@@ -1,15 +1,21 @@
 import React from 'react'
 import { StyleSheet, View, Pressable, Text, Platform } from 'react-native'
 
+// onPress는 버튼을 눌렀을 떄 수행할 동삭
+// title은 버튼의 타이틀
+// hasMarginBottom은 아래쪽 여백 설정을 위한 옵션
+// theme는 버튼의 스타일을 위한 옵션
+
 function CustomButton({onPress, title, hasMarginBottom, theme}){
     const isPrimary = theme === 'primary';
 
     return(
         <View style={[styles.block, hasMarginBottom && styles.margin]} >
             <Pressable onPress={onPress} style={({pressed})=> [styles.wrapper, 
+                    isPrimary && styles.primaryWrapper,
                     Platform.OS === 'ios' && pressed && {opacity : 0.5}]}
                 android_ripple={{color:isPrimary?'#ffffff':'#6200ee'}}>
-                    <Text style={[styles.text]}>{title}</Text>
+                    <Text style={[styles.text, isPrimary?styles.primaryText:styles.secondaryText]}>{title}</Text>
             </Pressable>
 
         </View>
@@ -49,7 +55,7 @@ const styles = StyleSheet.create({
         color:'white'
     },
     secondaryText:{
-        color:'#6200ee'
+        color:'red'
     }
 })
 
