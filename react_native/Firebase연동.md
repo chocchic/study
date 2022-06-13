@@ -133,4 +133,34 @@ export default App;
         Keytool -J-Duser.language=en -list -v -alias androiddebugkey -keystore ./android/app/debug.keystore  
        
         -> 비밀번호 입력란이 나오면 enter
-        Windows의 경우 C:\programfiles\Java\{자신의 jdk 버전에 맞춰 수정}\bin의 경로로 이동하여 keytool -J-Duser.language=en -list -v -alias androiddebugkey -keystore {자신의 keystore파일의 경로에 맞게 수정}/android/app/debug.keystore을 실행  
+        * Windows의 경우 
+            C:\programfiles\Java\{자신의 jdk 버전에 맞춰 수정}\bin의 경로로 이동하여 
+            keytool -J-Duser.language=en -list -v -alias androiddebugkey -keystore {자신의 keystore파일의 경로에 맞게 수정}/android/app/debug.keystore을 실행  
+
+* 앱 등록 전 나오는 설정 화면 다 따라하기 
+    - google-service.json 파일을 다운로드 받아서 ANDROID/APP디렉터리에 저장
+
+    - android 디렉터리의 build.gradle에 의존성 설정  
+    ```
+    dependencies {
+            classpath("com.android.tools.build:gradle:7.0.4")
+            classpath("com.facebook.react:react-native-gradle-plugin")
+            classpath("de.undercouch:gradle-download-task:4.1.2")
+            // NOTE: Do not place your application dependencies here; they belong
+            // in the individual module build.gradle files
+            classpath 'com.google.gms:google-services:4.3.10'
+    }
+    ```  
+
+    - android/app 디렉터리의 build.gradle에 의존성 설정  
+        최상단에 추가: apply plugin: 'com.google.gms.google-services'
+        defaultConfig를 찾아서 추가 : multiDexEnabled true
+        dependencies를 찾아서 추가 : implementation platform('com.google.firebase:firebase-bom:30.1.0')
+
+### 4) Firebase 공식 문서
+* https://rnfirebase.io
+
+### 5) Firebase 사용을 위한 라이브러리 설치  
+yarn add @react-native-firebase/app @react-native-firebase/auth @react-native-firebase/storage @react-native-firebase/firestore
+
+## 5. Firebase를 이용한 회원 인증  
