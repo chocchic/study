@@ -132,13 +132,13 @@ export default App;
     SHA-1은 터미널에서 아래 명령어를 입력해서 확인  
         Keytool -J-Duser.language=en -list -v -alias androiddebugkey -keystore ./android/app/debug.keystore  
        
-        -> 비밀번호 입력란이 나오면 enter
-        * Windows의 경우 
+        -> 비밀번호 입력란이 나오면 enter  
+        * Windows의 경우  
             C:\programfiles\Java\{자신의 jdk 버전에 맞춰 수정}\bin의 경로로 이동하여 
             keytool -J-Duser.language=en -list -v -alias androiddebugkey -keystore {자신의 keystore파일의 경로에 맞게 수정}/android/app/debug.keystore을 실행  
 
-* 앱 등록 전 나오는 설정 화면 다 따라하기 
-    - google-service.json 파일을 다운로드 받아서 ANDROID/APP디렉터리에 저장
+* 앱 등록 전 나오는 설정 화면 다 따라하기  
+    - google-service.json 파일을 다운로드 받아서 ANDROID/APP디렉터리에 저장  
 
     - android 디렉터리의 build.gradle에 의존성 설정  
     ```
@@ -153,14 +153,221 @@ export default App;
     ```  
 
     - android/app 디렉터리의 build.gradle에 의존성 설정  
-        최상단에 추가: apply plugin: 'com.google.gms.google-services'
-        defaultConfig를 찾아서 추가 : multiDexEnabled true
-        dependencies를 찾아서 추가 : implementation platform('com.google.firebase:firebase-bom:30.1.0')
+        최상단에 추가: apply plugin: 'com.google.gms.google-services'  
+        defaultConfig를 찾아서 추가 : multiDexEnabled true  
+        dependencies를 찾아서 추가 : implementation platform('com.google.firebase:firebase-bom:30.1.0')  
 
-### 4) Firebase 공식 문서
-* https://rnfirebase.io
+### 4) Firebase 공식 문서  
+* https://rnfirebase.io  
 
 ### 5) Firebase 사용을 위한 라이브러리 설치  
-yarn add @react-native-firebase/app @react-native-firebase/auth @react-native-firebase/storage @react-native-firebase/firestore
+yarn add @react-native-firebase/app @react-native-firebase/auth @react-native-firebase/storage @react-native-firebase/firestore  
 
 ## 5. Firebase를 이용한 회원 인증  
+* Firebase 콘솔 사이트에서 인증을 사용하기 위해서 Authentication을 클릭한 후 시작하기 클릭  
+    - 이메일 / 비밀번호를 선택해서 사용설정을 하고 저장을 클릭  
+
+### 1) 회원 인증을 위한 UI를 저장할 components 디렉터리 생성  
+
+### 2) components디렉터리에 Borderedinput.js파일 생성하고 작성  
+```javascript
+import React from 'react'
+import { StyleSheet, TextInput } from 'react-native'
+
+function BorderedInput({hasMarginBottom}){
+    return (<TextInput style={[styles.input, hasMarginBottom && styles.margin]} />);
+}
+
+const styles = StyleSheet.create({
+    input:{
+        borderColor:"#bdbdbd",
+        borderWidth:1,
+        padding:16,
+        borderRadius:4,
+        height:48,
+        backgroundColor:'white'
+    },
+    margin:{
+        marginBottom:16
+    }
+})
+
+export default BorderedInput
+```  
+
+### 3) 사용자 정의 버튼을 위한 CustomButton.js파일을 components 디렉터리에 생성하고 작성  
+```javascript
+import React from 'react'
+import { StyleSheet, View, Pressable, Text, Platform } from 'react-native'
+
+function CustomButton({onPress, title, hasMarginBottom}){
+    return(
+        <View style={[styles.block, hasMarginBottom && styles.margin]} >
+            <Pressable onPress={onPress} style={({pressed})=> [styles.wrapper, Platform.OS === 'ios' && pressed && {opacity : 0.5}]}
+                android_ripple={{color:'#ffffff'}}>
+                    <Text style={[styles.text]}>{title}</Text>
+            </Pressable>
+
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    overflow:{
+        borderRadius:4,
+        overflow:'hidden'
+    },
+    block:{
+
+    },
+    margin:{
+        marginBottom:8
+    },
+    wrapper:{
+        borderRadius:4,
+        height:48,
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor:'#6200ee'
+    },
+    text:{
+        fontWeight: 'bold',
+        fontsize:24,
+        color:'white'
+    }
+})
+
+export default CustomButton;
+```  
+
+### 4) SignInScreen.js파일에서 생성한 컴포넌트를 이용해 화면 디자인  
+```javascript
+import React, { useState } from 'react'
+
+import { StyleSheet, Text, View } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import BorderedInput from '../components/Borderedinput'
+import CustomButton from '../components/CustomButton'
+
+function SignInScreen( {navigation, route}){
+    return(
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>ChocoChip Gallery</Text>
+            <View style={styles.form}>
+                <BorderedInput hasMarginBottom />
+                <BorderedInput />
+                <View style={styles.buttons}>
+                    <CustomButton title="로그인" hasMarginBottom />
+                    <CustomButton title="회원가입" />
+                </View>
+            </View>
+        </SafeAreaView>
+    )
+}
+
+const styles = StyleSheet.create({
+    fullscreen:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    text:{
+        fontSize:32,
+        fontWeight:"bold"
+    },
+    form:{
+        marginTop:64,
+        width:'100%',
+        paddingHorizontal:26
+    },
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignInScreen
+```  
+
+### 5) rest 연산자와 spread연산자로 props 넘겨주기  
+* java에서 String[] args와 비슷함  
+* javascript의 var obj = {"name":"asdfa", "age":90}; => obj.name, obj.age 처럼 사용 => 줄여쓰기 위해 다른 변수에 할당하여 name=obj.name age = obj.age로 씀  
+    파이썬 같은거에서 이렇게 일일히 쓰지 않고 한번에 가능하게 해줌. name,age =obj;
+
+* Borderedinput.js 수정 - function 부분을 수정  
+```javascript
+function BorderedInput({hasMarginBottom, ...rest}){
+    return (<TextInput style={[styles.input, hasMarginBottom && styles.margin]} 
+        {...rest} />)
+        //onChangeText={onChangeText} value={value} placeholder={placeholder}/>);
+}
+```  
+-> 우리 눈에는 안보이지만 주석의 부분처럼 있어서 알아서 데이터 전달해줌  
+
+* SignInScreen.js파일에서 BorderedInput에 데이터를 넘겨주기  
+```javascript
+                <BorderedInput hasMarginBottom placeholder="이메일"/>
+                <BorderedInput placeholder="비밀번호"/>
+```  
+
+### 6) CustomButton에 Secondary Button Style 지정  
+* CustomButton.js 수정
+````javascript
+import React from 'react'
+import { StyleSheet, View, Pressable, Text, Platform } from 'react-native'
+
+function CustomButton({onPress, title, hasMarginBottom, theme}){
+    const isPrimary = theme === 'primary';
+
+    return(
+        <View style={[styles.block, hasMarginBottom && styles.margin]} >
+            <Pressable onPress={onPress} style={({pressed})=> [styles.wrapper, 
+                    Platform.OS === 'ios' && pressed && {opacity : 0.5}]}
+                android_ripple={{color:isPrimary?'#ffffff':'#6200ee'}}>
+                    <Text style={[styles.text]}>{title}</Text>
+            </Pressable>
+
+        </View>
+    )
+}
+
+// 기본 값 설정
+CustomButton.defaultProps = {theme:'primary'}
+
+const styles = StyleSheet.create({
+    overflow:{
+        borderRadius:4,
+        overflow:'hidden'
+    },
+    block:{
+
+    },
+    margin:{
+        marginBottom:8
+    },
+    wrapper:{
+        borderRadius:4,
+        height:48,
+        alignItems:'center',
+        justifyContent:'center',
+        backgroundColor:'#6200ee'
+    },
+    text:{
+        fontWeight: 'bold',
+        fontsize:24,
+        color:'white'
+    },
+    primaryWrapper:{
+        backgroundColor:'#6200ee'
+    },
+    primaryText:{
+        color:'white'
+    },
+    secondaryText:{
+        color:'#6200ee'
+    }
+})
+
+export default CustomButton;
+```  
