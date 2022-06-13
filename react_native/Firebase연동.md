@@ -642,7 +642,165 @@ export default SignInScreen
 ```
 
 ### 10) Input에서 return 키에 대한 처리  
-* 다른 곳으로 포커슬르 옮기는 작업을 수행  
-```javascript
+* 다른 곳으로 포커스를 옮기는 작업을 수행  
 
+* BorderedInput을 다른 곳에서 접근해서 사용할 수 있도록 BorderedInput.js를 수정
+```javascript
+import React from 'react';
+import { StyleSheet, TextInput } from 'react-native';
+
+function BorderedInput({hasMarginBottom, ...rest}, ref){
+    return (<TextInput style={[styles.input, hasMarginBottom && StyleSheet.margin]} 
+    
+    ref = {ref}
+
+    {...rest}/>);
+}
+
+const styles = StyleSheet.create({
+    input:{
+        borderColor:"#bdbdbd",
+        borderWidth:1,
+        paddingHorizontal:16,
+        borderRadius:4,
+        height:48,
+        backgroundColor:'white'
+    },
+    margin:{
+        marginBottom:16
+    }
+})
+
+//ref에 BorderedInput을 대입해서 넘겨줍니다.
+export default React.forwardRef(BorderedInput);
+```  
+
+* SignInScreen.js 파일을 수정해서 Return 키에 대한 처리를 수행  
+```javascript
+import React, {useRef, useState } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context'
+
+
+import BorderedInput from '../components/BorderdedInput';
+import CustomButton from '../components/CustomButton';
+
+function SignInScreen({ navigation, route }) {
+    //로그인인지 회원 가입인지 구분하기 위한 변수를 생성
+    const {isSignUp} = route.params ?? {};
+
+    //속성 과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+      email:'',
+      password:'',
+      confirmPassword:''
+    });
+
+    //form 에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+      //form 속성 안에서 name에 value를 설정
+      setForm({...form, [name]:value});
+    };
+
+    //버튼을 눌렀을 때 호출될 함수
+    const onSubmit = () => {
+      Keyboard.dismiss();
+      console.log(form);
+    }
+
+    //password 와 confirmPassword에 대한 참조를 가져온 것입니다.
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+
+    return (
+        <KeyboardAvoidingView style={styles.KeyboardAvoidingView} 
+        behavior={Platform.select({ios:'padding'})}>
+
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>PublicGallery</Text>
+            <View style={styles.form}>
+              <BorderedInput hasMarginBottom placeholder="이메일"
+              value={form.email} onChangeText={createChangeTextHandler('email')}
+              autoCapitalize="none" autoCorrect={false} autoCompleteType="email"
+              keyboardType="email-address"
+              returnKeyType="next" onSubmitEditing = {() => passwordRef.current.focus()} />
+
+              <BorderedInput placeholder="비밀번호" hasMarginBottom={isSignUp}
+              value={form.password} onChangeText={createChangeTextHandler('password')}
+              secureTextEntry
+              ref={passwordRef}
+              returnKeyType={isSignUp ? 'next' : 'done'} 
+              onSubmitEditing = {() => {
+              if(isSignUp){
+                confirmPasswordRef.current.focus();
+              }else{
+                onSubmit();
+              }
+            }
+          }/>
+
+              {isSignUp && <BorderedInput placeholder="비밀번호 확인" 
+              value={form.confirmPassword} onChangeText={createChangeTextHandler('confirmPassword')}
+              secureTextEntry
+              ref={confirmPasswordRef}
+              returnKeyType="done" 
+              onSubmitEditing = {onSubmit}/>}
+
+              <View style={styles.buttons}>
+                {isSignUp ? (
+                    <>
+                      <CustomButton title="회원가입" hasMarginBottom onPress={onSubmit}/>
+                      <CustomButton title="로그인" theme="secondary" 
+                        onPress={()=>{
+                          navigation.goBack();
+                      }}/>
+                    </>
+                ) : (
+                  <>
+                    <CustomButton title="로그인" hasMarginBottom onPress={onSubmit}/>
+                    <CustomButton title="회원가입" theme="secondary" 
+                        onPress={()=>{
+                          navigation.push("SignIn", {isSignUp:true});
+                      }}/>
+                  </>
+                )}
+              </View>
+            </View>
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    );
+}
+
+const styles = StyleSheet.create({
+  KeyboardAvoidingView:{
+    flex:1
+  },
+    fullscreen: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: {
+      fontSize: 32,
+      fontWeight: 'bold',
+    },
+    form:{
+      marginTop:64,
+      width:'100%',
+      paddingHorizontal:16
+    },
+    buttons:{
+      marginTop:64
+    }
+  });
+  
+  export default SignInScreen;
 ```

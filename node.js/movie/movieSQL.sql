@@ -8,7 +8,7 @@ desc m_member;
 
 select * from review;
 select movie_mno, count(*) from review group by movie_mno;
-select member_mid, count(*) from review group by member_mid;
+select member_mid, count(*) from review group by member_mid order by count(*) desc;
 
 -- drop table movie;
 -- drop table movie_image;
