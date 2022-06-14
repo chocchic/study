@@ -804,3 +804,197 @@ const styles = StyleSheet.create({
   
   export default SignInScreen;
 ```
+
++) 데이터베이스 작업시 하나의 테이블에 열의 개수가 너무 많아지거나 행의 개수가 너무 많아지면 테이블을 수평이나 수직으로 분할하는 것이 좋음
+
+MongoDB에서는 이를 샤딩과 클러스터링이라고 합니다.  
+
+DB에서는 일반적으로 자주 사용하는 것과 그렇지 않은 것으로 분리하는 경우가 많음.  
+아이디, 비밀번호, 프로필사진, 전화번호, 주소...
+아이디, 비밀번호, 프로필 사진 + 아이디, 전화번호, 주소
+
+프로그래밍에서 코드도 너무 복잡해지거나 라인 수가 많아지면 가독성이 떨어지게 되고 가독성이 떨어지면 유지보수가 어려워집니다.  
+이런 경우에는 코드를 분할해주는 것이 좋습니다. -> 기능 단위로 분할    
+객체 지향에서는 private메서드를 이용해서 분할하거나 상속이나 의존하는 클래스를 만들어서 해결합니다.  
+
+### 11) SignInScreen.js파일의 내용을 분할
+* 입력하는 컴포넌트들이 배치되는 부분을 components/SignForm.js로 작성  
+```javascript
+import React, {useRef} from 'react'
+
+import BorderedInput from '../components/Borderedinput'
+
+function SignForm({isSignUp, onSubmit, form, createChangeTextHandler}){
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return(
+        <>
+        <BorderedInput hasMarginBottom placeholder="이메일"
+            value={form.email} onChangeText={createChangeTextHandler('email')}
+            autoCapitalize="none" autoCorrect={false} autoCompleteType="email" keyboardType="email-address"
+            returnKeyType="next" onSubmitEditing= {()=> passwordRef.current.focus()} // returnKeyType은 안드로이드보단 ios에서 의미가 있음
+            />
+
+            <BorderedInput placeholder="비밀번호" hasMarginBottom={isSignUp}
+            value={form.password} onChangeText={createChangeTextHandler('password')}
+            secureTextEntry ref={passwordRef} 
+            returnKeyType={isSignUp ? 'next' : 'done'} onSubmitEditing = {() => {
+                if(isSignUp) {confirmPasswordRef.current.focus()} 
+                else {onSubmit();}
+            }}/>
+
+            {isSignUp && <BorderedInput placeholder="비밀번호 확인" 
+            value={form.confirmPassword} onChangeText={createChangeTextHandler('confirmPassword')} 
+            secureTextEntry ref={confirmPasswordRef} returnKeyType="done" onSubmitEditing={onSubmit}/>}
+            
+        </>
+    )
+}
+
+export default SignForm
+```  
+
+* 버튼들이 배치될 컴포넌트를 components/SignButton.sj 파일에 작성  
+```javascript
+import React from 'react'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import CustomButton from './CustomButton'
+import { useNavigation } from '@react-navigation/native'
+
+function SignButton({isSignUp, onSubmit}){
+    const navigation = useNavigation()
+    const primaryTitle = isSignUp ? '회원가입' : '로그인'
+    const secondaryTitle = isSignUp ? '로그인' : '회원가입'
+
+    const onSecondaryButtonPress =() =>{
+        if(isSignUp){
+            navigation.goBack();
+        }else{
+            navigation.push('SignIn', {isSignUp:true})
+        }
+    }
+
+    return (
+        <View style={styles.buttons}>
+            <CustomButton title={primaryTitle} hasMarginBottom onPress={onSubmit}/>
+            <CustomButton title={secondaryTitle} hasMarginBottom onPress={onSecondaryButtonPress}/>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignButton;
+```  
+
+* SignInScreen.js 수정  
+```javascript
+import React, { useState, useRef } from 'react'
+
+import { StyleSheet, Text, View, Keyboard, KeyboardAvoidingView, Platform } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import SignButton from '../components/SignButton'
+
+function SignInScreen( {navigation, route}){
+    // 로그인인지 회원 가입인지 구분하기 위한 변수 생성
+    const {isSignUp} = route.params ?? {};
+
+    // 속성과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+        email:'',
+        password:'',
+        confirmPassword:''
+    });
+
+    // form에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+        // name하고 value가 들어오면
+        // form 속성 안에서 name에 value를 설정
+        setForm({...form, [name]:value});
+    }
+
+    // 버튼을 눌렀을 때 호출될 함수
+    const onSubmit = () =>{
+        Keyboard.dismiss();
+        console.log(form);
+    }
+
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return(
+        <KeyboardAvoidingView style={styles.keyboardAvoidingView} 
+        behavior={Platform.select({iod:'padding'})}>
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>ChocoChip Gallery</Text>
+            <View style={styles.form}>
+                <View style={styles.form} isSignUp={isSignUp} onSubmit={onSubmit} createChangeTextHandler={createChangeTextHandler}>
+                    <SignButton isSignUp={isSignUp} onSubmit={onSubmit}/>
+                </View>
+            </View>
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    )
+}
+
+const styles = StyleSheet.create({
+    keyboardAvoidingView:{flex:1},
+    fullscreen:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    text:{
+        fontSize:32,
+        fontWeight:"bold"
+    },
+    form:{
+        marginTop:64,
+        width:'100%',
+        paddingHorizontal:26
+    },
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignInScreen
+```  
+
+### 12) Firebase를 인증처리  
+* React Native를 이용한 Firebase 인증 처리 도큐먼트 https://rnfirebase.io/auth/usage  
+
+* 처리를 위한 로직 파일이 저장될 lib디렉터리를 생성  
+
+* 인증처리를 위한 함수들을 lib/auth.js파일에 작성 : https://rnfirebase.io/auth/usage의 내용을 가지고 작성  
+```javascript
+import auth from '@react-native-firebase/auth'
+
+// 로그인 처리
+export function signIn({email, password}){
+    return auth().signInWithEmailAndPassword(email, password)
+}
+
+// 회원 가입
+export function signUp({email, password}){
+    return auth().createUserWithEmailAndPassword(email, password);
+}
+
+// 앱을 동작시킬 때, 로그인 상태가 변경될 때 호출되는 함수  
+export function subscribeAuth(callback){
+    return auth().onAuthStateChanged(callback);
+}
+
+// 로그아웃 처리
+export function signOut(){
+    return auth().signOut();
+}
+```  
+  
