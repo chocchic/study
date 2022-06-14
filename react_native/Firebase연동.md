@@ -997,4 +997,341 @@ export function signOut(){
     return auth().signOut();
 }
 ```  
-  
+
+* SignButton.js파일을 수정  
+```javascript
+import React from 'react'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import CustomButton from './CustomButton'
+import { useNavigation } from '@react-navigation/native'
+
+function SignButton({isSignUp, onSubmit, loading}){
+    const navigation = useNavigation()
+    const primaryTitle = isSignUp ? '회원가입' : '로그인'
+    const secondaryTitle = isSignUp ? '로그인' : '회원가입'
+
+    const onSecondaryButtonPress =() =>{
+        if(isSignUp){
+            navigation.goBack();
+        }else{
+            navigation.push('SignIn', {isSignUp:true})
+        }
+    }
+    if(loading){
+        return (
+            <View style={styles.spinnerWrapper}>
+                <ActivityIndicator size={32} color="#6200ee"/>
+            </View>
+        )
+    }
+    return (
+        <View style={styles.buttons}>
+            <CustomButton title={primaryTitle} hasMarginBottom onPress={onSubmit}/>
+            <CustomButton title={secondaryTitle} hasMarginBottom onPress={onSecondaryButtonPress}/>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    buttons:{
+        marginTop:64
+    },
+    spinnerWrapper:{
+        marginTop:64,
+        height:104,
+        justifyContent:'center',
+        alignItems:'center'
+    }
+})
+
+export default SignButton;
+```  
+
+* SignInScreen.js파일을 수정  
+```javascript
+import React, { useState, useRef } from 'react'
+
+import { StyleSheet, Text, View, Keyboard, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import SignButton from '../components/SignButton'
+
+import {signIn, signUp} from '../lib/auth'
+
+function SignInScreen( {navigation, route}){
+    // 로그인인지 회원 가입인지 구분하기 위한 변수 생성
+    const {isSignUp} = route.params ?? {};
+
+    // 속성과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+        email:'',
+        password:'',
+        confirmPassword:''
+    });
+
+    const [loading, setLoading] = useState();
+
+    // form에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+        // name하고 value가 들어오면
+        // form 속성 안에서 name에 value를 설정
+        setForm({...form, [name]:value});
+    }
+
+    // 버튼을 눌렀을 때 호출될 함수
+    const onSubmit = async() =>{
+        Keyboard.dismiss();
+        console.log(form);
+
+        // 입력한 내용 가져오기
+        const {email, password} = form;
+        const info = {email, password};
+        // 스피너를 화면에 출력
+        setLoading(true);
+
+        try{
+            const {user} = isSignUp ? await signUp(info) : await signIn(info)
+            console.log(user)
+        }catch(e){
+            Alert.alert("실패");
+        }
+    }
+
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return(
+        <KeyboardAvoidingView style={styles.keyboardAvoidingView} 
+        behavior={Platform.select({iod:'padding'})}>
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>ChocoChip Gallery</Text>
+            <View style={styles.form}>
+                <View style={styles.form} isSignUp={isSignUp} onSubmit={onSubmit} createChangeTextHandler={createChangeTextHandler}>
+                    <SignButton isSignUp={isSignUp} onSubmit={onSubmit} loading={loading}/>
+                </View>
+            </View>
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    )
+}
+
+const styles = StyleSheet.create({
+    keyboardAvoidingView:{flex:1},
+    fullscreen:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    text:{
+        fontSize:32,
+        fontWeight:"bold"
+    },
+    form:{
+        marginTop:64,
+        width:'100%',
+        paddingHorizontal:26
+    },
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignInScreen
+```  
+-> 비밀번호는 기본 6자 이상  
+
+* 오류 처리  
+https://firebase.google.com/docs/reference/js/v8/firebase.auth.Auth  
+https://firebase.google.com/docs/reference/js/v8/firebase.auth.Error   
+
+* 회원가입 오류처리를 위해 onSubmit함수를 수정  
+```javascript
+import React, { useState, useRef } from 'react'
+
+import { StyleSheet, Text, View, Keyboard, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import SignButton from '../components/SignButton'
+
+import {signIn, signUp} from '../lib/auth'
+
+function SignInScreen( {navigation, route}){
+    // 로그인인지 회원 가입인지 구분하기 위한 변수 생성
+    const {isSignUp} = route.params ?? {};
+
+    // 속성과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+        email:'',
+        password:'',
+        confirmPassword:''
+    });
+
+    const [loading, setLoading] = useState();
+
+    // form에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+        // name하고 value가 들어오면
+        // form 속성 안에서 name에 value를 설정
+        setForm({...form, [name]:value});
+    }
+
+    // 버튼을 눌렀을 때 호출될 함수
+    // async()는 이 함수를 비동기적으로 수행
+    const onSubmit = async() =>{
+        Keyboard.dismiss();
+        console.log(form);
+
+        // 입력한 내용 가져오기
+        const {email, password} = form;
+        const info = {email, password};
+        // 스피너를 화면에 출력
+        setLoading(true);
+
+        // await가 붙으면 이 동작이 완료될 때까지 대기
+        try{
+            const {user} = isSignUp ? await signUp(info) : await signIn(info)
+            console.log(user)
+        }catch(e){
+            console.log(e);
+
+            const messages = {
+                'auth/email-already-in-use' : '이미 가입된 이메일입니다.',
+                'auth/wrong-password' : '잘못된 비밀번호입니다.',
+                'auth/user-not-found' : '존재하지 않는 계정입니다.',
+                'auth/invalid-email' : '유효하지 않은 이메일입니다.'
+            }
+
+            const msg = messages[e.code] || `${isSignUp ? '가입' : '로그인'} 실패`;
+            Alert.alert('실패', msg);
+        }
+    }
+
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return(
+        <KeyboardAvoidingView style={styles.keyboardAvoidingView} 
+        behavior={Platform.select({iod:'padding'})}>
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>ChocoChip Gallery</Text>
+            <View style={styles.form}>
+                <View style={styles.form} isSignUp={isSignUp} onSubmit={onSubmit} createChangeTextHandler={createChangeTextHandler}>
+                    <SignButton isSignUp={isSignUp} onSubmit={onSubmit} loading={loading}/>
+                </View>
+            </View>
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    )
+}
+
+const styles = StyleSheet.create({
+    keyboardAvoidingView:{flex:1},
+    fullscreen:{
+        flex:1,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    text:{
+        fontSize:32,
+        fontWeight:"bold"
+    },
+    form:{
+        marginTop:64,
+        width:'100%',
+        paddingHorizontal:26
+    },
+    buttons:{
+        marginTop:64
+    }
+})
+
+export default SignInScreen
+```  
+
+## 6. Firebase를 이용한 데이터 저장  
+### 1) Firebase 콘솔 페이지에서 Firebase Database를 선택하고 데이터베이스 만들기를 클릭  
+
+### 2) lib/users.js을 생성하고 작성
+```javascript
+import firestore from '@react-native-firebase/firestore'
+
+export const usersCollection = firestore().collection('users');
+
+// 데이터 저장
+export function createUser({id, displayName, photoURL}){
+    return usersCollection.doc(id).set({id, displayName, photoURL})
+}
+
+// 데이터 1개 가져오기
+export async function getUser(id){
+    const doc = await usersCollection.doc(id).get();
+    return doc.data();
+}
+```
+
+### 3) 회원정보를 출력할 screens/WelcomeScreen.js를 생성하고 작성  
+```javascript
+import React from 'react'
+import { KeyboardAvoidingView, Platform, StyleSheet, Text } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+function WelcomeScreen(){
+    return (
+        <KeyboardAvoidingView style = {styles.KeyboardAvoidingView}
+        behavior ={Platform.select({ios:'padding'})}>
+            <SafeAreaView style={styles.block}>
+                <Text style={styles.title}>환영합니다</Text>
+                <Text style={styles.description}>ㄴ프로필을 설정하세요</Text>
+            </SafeAreaView>
+        </KeyboardAvoidingView>
+    )
+}
+
+const styles = StyleSheet.create({
+    KeyboardAvoidingView:{
+        flex:1
+    },
+    block:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    description:{
+        marginTop: 16,
+        fontSize: 21,
+        color: '#757575'
+    }
+})
+
+export default WelcomeScreen
+```  
+
+### 4) WelcomeScreen을 RootStack에 등록  
+```javascript
+import React, { useState } from 'react'
+import { StyleSheet, Text} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+
+import SignInScreen from './SignInScreen'
+import WelcomeScreen from './WelcomeScreen'
+
+const Stack = createNativeStackNavigator()
+
+function RootStack( {navigation, route}){
+    return(
+        <Stack.Navigator>
+            <Stack.Screen name="SignIn" component={SignInScreen} options={{headerShown:false}} />
+            <Stack.Screen name="Welcome" component={WelcomeScreen} options={{headerShown:false}} />
+        </Stack.Navigator>
+    )
+}
+
+const styles = StyleSheet.create({
+    
+})
+
+export default RootStack
+```  
