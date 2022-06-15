@@ -1,7 +1,7 @@
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, {useState} from 'react';
-import {StyleSheet, View, Pressable, Platform} from 'react-native';
+import {StyleSheet, View, Pressable, Platform, Image} from 'react-native';
 import {signOut} from '../lib/auth';
 import {createUser} from '../lib/users';
 
@@ -22,6 +22,9 @@ function SetupProfile(){
     const {params} = useRoute();
 
     const {uid} = params || {};
+
+    const {setUser} = useUserContext();
+    const [response, setResponse] = useState(null);
 
     //버튼을 눌렀을 때 Firebase 의 Storage에 저장
     const onSubmit = async () => {
@@ -50,12 +53,20 @@ function SetupProfile(){
             includeBase64: Platform.OS === 'android'
         },
         (res) =>{
-            res
+            if(res.didCancel){
+                return;
+            }
+            setResponse(res)
+            console.log({uri:response?.assets[0]?.uri})
         }
         )
     }
     return (
         <View style={styles.block}>
+            <Pressable onPress={onSelectImage}>
+                <Image style={styles.circle} 
+                source={response?{uri:response?.assets[0]?.uri} : require('../assets/user.png')} / >
+            </Pressable>
             <View style={styles.circle} />
             <View style={styles.form} >
                 <BorderedInput

@@ -1971,3 +1971,150 @@ launchImageLibrary(options, callback)
 
 ### 4) 이미지를 선택해서 화면에 출력  
 * 갤러리를 불러오도록 SetupProfile.js 파일을 수정  
+```javascript
+// ... 생략 ...
+
+import {launchImageLibrary} from 'react-native-image-picker'
+
+function SetupProfile(){
+    //닉네임 변수
+    const [displayName, setDisplayName] = useState("");
+    //화면 전환을 수행하는 navigation 찾아오기
+    const navigation = useNavigation();
+
+    //파라미터 생성
+    const {params} = useRoute();
+
+    const {uid} = params || {};
+
+    //버튼을 눌렀을 때 Firebase 의 Storage에 저장
+    const onSubmit = async () => {
+        const user = {
+            id:uid,
+            displayName,
+            photoURL:null
+        }
+        createUser(user);
+        setUser(user);
+    }
+
+    //취소를 누른 경우
+    const onCancel = () => {
+        //로그 아웃
+        signOut();
+        //이전 화면으로 돌아가기
+        navigation.goBack();
+    }
+    // 원 부분을 눌렀을 때 호출될 함수  
+    const onSelectImage = () => {
+        launchImageLibrary({
+            mediaType :'photo',
+            maxWidth:512,
+            maxHeight:512,
+            includeBase64: Platform.OS === 'android'
+        },
+        (res) =>{
+            res
+        }
+        )
+    }
+
+    return (
+        <View style={styles.block}>
+            <Pressable style={styles.circle} onPress={onSelectImage}>
+            </Pressable>
+            <View style={styles.circle} />
+            <View style={styles.form} >
+                <BorderedInput
+                    placeholder="닉네임"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="next"/>
+                <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+                <CustomButton title="취소" onPress={onCancel} theme="secondary" />
+            </View>
+        </View>
+    );
+// ... 생략 ... 
+```  
+
+### 5) 기본 이미지 사용  
+* 기본 이미지로 사용할 파일 프로젝트의 assets 디렉터리에 저장 : assets/user.png
+
+### 6) 선택한 이미지를 출력하기 위해서 SetupProfile.js파일을 수정
+* +) 최근의 언어는 null을 저장할 수 있는 자료형과 그렇지 않은 자료형으로 나뉨  
+    ? 나 ! 연산자를 많이 이용하는데 ??는 앞의 데이터가 없을 때 뒤의 데이터를 사용하는 개념으로 ||랑 유사.  
+
+    데이터?나 !.하는 것은 null을 저장할 수 있는 Optional 자료형에서 null이 아닐 때만 수행하도록 하는 것입니다.  
+    NullPointerException을 방지하기 위한 문법입니다.  
+
+    최근에 자바스크립트를 이용해서 프레임워크를 사용하고자 한다면 JavaScript(ECMA 2015 - ES6)과 TypeScript가 필수입니다.  
+
+* 파일 수정
+```javascript
+
+//... 생략 ...
+
+    const {uid} = params || {};
+
+    const {setUser} = useUserContext();
+    const [response, setResponse] = useState(null);
+
+    //버튼을 눌렀을 때 Firebase 의 Storage에 저장
+    const onSubmit = async () => {
+        const user = {
+            id:uid,
+            displayName,
+            photoURL:null
+        }
+        createUser(user);
+        setUser(user);
+    }
+
+    //취소를 누른 경우
+    const onCancel = () => {
+        //로그 아웃
+        signOut();
+        //이전 화면으로 돌아가기
+        navigation.goBack();
+    }
+    // 원 부분을 눌렀을 때 호출될 함수  
+    const onSelectImage = () => {
+        launchImageLibrary({
+            mediaType :'photo',
+            maxWidth:512,
+            maxHeight:512,
+            includeBase64: Platform.OS === 'android'
+        },
+        (res) =>{
+            if(res.didCancel){
+                return;
+            }
+            setResponse(res)
+            console.log({uri:response?.assets[0]?.uri})
+        }
+        )
+    }
+    return (
+        <View style={styles.block}>
+            <Pressable onPress={onSelectImage}>
+                <Image style={styles.circle} 
+                source={response?{uri:response?.assets[0]?.uri} : require('../assets/user.png')} / >
+            </Pressable>
+            <View style={styles.circle} />
+            <View style={styles.form} >
+                <BorderedInput
+                    placeholder="닉네임"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="next"/>
+                <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+                <CustomButton title="취소" onPress={onCancel} theme="secondary" />
+            </View>
+        </View>
+    );
+
+// ... 생략 ...
+```  
