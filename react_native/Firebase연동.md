@@ -1968,3 +1968,6 @@ launchImageLibrary(options, callback)
             fileSize  
             type  
             fileName  
+
+### 4) 이미지를 선택해서 화면에 출력  
+* 갤러리를 불러오도록 SetupProfile.js 파일을 수정  

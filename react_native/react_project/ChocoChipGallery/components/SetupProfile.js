@@ -1,7 +1,7 @@
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Pressable, Platform} from 'react-native';
 import {signOut} from '../lib/auth';
 import {createUser} from '../lib/users';
 
@@ -9,6 +9,8 @@ import BorderedInput from "./BorderedInput";
 import CustomButton from "./CustomButton";
 
 import {useUserContext} from '../contexts/UserContext'
+
+import {launchImageLibrary} from 'react-native-image-picker'
 
 function SetupProfile(){
     //닉네임 변수
@@ -39,7 +41,19 @@ function SetupProfile(){
         //이전 화면으로 돌아가기
         navigation.goBack();
     }
-
+    // 원 부분을 눌렀을 때 호출될 함수  
+    const onSelectImage = () => {
+        launchImageLibrary({
+            mediaType :'photo',
+            maxWidth:512,
+            maxHeight:512,
+            includeBase64: Platform.OS === 'android'
+        },
+        (res) =>{
+            res
+        }
+        )
+    }
     return (
         <View style={styles.block}>
             <View style={styles.circle} />
