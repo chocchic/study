@@ -1,24 +1,41 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import SignInScreen from './SignInScreen';
+import WelcomeScreen from './WelcomeScreen';
 
-import SignInScreen from './SignInScreen'
-import WelcomeScreen from './WelcomeScreen'
+const Stack = createNativeStackNavigator();
 
-const Stack = createNativeStackNavigator()
+import {useUserContext} from '../contexts/UserContext';
+import MainTab from './MainTab';
 
-function RootStack( {navigation, route}){
-    return(
-        <Stack.Navigator>
-            <Stack.Screen name="SignIn" component={SignInScreen} options={{headerShown:false}} />
-            <Stack.Screen name="Welcome" component={WelcomeScreen} options={{headerShown:false}} />
-        </Stack.Navigator>
-    )
+function RootStack() {
+  const {user} = useUserContext(); 
+  return (
+    <Stack.Navigator>
+      {
+        user?(
+          <>
+            <Stack.Screen name="MainTab" component={MainTab} options={{headerShown:false}} />
+          </>
+        ):(
+          <>
+            <Stack.Screen
+              name="SignIn"
+              component={SignInScreen}
+              options={{headerShown:false}}
+            />
+            <Stack.Screen
+              name="Welcome"
+              component={WelcomeScreen}
+              options={{headerShown:false}}
+            />  
+          </>
+        )
+      }
+
+      
+    </Stack.Navigator>
+  );
 }
 
-const styles = StyleSheet.create({
-    
-})
-
-export default RootStack
+export default RootStack;

@@ -1283,7 +1283,7 @@ function WelcomeScreen(){
         behavior ={Platform.select({ios:'padding'})}>
             <SafeAreaView style={styles.block}>
                 <Text style={styles.title}>환영합니다</Text>
-                <Text style={styles.description}>ㄴ프로필을 설정하세요</Text>
+                <Text style={styles.description}>프로필을 설정하세요</Text>
             </SafeAreaView>
         </KeyboardAvoidingView>
     )
@@ -1335,3 +1335,636 @@ const styles = StyleSheet.create({
 
 export default RootStack
 ```  
+
+### 5) 사용자 프로필 사진 과 닉네임을 입력할 수 있는 컴포넌트를 components 디렉토리에 SetupProfile.js 파일로 생성  
+```javascript
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, {useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {signOut} from '../lib/auth';
+import {createUser} from '../lib/users';
+
+import BorderedInput from "./BorderedInput";
+import CustomButton from "./CustomButton";
+
+function SetupProfile(){
+    //닉네임 변수
+    const [displayName, setDisplayName] = useState("");
+    //화면 전환을 수행하는 navigation 찾아오기
+    const navigation = useNavigation();
+
+    //파라미터 생성
+    const {params} = useRoute();
+
+    const {uid} = params || {};
+
+    //버튼을 눌렀을 때 Firebase 의 Storage에 저장
+    const onSubmit = async () => {
+        createUser({
+            id:uid,
+            displayName,
+            photoURL:null
+        })
+    }
+
+    //취소를 누른 경우
+    const onCancel = () => {
+        //로그 아웃
+        signOut();
+        //이전 화면으로 돌아가기
+        navigation.goBack();
+    }
+
+    return (
+        <View style={styles.block}>
+            <View style={styles.circle} />
+            <View style={styles.form} >
+                <BorderedInput
+                    placeholder="닉네임"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="next"/>
+                <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+                <CustomButton title="취소" onPress={onCancel} theme="secondary" />
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    block:{
+        alignItems:'center',
+        marginTop: 24,
+        paddingHorizontal: 16,
+        width:'100%'
+    },
+    circle:{
+        backgroundColor:'#cdcdcd',
+        borderRadius: 64,
+        width:128,
+        height:128
+    },
+    form:{
+        marginTop:16,
+        width:'100%'
+    },
+    buttons:{
+        marginTop:48
+    }
+})
+
+export default SetupProfile;
+```  
+
+### 6)SetupProfile 을 WelcomeScreen 에 등록  
+```javascript
+import React from 'react'
+import {KeyboardAvoidingView, Platform, StyleSheet, Text} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import SetupProfile from '../components/SetupProfile';
+
+function WelcomScreen(){
+    return (
+        <KeyboardAvoidingView style={styles.KeyboardAvoidingView}
+        behavior={Platform.select({ios:'padding'})}>
+            <SafeAreaView style={styles.block}>
+                <Text style={styles.title}>환영합니다.</Text>
+                <Text style={styles.description}>프로필을 설정하세요</Text>
+                <SetupProfile />
+            </SafeAreaView>
+        </KeyboardAvoidingView>
+    )
+}
+
+const styles = StyleSheet.create({
+    KeyboardAvoidingView:{
+        flex:1
+    },
+    block:{
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
+    },
+    description:{
+        marginTop: 16,
+        fontSize:21,
+        color:'#757575'
+    }
+})
+
+export default WelcomScreen;
+```  
+
+### 7)SignInScreen.js 파일을 수정해서 회원가입이나 로그인에 성공했을 때 user.uid를 이용해서 데이터가 존재하지 않으면 Welcome 화면을 출력  
+```javascript
+import React, {useRef, useState } from 'react';
+import {
+    Alert,
+    StyleSheet,
+    Text,
+    View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context'
+
+
+import SignForm from '../components/SignForm';
+import SignButtons from '../components/SignButtons';
+
+import {signIn, signUp} from '../lib/auth'
+import {getUser} from '../lib/users'
+
+function SignInScreen({ navigation, route }) {
+    //로그인인지 회원 가입인지 구분하기 위한 변수를 생성
+    const {isSignUp} = route.params ?? {};
+
+    //속성 과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+      email:'',
+      password:'',
+      confirmPassword:''
+    });
+
+    const [loading, setLoading] = useState();
+
+    //form 에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+      //form 속성 안에서 name에 value를 설정
+      setForm({...form, [name]:value});
+    };
+
+    //버튼을 눌렀을 때 호출될 함수
+    const onSubmit = async() => {
+      Keyboard.dismiss();
+      console.log(form);
+
+      //입력한 내용 가져오기
+      const {email, password} = form;
+      const info = {email, password};
+      //스피너를 화면에 출력
+      setLoading(true);
+
+      try{
+        //isSignUp 에 따라 파이어베이스에 저장하던가 로그인을 수행
+        const {user} = isSignUp? await signUp(info) : await signIn(info);
+        //작업이 성공적으로 완료되면 uid를 이용해서 user의 정보를 가져오기
+        const profile = await getUser(user.uid);
+        if(!profile){
+          navigation.navigate('Welcome', {uid:user.uid});
+        }else{
+          
+        }
+        console.log(user);
+      }catch(e){
+        console.log(e);
+
+        const messages = {
+          'auth/email-already-in-use':'이미 가입된 이메일입니다.',
+          'auth/wrong-password': '잘못된 비밀번호입니다.',
+          'auth/user-not-found': '존재하지 않는 계정입니다.',
+          'auth/invalid-email': '유효하지 않은 이메일 입니다.'
+        };
+
+        const msg = messages[e.code] || `${isSignUp ? '가입' : '로그인'} 실패`;
+        Alert.alert('실패', msg);
+      }
+
+    }
+
+    //password 와 confirmPassword에 대한 참조를 가져온 것입니다.
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return (
+        <KeyboardAvoidingView style={styles.KeyboardAvoidingView} 
+        behavior={Platform.select({ios:'padding'})}>
+
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>PublicGallery</Text>
+            <View style={styles.form}>
+              <SignForm style={styles.form}
+                isSignUp={isSignUp}
+                onSubmit = {onSubmit}
+                form={form}
+                createChangeTextHandler = {createChangeTextHandler} />
+
+              <SignButtons isSignUp={isSignUp} onSubmit={onSubmit} loading={loading}/>
+            </View>  
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    );
+}
+
+const styles = StyleSheet.create({
+  KeyboardAvoidingView:{
+    flex:1
+  },
+    fullscreen: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: {
+      fontSize: 32,
+      fontWeight: 'bold',
+    },
+    form:{
+      marginTop:64,
+      width:'100%',
+      paddingHorizontal:16
+    },
+    buttons:{
+      marginTop:64
+    }
+  });
+  
+  export default SignInScreen;
+```  
+
+### 8)User의 상태 정보를 위한 함수를 소유하는 Context 파일을 contexts 디렉토리에 UserContext.js 파일로 저장  
+```javascript
+import React, { useContext, createContext, useState } from 'react';
+
+const UserContext = createContext(null);
+
+export function UserContextProvider({ children }) {
+    const [user, setUser] = useState(null);
+    console.log({ user });
+    return (
+        <UserContext.Provider
+            children={children}
+            value={{
+                user,
+                setUser,
+            }}
+        />
+    );
+}
+
+export function useUserContext() {
+    const userContext = useContext(UserContext);
+    if (!userContext) {
+        throw new Error('UserContext.Provider is not found');
+    }
+    return userContext;
+}
+```  
+
+### 9)App.js 의 모든 영역을 이전에 생성한 UserContextProvider로 감싸기  
+```javascript
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import RootStack from './screens/RootStack';
+
+import {UserContextProvider} from './contexts/UserContext'
+
+function App(){
+  return(
+    <UserContextProvider>
+    <NavigationContainer>
+      <RootStack />
+    </NavigationContainer>
+    </UserContextProvider>
+  )
+};
+
+export default App;
+```  
+
+### 10)User 정보를 가져와서 앱에 등록하는 시점  
+
+* Welcome 화면에서 유저 정보를 등록하는 경우
+* 프로필이 등록된 계정으로 로그인 한 경우
+* 앱을 새로 시작해서 로그인 상태가 유지되는 경우
+
+### 11)User 정보를 등록하기 위해서 SingInScreen.js 파일을 수정  
+```javascript
+import React, {useRef, useState } from 'react';
+import {
+    Alert,
+    StyleSheet,
+    Text,
+    View,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context'
+
+
+import SignForm from '../components/SignForm';
+import SignButtons from '../components/SignButtons';
+
+import {signIn, signUp} from '../lib/auth'
+import {getUser} from '../lib/users'
+
+import {useUserContext} from '../contexts/UserContext'
+
+function SignInScreen({ navigation, route }) {
+    //로그인인지 회원 가입인지 구분하기 위한 변수를 생성
+    const {isSignUp} = route.params ?? {};
+
+    //속성 과 속성을 수정하는 함수 그리고 기본값을 설정
+    const [form, setForm] = useState({
+      email:'',
+      password:'',
+      confirmPassword:''
+    });
+
+    const [loading, setLoading] = useState();
+    const {setUser} = useUserContext();
+    //form 에 데이터를 설정하는 함수 - BorderedInput에 연결
+    const createChangeTextHandler = name => value => {
+      //form 속성 안에서 name에 value를 설정
+      setForm({...form, [name]:value});
+    };
+
+    //버튼을 눌렀을 때 호출될 함수
+    const onSubmit = async() => {
+      Keyboard.dismiss();
+      console.log(form);
+
+      //입력한 내용 가져오기
+      const {email, password} = form;
+      const info = {email, password};
+      //스피너를 화면에 출력
+      setLoading(true);
+
+      try{
+        //isSignUp 에 따라 파이어베이스에 저장하던가 로그인을 수행
+        const {user} = isSignUp? await signUp(info) : await signIn(info);
+        //작업이 성공적으로 완료되면 uid를 이용해서 user의 정보를 가져오기
+        const profile = await getUser(user.uid);
+        if(!profile){
+          navigation.navigate('Welcome', {uid:user.uid});
+        }else{
+            setUser(profile)
+        }
+        console.log(user);
+      }catch(e){
+        console.log(e);
+
+        const messages = {
+          'auth/email-already-in-use':'이미 가입된 이메일입니다.',
+          'auth/wrong-password': '잘못된 비밀번호입니다.',
+          'auth/user-not-found': '존재하지 않는 계정입니다.',
+          'auth/invalid-email': '유효하지 않은 이메일 입니다.'
+        };
+
+        const msg = messages[e.code] || `${isSignUp ? '가입' : '로그인'} 실패`;
+        Alert.alert('실패', msg);
+      }
+
+    }
+
+    //password 와 confirmPassword에 대한 참조를 가져온 것입니다.
+    const passwordRef = useRef();
+    const confirmPasswordRef = useRef();
+
+    return (
+        <KeyboardAvoidingView style={styles.KeyboardAvoidingView} 
+        behavior={Platform.select({ios:'padding'})}>
+
+        <SafeAreaView style={styles.fullscreen}>
+            <Text style={styles.text}>PublicGallery</Text>
+            <View style={styles.form}>
+              <SignForm style={styles.form}
+                isSignUp={isSignUp}
+                onSubmit = {onSubmit}
+                form={form}
+                createChangeTextHandler = {createChangeTextHandler} />
+
+              <SignButtons isSignUp={isSignUp} onSubmit={onSubmit} loading={loading}/>
+            </View>  
+        </SafeAreaView>
+        </KeyboardAvoidingView>
+    );
+}
+
+const styles = StyleSheet.create({
+  KeyboardAvoidingView:{
+    flex:1
+  },
+    fullscreen: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: {
+      fontSize: 32,
+      fontWeight: 'bold',
+    },
+    form:{
+      marginTop:64,
+      width:'100%',
+      paddingHorizontal:16
+    },
+    buttons:{
+      marginTop:64
+    }
+  });
+  
+  export default SignInScreen;
+```
+
+### 12)Welcome 화면에서 프로필 정보를 등록한 경우를 처리하기 위해서 SetupProfile.js 파일을 수정  
+```javascript
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, {useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {signOut} from '../lib/auth';
+import {createUser} from '../lib/users';
+
+import BorderedInput from "./BorderedInput";
+import CustomButton from "./CustomButton";
+
+import {useUserContext} from '../contexts/UserContext'
+
+function SetupProfile(){
+    //닉네임 변수
+    const [displayName, setDisplayName] = useState("");
+    //화면 전환을 수행하는 navigation 찾아오기
+    const navigation = useNavigation();
+
+    //파라미터 생성
+    const {params} = useRoute();
+
+    const {uid} = params || {};
+
+    //버튼을 눌렀을 때 Firebase 의 Storage에 저장
+    const onSubmit = async () => {
+        const user = {
+            id:uid,
+            displayName,
+            photoURL:null
+        }
+        createUser(user);
+        setUser(user);
+    }
+
+    //취소를 누른 경우
+    const onCancel = () => {
+        //로그 아웃
+        signOut();
+        //이전 화면으로 돌아가기
+        navigation.goBack();
+    }
+
+    return (
+        <View style={styles.block}>
+            <View style={styles.circle} />
+            <View style={styles.form} >
+                <BorderedInput
+                    placeholder="닉네임"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="next"/>
+                <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+                <CustomButton title="취소" onPress={onCancel} theme="secondary" />
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    block:{
+        alignItems:'center',
+        marginTop: 24,
+        paddingHorizontal: 16,
+        width:'100%'
+    },
+    circle:{
+        backgroundColor:'#cdcdcd',
+        borderRadius: 64,
+        width:128,
+        height:128
+    },
+    form:{
+        marginTop:16,
+        width:'100%'
+    },
+    buttons:{
+        marginTop:48
+    }
+})
+
+export default SetupProfile;
+```  
+
+### 13)로그인이 정상적으로 처리된 후 보여질 컴포넌트를 screens 디렉토리에 MainTab.js 파일에 작성  
+```javascript
+import React from "react";
+import {StyleSheet, Text, View} from 'react-native';
+import {useUserContext} from '../contexts/UserContext';
+
+function MainTab(){
+    const {user} = useUserContext();
+    return (
+        <View style={styles.block}>
+            <Text style={styles.text}>Hello {user.displayName}</Text>
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    block:{
+        flext:1,
+        alignItems: 'center',
+        justifyContent:'center'
+    },
+    text:{
+        fontSize:24
+    }
+})
+
+export default MainTab;
+
+14)RootStack 에서 사용자 정보가 있는 경우 MainTab을 출력하도록 코드를 추가
+import React from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import SignInScreen from './SignInScreen';
+import WelcomeScreen from './WelcomeScreen';
+
+const Stack = createNativeStackNavigator();
+
+import {useUserContext} from '../contexts/UserContext';
+import MainTab from './MainTab';
+
+function RootStack() {
+  const {user} = useUserContext(); 
+  return (
+    <Stack.Navigator>
+      {
+        user?(
+          <>
+            <Stack.Screen name="MainTab" component={MainTab} options={{headerShown:false}} />
+          </>
+        ):(
+          <>
+            <Stack.Screen
+              name="SignIn"
+              component={SignInScreen}
+              options={{headerShown:false}}
+            />
+            <Stack.Screen
+              name="Welcome"
+              component={WelcomeScreen}
+              options={{headerShown:false}}
+            />  
+          </>
+        )
+      }
+
+      
+    </Stack.Navigator>
+  );
+}
+
+export default RootStack;
+```  
+
+## 7.디바이스의 이미지 사용  
+### 1)라이브러리  
+* react-native-image-picker  
+* 설치 : yarn add react-native-image-picker  
+
+### 2) 권한 설정  
+* iOS에서는 iOS/앱이름 디렉터리의 info.plist에서 설정  
+* Android는 권한 설정을 android/app/src/main/AndroidMainfest.xml파일에서 설정  
+```xml
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```  
+
+### 3) 갤러리나 카메라 사용  
+import { launchcamera, launchImageLibrary } from 'react-native-image-picker'
+
+* 카메라 이용  
+launchcarmera(options, callback)  
+options는 생략가능  
+
+* 갤러리 사용
+launchImageLibrary(options, callback)  
+    - options 속성  
+        mediaType : photo 또는 video  
+        maxWidth, maxHeigth  
+        videoQuality : 영상에서의 화질로 low와 high 선택가능하고 iOS에서는 medium도 있음  
+        quality : 이미지의 화질로 0에서 1 사이의 숫자로 설정  
+        selectcionLimit : 선택할 이미지의 수인데 기본값은 1이고, 0을 설정하면 무한대로 선택 가능  
+
+    - callback 함수의 매개변수  
+        didCancel : 사용자가 선택을 취소하면 true를 넘겨줌  
+        errorCode : 에러에 대한 코드 정보  
+        errorMessage : 에러 메시지  
+        assests : 선택한 이미지의 정보 객체 배열  
+            base64  
+            uri  
+            width  
+            height  
+            fileSize  
+            type  
+            fileName  

@@ -1,48 +1,82 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useState } from 'react';
-import { StyleSheet, View } from "react-native";
-import { signOut } from "../lib/auth";
-import { createUser } from "../lib/users";
 
-import Borderedinput from "./Borderedinput";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, {useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {signOut} from '../lib/auth';
+import {createUser} from '../lib/users';
+
+import BorderedInput from "./BorderedInput";
 import CustomButton from "./CustomButton";
 
+import {useUserContext} from '../contexts/UserContext'
+
 function SetupProfile(){
-    // 닉네임 변수
+    //닉네임 변수
     const [displayName, setDisplayName] = useState("");
-    // 화면전환을 수행하는 navigation 찾아오기
+    //화면 전환을 수행하는 navigation 찾아오기
     const navigation = useNavigation();
 
-    // 파라미터 생성
+    //파라미터 생성
     const {params} = useRoute();
+
     const {uid} = params || {};
-    
-    // 버튼을 눌렀을 때 Firebase의 Storage에 저장
-    const onSubmit = async function(){
-        createUser({id:uid, displayName, photoURL:null})
+
+    //버튼을 눌렀을 때 Firebase 의 Storage에 저장
+    const onSubmit = async () => {
+        const user = {
+            id:uid,
+            displayName,
+            photoURL:null
+        }
+        createUser(user);
+        setUser(user);
     }
 
-    // 취소를 누른 경우
-    const onCancel = () =>{
-        // 로그아웃
+    //취소를 누른 경우
+    const onCancel = () => {
+        //로그 아웃
         signOut();
-        // 이전 화면으로 돌아가기
+        //이전 화면으로 돌아가기
         navigation.goBack();
     }
+
     return (
         <View style={styles.block}>
             <View style={styles.circle} />
-            <View style={styles.form}>
-                <Borderedinput placeholder="닉네임" value={displayName} onChnageText={setDisplayName} onSubmitEditing={onSubmit} returnKeyType="next"/>
-                <CustomButton title="next" onPress={onSubmit} hasMarginBottom />
-                <CustomButton title="cancel" onPress={onCancel} theme="secondary" />
+            <View style={styles.form} >
+                <BorderedInput
+                    placeholder="닉네임"
+                    value={displayName}
+                    onChangeText={setDisplayName}
+                    onSubmitEditing={onSubmit}
+                    returnKeyType="next"/>
+                <CustomButton title="다음" onPress={onSubmit} hasMarginBottom />
+                <CustomButton title="취소" onPress={onCancel} theme="secondary" />
             </View>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-
+    block:{
+        alignItems:'center',
+        marginTop: 24,
+        paddingHorizontal: 16,
+        width:'100%'
+    },
+    circle:{
+        backgroundColor:'#cdcdcd',
+        borderRadius: 64,
+        width:128,
+        height:128
+    },
+    form:{
+        marginTop:16,
+        width:'100%'
+    },
+    buttons:{
+        marginTop:48
+    }
 })
 
 export default SetupProfile;

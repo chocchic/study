@@ -1,18 +1,17 @@
 import React from 'react';
-import {NavigatorContainer} from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native';
+import RootStack from './screens/RootStack';
 
-import RootStack from './screens/RootStack'
+import {UserContextProvider} from './contexts/UserContext'
 
-function App() {
-    return(
-        <NavigatorContainer>
-            <RootStack />
-        </NavigatorContainer>
-    )
+function App(){
+  return(
+    <UserContextProvider>
+    <NavigationContainer>
+      <RootStack />
+    </NavigationContainer>
+    </UserContextProvider>
+  )
 };
-
-const styles = StyleSheet.create({
-
-});
 
 export default App;
