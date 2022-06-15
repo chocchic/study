@@ -2053,7 +2053,6 @@ function SetupProfile(){
 
 * 파일 수정
 ```javascript
-
 //... 생략 ...
 
     const {uid} = params || {};
