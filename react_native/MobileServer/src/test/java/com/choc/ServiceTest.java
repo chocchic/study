@@ -10,7 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.choc.dto.ItemDTO;
 import com.choc.dto.MemberDTO;
+import com.choc.dto.PageRequestItemDTO;
+import com.choc.dto.PageResponseItemDTO;
+import com.choc.service.ItemService;
 import com.choc.service.MemberService;
 
 @SpringBootTest
@@ -38,7 +42,7 @@ public class ServiceTest {
 	}
 	
 	// 로그인 테스트
-	@Test
+	//@Test
 	public void testLoginMember() {
 		MemberDTO dto = MemberDTO.builder().email("youremail@site.com").password("yourpw").build();
 		MemberDTO result = m.loginMember(dto);
@@ -70,10 +74,56 @@ public class ServiceTest {
 	}
 	
 	// 멤버 삭제 테스트
-	@Test
+	//@Test
 	public void deleteMember() {
 		MemberDTO dto = MemberDTO.builder().email("youremail@site.com").build();
 		String result = m.deleteMember(dto);
 		System.out.println(result);
+	}
+	
+	@Autowired
+	private ItemService itemService;
+	
+	// 데이터 삽입
+	//@Test
+	public void testregisterItem() {
+		for(int i = 0; i<100; i++) {
+			ItemDTO dto = ItemDTO.builder().itemname("apple_"+i).price(3000).description("사과_"+i).pictureurl("apple_"+i+".png")
+					.email("dntksemfdj473@gmail.com").build();
+			Long itemid = itemService.registerItem(dto);
+			System.out.println(itemid);
+		}
+	}
+	// 데이터 1개 가져오기
+	//@Test
+	public void testGetItem() {
+		ItemDTO dto = ItemDTO.builder().itemid(101L).build();
+		System.out.println(itemService.getItem(dto));
+	}
+	
+	// 페이지 단위로 가져오기
+	//@Test
+	public void testGetList() {
+		PageRequestItemDTO dto = PageRequestItemDTO.builder().page(2).size(10).build();
+		PageResponseItemDTO result = itemService.getList(dto);
+		System.out.println(result);
+	}
+	
+	// 데이터 수정
+	//@Test
+	public void testUpdateItem() {
+		ItemDTO dto = ItemDTO.builder().itemid(16L).itemname("apple_0616수정").price(6000).description("수정된 사과")
+				.pictureurl("apple__0616수정")
+				.email("dntksemfdj473@gmail.com").build();
+		Long itemid = itemService.updateItem(dto);
+		System.out.println(itemid);
+	}
+	
+	// Item 삭제
+	@Test
+	public void testDeleteItem() {
+		ItemDTO dto = ItemDTO.builder().itemid(23L).build();
+		Long itemid = itemService.deleteItem(dto);
+		System.out.println(itemid);
 	}
 }

@@ -6,12 +6,14 @@ import java.util.stream.IntStream;
 
 import org.springframework.data.domain.Pageable;
 
+import com.choc.model.Item;
+
 import lombok.Data;
 
 @Data
 public class PageResponseItemDTO {
 	// Dto 리스트
-	private List<ItemDTO> itemList;
+	private List<Item> itemList;
 	
 	// 전체 페이지 개수
 	private int totalPage;
