@@ -1,12 +1,10 @@
 package com.choc.service;
 
 import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.stereotype.Service;
 
 import com.choc.dto.MemberDTO;
 import com.choc.model.Member;
 
-@Service
 public interface MemberService {
 	// 데이터 삽입
 	public String registerMember(MemberDTO dto);
