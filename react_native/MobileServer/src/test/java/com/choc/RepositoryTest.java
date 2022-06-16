@@ -114,11 +114,48 @@ public class RepositoryTest {
 	}
 	
 	// 페이징과 정렬
-	@Test
+	//@Test
 	public void getPaging() {
 		Sort sort = Sort.by("itemid").descending();
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Item> list = i.findAll(pageable);
 		list.get().forEach(item-> {System.out.println(item);});
 	}
+	
+	// 외래키를 이용한 조회
+	//@Test
+	public void getFindMember() {
+		Member member = Member.builder().email("dntksemfdj473@gmail.com").build();
+		List<Item> list = i.findItemByMember(member);
+		System.out.println(list);
+	}
+	
+	// 데이터 1개 가져오기
+	//@Test
+	public void getItem() {
+		Optional<Item> item = i.findById(10L);
+		if(item.isPresent()) {
+			System.out.println(item.get());
+		}else {
+			System.out.println("데이터가 없습니다.");
+		}
+	}
+	
+	// 데이터 수정
+	//@Test
+	public void updateItem() {
+		Member member = Member.builder().email("dntksemfdj473@gmail.com").build();
+		Item item = Item.builder().itemid(10L).itemname("아오리사과").description("달고 아삭아삭해요~")
+				.price(3450).pictureurl("greenapple.png").member(member).build();
+		i.save(item);
+	}
+	
+	// 데이터 삭제
+	@Test
+	public void deleteItem(){
+		Item item = Item.builder().itemid(100L).build();
+		i.delete(item);
+	}
+	
+	
 }
