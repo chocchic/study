@@ -6,6 +6,9 @@ import com.choc.persistence.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +46,13 @@ public class MemberServiceImpl implements MemberService{
 			// 비밀번호 확인
 			Member member = optional.get();
 			if(BCrypt.checkpw(dto.getPassword(), member.getPassword())) {
+				// 로그인에 성공했을 때 로그인한 시간을 업데이트
+				ZonedDateTime nowUTC = ZonedDateTime.now(ZoneId.of("UTC"));
+				LocalDateTime now = nowUTC.withZoneSameInstant(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+				System.out.println(now);
+				Member updateM = Member.builder().email(member.getEmail()).password(member.getPassword())
+						.imageurl(member.getImageurl()).name(member.getName()).lastlogindate(now).build();
+				memberRepository.save(updateM);
 				return entityToDto(member);
 			}//else {
 			//	return null;
@@ -61,11 +71,7 @@ public class MemberServiceImpl implements MemberService{
 		if(optional.isPresent()) { // 존재하는 이메일
 			// 비밀번호 확인
 			Member member = optional.get();
-			if(BCrypt.checkpw(dto.getPassword(), member.getPassword())) {
-				return entityToDto(member);
-			}//else {
-			//	return null;
-			//}
+			return entityToDto(member);
 		}
 		return null;
 	}
