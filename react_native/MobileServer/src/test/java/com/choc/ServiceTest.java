@@ -59,4 +59,21 @@ public class ServiceTest {
 			
 		}
 	}
+	
+	// 멤버 수정 테스트
+	//@Test
+	public void updateMember() {
+		MemberDTO dto = MemberDTO.builder().email("youremail@site.com").name("NAME").password("pw1234")
+				.imageurl("user.png").build();
+		String result = m.updateMember(dto);
+		System.out.println(result);
+	}
+	
+	// 멤버 삭제 테스트
+	@Test
+	public void deleteMember() {
+		MemberDTO dto = MemberDTO.builder().email("youremail@site.com").build();
+		String result = m.deleteMember(dto);
+		System.out.println(result);
+	}
 }
