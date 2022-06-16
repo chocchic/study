@@ -1,13 +1,20 @@
 package com.choc;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
+import com.choc.model.Item;
 import com.choc.model.Member;
+import com.choc.persistence.ItemRepository;
 import com.choc.persistence.MemberRepository;
 
 @SpringBootTest
@@ -16,7 +23,7 @@ public class RepositoryTest {
 	private MemberRepository m;
 	
 	// Member에 데이터 삽입
-	@Test
+	//@Test
 	public void testRegisterMember() {
 		/*
 		Member member = Member.builder().email("dntksemfdj473@gmail.com")
@@ -69,5 +76,49 @@ public class RepositoryTest {
 		
 
 		//m.deleteById("dntksemfdj473@gmail.com");
+	}
+	
+	//이름으로 데이터 조회
+	//@Test
+	public void testFindName() {
+		String name="칙촉";
+		List<Member> list = m.findMemberByName(name);
+		System.out.println(list);
+		
+		name = "촉촉한초코칩";
+		list = m.findMemberByName(name);
+		System.out.println(list);
+		
+	}
+	
+	@Autowired
+	private ItemRepository i;
+	
+	// Item 삽입을 테스트
+	//@Test
+	void testRegisterItem() {
+		// 외래키를 생성
+		Member member = Member.builder().email("dntksemfdj473@gmail.com").build();
+		for(int j = 0; j< 100; j++) {
+			Item item = Item.builder().itemname("사과").price(2500).description("비타민 C가 풍부합니다.")
+				.pictureurl("apple.png").member(member).build();
+			i.save(item);
+		}
+	}
+	
+	// 데이터 전체 보기 테스트
+	//@Test
+	public void getAll() {
+		List<Item> list = i.findAll();
+		System.out.println(list);
+	}
+	
+	// 페이징과 정렬
+	@Test
+	public void getPaging() {
+		Sort sort = Sort.by("itemid").descending();
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Item> list = i.findAll(pageable);
+		list.get().forEach(item-> {System.out.println(item);});
 	}
 }
