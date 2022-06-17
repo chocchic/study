@@ -44,8 +44,7 @@ public class MemberServiceImpl implements MemberService{
 		}
 		return realUploadPath;
 	}
-	
-	
+		
 	@Override
 	public String registerMember(MemberDTO dto) {
 		Member member = dtoToEntity(dto);
