@@ -18,8 +18,8 @@ public class MemberDTO {
 	private String password;
 	private String name;
 	private String imageurl;
-	// 전송된 파일의 내용을 저장할 속성
-	private MultipartFile image;
+	//전송된 파일의 내용을 저장할 속성
+	private MultipartFile image; //한번에 업로드 하는 파일이 여러 개라면 MultipartFile [] 
 	private LocalDateTime lastlogindate;
 	private LocalDateTime regdate;
 	private LocalDateTime moddate;

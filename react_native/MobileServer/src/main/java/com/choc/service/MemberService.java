@@ -1,6 +1,7 @@
 package com.choc.service;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.http.ResponseEntity;
 
 import com.choc.dto.MemberDTO;
 import com.choc.model.Member;
@@ -12,6 +13,7 @@ public interface MemberService {
 	public MemberDTO getMember(MemberDTO dto);
 	public String updateMember(MemberDTO dto);
 	public String deleteMember(MemberDTO dto);
+	public ResponseEntity<Object> download(String path);
 	
 	// DTO클래스의 객체를 Model클래스의 객체로 변환
 	public default Member dtoToEntity(MemberDTO dto) {
