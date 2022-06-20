@@ -123,9 +123,49 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public Long updateItem(ItemDTO dto) {
+		// 삽입할 때는 이미지가 없으면 이미지 업로드를 처리하지 않거나 기본 이미지로 설정
+		// 수정을 할 때 이미지가 없다는 것은 수정할 이미지가 없다는 의미가 될 수 있음
+		if(dto.getImage().isEmpty() == false) {
+			// 업로드된 파일을 가져오기
+			MultipartFile uploadFile = dto.getImage();
+			
+			// 원본 파일 이름 찾아오기
+			String originalName = uploadFile.getOriginalFilename();
+			// IE나 Edge에서는 전체 파일 경로가 오기 때문에 마지막 \위치를 찾아서 뒷부부만 가져와야 합.
+			String fileName = originalName.substring(originalName.lastIndexOf("\\")+1); // 모바일에서 이 작업은 안해도 됨
+			
+			// 업로드할 디렉터리 경로를 생성, 회원 정보 이미지와 아이템 이미지를 구별해서 ㅅ저장하고자 하면 makeFolder 메서드를 각ㄱ각 구현
+			String realUploadPath = makeFolder();
+
+			// 파일 이름 중복을 최소화하기 위한 UUID 생성
+			String uuid = UUID.randomUUID().toString();
+			// 파일 이름 중간에 _를 이용해서 구분
+			// 교재나 검색한 소스가 보일 때 \나 /가 보이면 앞뒤 문맥을 읽어서 디렉터리 기호라면 File.separator로 변경하는 것을 고려
+			// 고재를 볼 때는 어떤 운영체제에서 작성한 것인지 확인하고 교재를 읽어보는 것이 좋습니다. 
+			String saveName = uploadPath + File.separator + realUploadPath + File.separator + uuid + fileName;
+			// 실제 전송할 경로를 생성 - jdk 1.7 이상에서 지원
+			Path savePath = Paths.get(saveName);
+			
+			try {
+				// 파일 전송
+				uploadFile.transferTo(savePath);
+			}catch(Exception e) {
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
+			}
+			// 파일의 경로를 저장
+			dto.setPictureurl(realUploadPath + File.separator + uuid + fileName);
+		}else {
+			// 업로드할 파일이 없을 때 이전 내용을 그대로 적용
+			dto.setPictureurl(getItem(dto).getPictureurl());
+		}
+		
+		// 데이터베이스에서 수정
 		Item item = dtoToEntity(dto);
 		Long itemid = item.getItemid();
 		itemRepository.save(item);
+		// 수정한 날짜 업데이트
+		updateDate();
 		return itemid;
 	}
 

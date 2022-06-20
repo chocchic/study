@@ -74,4 +74,17 @@ public class ItemController {
 		return ResponseEntity.ok().body(response);
 	}
 	
+	// 데이터 수정
+	@PostMapping("update")
+	public ResponseEntity<?> updateItem(ItemDTO dto){
+		ItemDTO response = null;
+		try {
+			Long itemid = itemService.updateItem(dto);
+			response = ItemDTO.builder().itemid(itemid).build();
+		}catch (Exception e) {
+			response = ItemDTO.builder().error(e.getMessage()).build();
+		}
+		return ResponseEntity.ok().body(response);
+	}
+	
 }
