@@ -17,17 +17,14 @@ public interface ItemService {
 	public Long deleteItem(ItemDTO dto);
 	//페이지 단위로 데이터를 가져오기
 	public PageResponseItemDTO getList(PageRequestItemDTO dto);
+	// 마지막 업데이트된 시간을 전송하는 메서드  
+	public String updatedate();
 	
 	//DTO를 ENTITY로 변환해주는 메서드
 	public default Item dtoToEntity(ItemDTO dto) {
-		Item item = Item.builder()
-				.itemid(dto.getItemid())
-				.itemname(dto.getItemname())
-				.price(dto.getPrice())
-				.description(dto.getDescription())
-				.pictureurl(dto.getPictureurl())
-				.member(Member.builder().email(dto.getEmail()).build())
-				.build();
+		Item item = Item.builder().itemid(dto.getItemid()).itemname(dto.getItemname()).price(dto.getPrice())
+				.description(dto.getDescription()).pictureurl(dto.getPictureurl())
+				.member(Member.builder().email(dto.getEmail()).build()).build();
 		return item;
 				
 	}

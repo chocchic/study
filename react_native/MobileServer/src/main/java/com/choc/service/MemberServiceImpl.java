@@ -35,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 
 	//application.properties 파일에 작성한 속성 가져오기
-	@Value("${com.adamsoft.upload.path}")
+	@Value("${com.choc.upload.path}")
 	private String uploadPath;
 	
 	//업로드한 날짜 별로 이미지를 저장하기 위해서 날짜별로 디렉토리를 만들어서 경로를 리턴하는 메서드

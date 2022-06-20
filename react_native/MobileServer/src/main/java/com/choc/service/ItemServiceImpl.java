@@ -1,7 +1,10 @@
 package com.choc.service;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -103,7 +106,6 @@ public class ItemServiceImpl implements ItemService {
 			}
 			
 		}
-		
 		Item item = dtoToEntity(dto);
 		itemRepository.save(item);
 		//수정한 시간을 기록
@@ -194,6 +196,17 @@ public class ItemServiceImpl implements ItemService {
 		});
 		result.setItemList(list);
 		return result;
+	}
+	@Override
+	public String updatedate() {
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("./updatedate.dat")))){
+			String str = br.readLine();
+			return str;
+			// return br.readLine();
+		}catch(Exception e) {
+			System.out.println(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 }

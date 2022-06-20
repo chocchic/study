@@ -1,5 +1,8 @@
 package com.choc.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,4 +90,13 @@ public class ItemController {
 		return ResponseEntity.ok().body(response);
 	}
 	
+	// 마지막 수정시간을 전송
+	@GetMapping("updatedate")
+	public ResponseEntity<?> updateDateItem(){
+		String updatedate = itemService.updatedate();
+		// 별도의 DTO가 없어서 Map을 이용해서 저장
+		Map<String, String> map = new HashMap<>();
+		map.put("updatedate", updatedate);
+		return ResponseEntity.ok().body(updatedate);
+	}
 }
