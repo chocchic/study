@@ -105,7 +105,7 @@ public class ItemAdapter extends BaseAdapter {
                     // 핸들러에게 데이터를 전달하기 위해서 Message객체를 생성
                     Message msg = new Message();
                     msg.obj = bitmap;
-                    
+
                     // 핸들러에게 순서대로 작업을 수행하도록 요청
                     handler.sendMessage(msg);
                 }catch (Exception e){
