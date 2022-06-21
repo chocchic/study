@@ -86,8 +86,7 @@ public class MemberServiceImpl implements MemberService {
 			
 			//업로드 할 파일의 경로를 생성
 			String uuid = UUID.randomUUID().toString(); //파일 이름의 중복을 피하기 위해서 생성
-			String saveName = uploadPath + File.separator + 
-					realUploadPath + File.separator + uuid + fileName;
+			String saveName = uploadPath + File.separator + realUploadPath + File.separator + uuid + fileName;
 			Path savePath = Paths.get(saveName);
 			try {
 				//파일 업로드
@@ -96,7 +95,7 @@ public class MemberServiceImpl implements MemberService {
 				System.out.println(e.getLocalizedMessage());
 			}
 			//이미지 경로를 DTO에 설정
-			dto.setImageurl(realUploadPath + File.separator + uuid + fileName);
+			dto.setImageurl(realUploadPath + "/" + uuid + fileName);
 		}
 		member = dtoToEntity(dto);
 		memberRepository.save(member);
@@ -117,13 +116,8 @@ public class MemberServiceImpl implements MemberService {
 				ZonedDateTime nowUTC = ZonedDateTime.now(ZoneId.of("UTC"));
 				LocalDateTime now = nowUTC.withZoneSameInstant(
 						ZoneId.of("Asia/Seoul")).toLocalDateTime();
-				Member updateMember = Member.builder()
-						.email(member.getEmail())
-						.password(member.getPassword())
-						.imageurl(member.getImageurl())
-						.name(member.getName())
-						.lastlogindate(now)
-						.build();
+				Member updateMember = Member.builder().email(member.getEmail()).password(member.getPassword()).imageurl(member.getImageurl())
+						.name(member.getName()).lastlogindate(now).build();
 				memberRepository.save(updateMember);
 				
 				return entityToDto(member);
@@ -171,8 +165,7 @@ public class MemberServiceImpl implements MemberService {
 			
 			//업로드 할 파일의 경로를 생성
 			String uuid = UUID.randomUUID().toString(); //파일 이름의 중복을 피하기 위해서 생성
-			String saveName = uploadPath + File.separator + 
-					realUploadPath + File.separator + uuid + fileName;
+			String saveName = uploadPath + File.separator + realUploadPath + File.separator + uuid + fileName;
 			Path savePath = Paths.get(saveName);
 			try {
 				//파일 업로드
@@ -181,7 +174,7 @@ public class MemberServiceImpl implements MemberService {
 				System.out.println(e.getLocalizedMessage());
 			}
 			//이미지 경로를 DTO에 설정
-			dto.setImageurl(realUploadPath + File.separator + uuid + fileName);
+			dto.setImageurl(realUploadPath + "/" + uuid + fileName);
 		}else {
 			//전송된 이미지가 없다면 이전 이미지 사용
 			dto.setImageurl(getMember(dto).getImageurl());
