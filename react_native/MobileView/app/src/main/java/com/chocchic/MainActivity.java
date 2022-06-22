@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     //ListView에 데이터를 공급해줄 Adapter
     private ItemAdapter itemAdapter;
 
+    // 가장하단에서 스크롤했는지 여부를 저장하기 위한 변수
+    private Boolean lastitemVisibleFlag = false;
 
     //Looper는 메시지 시스템
     //메인 스레드에게 요청을 전송하는 핸들러
@@ -283,7 +286,32 @@ public class MainActivity extends AppCompatActivity {
         //뷰 찾아오기
         listView = (ListView)findViewById(R.id.listview);
         downloadview = (ProgressBar)findViewById(R.id.downloadview);
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            // i는 현재 스크롤 상태
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+                if(i == AbsListView.OnScrollListener.SCROLL_STATE_IDLE && lastitemVisibleFlag){
+                    // 다음 페이지의 데이터 가져오기
+                    // page번호를 1 증가시켜서 다음 페이지의 데이터를 요청
+                    if(page >= totalPage){
+                        Toast.makeText(MainActivity.this,"더 이상의 데이터가 없습니다.", Toast.LENGTH_LONG).show();
+                    }else{
+                        page = page +1;
+                        downloadview.setVisibility(View.VISIBLE);
+                    }
 
+                }
+            }
+
+            @Override
+            // i는 가장 처음에 보이는 데이터의 인덱스
+            // i1은 한 페이지에 보여줄 데이터 개수
+            // i2는 출력되어야 할 전체 데이터의 개수
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                // 마지막 부분에서 스크롤했는지 여부를 설정
+                lastitemVisibleFlag = i2 > 2 && i+i1 >=i2;
+            }
+        });
         //기본 출력을 위한 Adapter 생성 과 설정
         itemAdapter = new ItemAdapter(this, list, R.layout.item_cell);
         listView.setAdapter(itemAdapter);
