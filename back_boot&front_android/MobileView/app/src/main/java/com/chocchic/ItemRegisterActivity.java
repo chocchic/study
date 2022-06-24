@@ -9,5 +9,8 @@ public class ItemRegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_register);
+
+        setContentView(R.layout.activity_item_register);
+        this.setTitle("아이템 추가");
     }
 }

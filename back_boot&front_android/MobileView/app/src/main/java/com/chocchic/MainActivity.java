@@ -1,5 +1,4 @@
 package com.chocchic;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -280,12 +279,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //액티비티가 최상단에 보여질 때 마다 호출되는 메서드
+    //onCreate 다음에 호출되는 메서드
+    @Override
+    public void onResume(){
+        super.onResume();
+        //로그인 여부를 확인해서 로그인 버튼의 텍스트를 수정
+        try{
+            FileInputStream fis = openFileInput("login.txt");
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            String loginText = new String(data);
+            Log.e("로그인 정보", loginText);
+
+            loginbtn.setText("로그아웃");
+        }catch(Exception e){
+            loginbtn.setText("로그인");
+        }
+    }
+
     @Override
     //Activity가 만들어지면 호출되는 메서드
     //화면을 초기화하고 설정하는 작업을 수행
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.e("create", "나는 create");
         //페이지 번호 와 한 페이지에 보여질 데이터 개수 초기화
         page=1;
         size=15;
@@ -487,7 +506,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 }else{
-
+                    //로그인 정보가 있는 파일을 삭제
+                    deleteFile("login.txt");
                     loginbtn.setText("로그인");
                 }
             }
@@ -507,9 +527,20 @@ public class MainActivity extends AppCompatActivity {
         itemregisterbtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent intent = new Intent(
-                        MainActivity.this, ItemRegisterActivity.class);
-                startActivity(intent);
+                try{
+                    FileInputStream fis = openFileInput("login.txt");
+                    byte[] data = new byte[fis.available()];
+                    fis.read(data);
+
+                    Intent intent = new Intent(
+                            MainActivity.this, ItemRegisterActivity.class);
+                    startActivity(intent);
+                }catch(Exception e){
+                    Intent intent = new Intent(
+                            MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+
             }
         });
     }
